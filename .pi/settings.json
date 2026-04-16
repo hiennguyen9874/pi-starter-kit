@@ -1,0 +1,21 @@
+{
+  "packages": [
+    "npm:pi-powerline-footer",
+    "npm:pi-web-access",
+    "npm:pi-mcp-adapter",
+    "npm:@tintinweb/pi-subagents",
+    "npm:pi-ask-user",
+    "npm:pi-rtk-optimizer",
+    "npm:@tmustier/pi-usage-extension",
+    "npm:pi-command-history",
+    "git:github.com/MasuRii/pi-tool-display",
+    "git:github.com/davebcn87/pi-autoresearch"
+  ],
+  "extensions": [
+    "./extensions/permission-gate.ts",
+    "./extensions/protected-paths.ts",
+    "./extensions/confirm-destructive.ts",
+    "./extensions/dirty-repo-guard.ts",
+    "./extensions/inline-bash.ts"
+  ]
+}
