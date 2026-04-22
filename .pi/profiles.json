@@ -4,6 +4,7 @@
     "backend": {
       "skillsEnable": [
         "brainstorming",
+        "grill-me",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -35,6 +36,7 @@
     "frontend": {
       "skillsEnable": [
         "brainstorming",
+        "grill-me",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -68,6 +70,7 @@
     "devops":{
       "skillsEnable": [
         "brainstorming",
+        "grill-me",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -93,6 +96,7 @@
     "agentic": {
       "skillsEnable": [
         "brainstorming",
+        "grill-me",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -118,6 +122,7 @@
     "documenter": {
       "skillsEnable": [
         "brainstorming",
+        "grill-me",
         "context7-cli",
         "git-commit",
         "using-superpowers",
