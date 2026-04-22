@@ -155,6 +155,9 @@ Example:
 What branch am I on? !{git branch --show-current}
 ```
 
+### `.pi/extensions/caveman.ts`
+Adds `/caveman` commands to switch compression modes (lite, full, ultra, wenyan variants, commit, review, compress). It activates on session start with a configurable default, injects per-turn system prompt rules for persistent behavior, and shows the active mode in the status line.
+
 ### `.pi/extensions/profile/`
 This folder contains profile support code such as config loading, policy evaluation, discovery helpers, and profile syncing. It supports the profile-based filtering defined in `.pi/profiles.json`.
 
@@ -197,6 +200,7 @@ These shape how work gets done:
 
 - `using-superpowers`
 - `brainstorming`
+- `grill-me`
 - `writing-plans`
 - `executing-plans`
 - `verification-before-completion`
@@ -247,6 +251,15 @@ Examples:
 - `skill-creator`
 - `subagent-driven-development`
 - `writing-skills`
+
+### Caveman and compression skills
+These provide ultra-compressed communication modes and utilities:
+
+- `caveman`
+- `caveman-commit`
+- `caveman-help`
+- `caveman-review`
+- `compress`
 
 ### Product and documentation skills
 Examples:
