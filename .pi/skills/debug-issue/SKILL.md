@@ -9,11 +9,11 @@ Use the knowledge graph to systematically trace and debug issues.
 
 ### Steps
 
-1. Use `code_review_graph_semantic_search_nodes` to find code related to the issue.
-2. Use `code_review_graph_query_graph` with `callers_of` and `callees_of` to trace call chains.
-3. Use `code_review_graph_get_flow` to see full execution paths through suspected areas.
-4. Run `code_review_graph_detect_changes` to check if recent changes caused the issue.
-5. Use `code_review_graph_get_impact_radius` on suspected files to see what else is affected.
+1. Use `code_review_graph_semantic_search_nodes_tool` to find code related to the issue.
+2. Use `code_review_graph_query_graph_tool` with `callers_of` and `callees_of` to trace call chains.
+3. Use `code_review_graph_get_flow_tool` to see full execution paths through suspected areas.
+4. Run `code_review_graph_detect_changes_tool` to check if recent changes caused the issue.
+5. Use `code_review_graph_get_impact_radius_tool` on suspected files to see what else is affected.
 
 ### Tips
 
@@ -22,6 +22,6 @@ Use the knowledge graph to systematically trace and debug issues.
 - Recent changes are the most common source of new issues.
 
 ## Token Efficiency Rules
-- ALWAYS start with `code_review_graph_get_minimal_context(task="<your task>")` before any other graph tool.
+- ALWAYS start with `code_review_graph_get_minimal_context_tool(task="<your task>")` before any other graph tool.
 - Use `detail_level="minimal"` on all calls. Only escalate to "standard" when minimal is insufficient.
 - Target: complete any review/debug/refactor task in ≤5 tool calls and ≤800 total output tokens.
