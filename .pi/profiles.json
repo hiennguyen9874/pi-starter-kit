@@ -36,6 +36,7 @@
         "postgres-patterns",
         "api-design"
       ],
+      "mcpServersEnable": ["code-review-graph"],
       "mcpServersDisable": ["chrome-devtools"]
     },
     "frontend": {
@@ -75,7 +76,7 @@
         "shadcn-best-practices",
         "coding-standards"
       ],
-      "mcpServersEnable": ["chrome-devtools"]
+      "mcpServersEnable": ["chrome-devtools", "code-review-graph"]
     },
     "devops":{
       "skillsEnable": [
