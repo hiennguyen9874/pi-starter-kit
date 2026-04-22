@@ -16,7 +16,8 @@
     "./extensions/protected-paths.ts",
     "./extensions/confirm-destructive.ts",
     "./extensions/dirty-repo-guard.ts",
-    "./extensions/inline-bash.ts"
+    "./extensions/inline-bash.ts",
+    "./extensions/caveman.ts"
   ],
   "skills": [
     "-skills/api-design",
