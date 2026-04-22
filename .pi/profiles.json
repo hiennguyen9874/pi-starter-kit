@@ -34,7 +34,11 @@
         "golang-testing",
         "go-api-project-structure",
         "postgres-patterns",
-        "api-design"
+        "api-design",
+        "debug-issue",
+        "explore-codebase",
+        "refactor-safely",
+        "review-changes"
       ],
       "mcpServersEnable": ["code-review-graph"],
       "mcpServersDisable": ["chrome-devtools"]
@@ -74,7 +78,11 @@
         "vercel-composition-patterns",
         "web-design-guidelines",
         "shadcn-best-practices",
-        "coding-standards"
+        "coding-standards",
+        "debug-issue",
+        "explore-codebase",
+        "refactor-safely",
+        "review-changes"
       ],
       "mcpServersEnable": ["chrome-devtools", "code-review-graph"]
     },
