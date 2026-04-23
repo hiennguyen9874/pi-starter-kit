@@ -17,6 +17,26 @@ The root of the setup lives in `.pi/`:
 
 There is also an `AGENTS.md` file at the repo root that sets working rules for coding agents, especially around simplicity, surgical edits, and explicit planning.
 
+## Install
+
+### Context Mode
+
+```bash
+cd .pi/extensions
+git clone https://github.com/mksglu/context-mode.git
+cd context-mode
+npm run build
+npm install
+```
+
+### RTK
+
+- [https://github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk)
+
+### Web Access Token
+
+- [pi-web-access](https://github.com/nicobailon/pi-web-access)
+
 ## How profile-based setup works
 
 `pi/profiles.json` defines the available profiles and sets `backend` as the default.
@@ -32,6 +52,7 @@ The profile system is backed by code in `.pi/extensions/profile/`, which loads p
 ## Available profiles
 
 ### `backend` (default)
+
 Best for server-side and API work.
 
 Includes skills for:
@@ -46,6 +67,7 @@ Disables:
 - `chrome-devtools`
 
 ### `frontend`
+
 Best for UI and browser-facing work.
 
 Includes skills for:
@@ -60,6 +82,7 @@ Enables:
 - `chrome-devtools`
 
 ### `devops`
+
 Best for release and infrastructure-oriented work.
 
 Includes skills for:
@@ -73,6 +96,7 @@ Disables:
 - `chrome-devtools`
 
 ### `agentic`
+
 Best for agent authoring and agent-heavy workflows.
 
 Includes skills for:
@@ -86,6 +110,7 @@ Disables:
 - `chrome-devtools`
 
 ### `documenter`
+
 Best for writing docs, prompts, and specifications.
 
 Includes skills for:
@@ -121,6 +146,7 @@ In practice, this gives the workspace support for web access, MCP integration, s
 The active custom extensions listed in `.pi/settings.json` are:
 
 ### `.pi/extensions/permission-gate.ts`
+
 Prompts before dangerous `bash` commands such as:
 
 - `rm -rf`
@@ -130,6 +156,7 @@ Prompts before dangerous `bash` commands such as:
 In non-interactive mode, dangerous commands are blocked.
 
 ### `.pi/extensions/protected-paths.ts`
+
 Blocks `write` and `edit` operations on protected paths such as:
 
 - `.env`
@@ -137,6 +164,7 @@ Blocks `write` and `edit` operations on protected paths such as:
 - `node_modules/`
 
 ### `.pi/extensions/confirm-destructive.ts`
+
 Adds confirmation prompts before destructive session actions, including:
 
 - clearing the current session
@@ -144,9 +172,11 @@ Adds confirmation prompts before destructive session actions, including:
 - forking from a prior entry
 
 ### `.pi/extensions/dirty-repo-guard.ts`
+
 Checks `git status --porcelain` before session switching or forking and warns when the repo has uncommitted changes.
 
 ### `.pi/extensions/inline-bash.ts`
+
 Expands inline shell snippets written as `!{command}` directly inside a prompt before the prompt reaches the agent.
 
 Example:
@@ -156,9 +186,11 @@ What branch am I on? !{git branch --show-current}
 ```
 
 ### `.pi/extensions/caveman.ts`
+
 Adds `/caveman` commands to switch compression modes (lite, full, ultra, wenyan variants, commit, review, compress). It activates on session start with a configurable default, injects per-turn system prompt rules for persistent behavior, and shows the active mode in the status line.
 
 ### `.pi/extensions/profile/`
+
 This folder contains profile support code such as config loading, policy evaluation, discovery helpers, and profile syncing. It supports the profile-based filtering defined in `.pi/profiles.json`.
 
 ## Custom agents
@@ -166,6 +198,7 @@ This folder contains profile support code such as config loading, policy evaluat
 The repository defines three agents in `.pi/agents/`:
 
 ### `general-purpose`
+
 A broad agent for complex, multi-step work.
 
 - display name: `Agent`
@@ -173,6 +206,7 @@ A broad agent for complex, multi-step work.
 - prompt mode: `append`
 
 ### `explore`
+
 A fast, read-only exploration agent for understanding a codebase.
 
 - display name: `Explore`
@@ -183,6 +217,7 @@ A fast, read-only exploration agent for understanding a codebase.
 This agent is explicitly read-only and is instructed not to modify files or run state-changing commands.
 
 ### `code-reviewer`
+
 A background-capable review agent for validating completed work against plans and coding standards.
 
 - display name: `Code Reviewer`
@@ -196,6 +231,7 @@ A background-capable review agent for validating completed work against plans an
 The `.pi/skills/` directory contains a large local skill library. Instead of documenting every skill in detail here, it is easiest to think of them in groups:
 
 ### Core workflow skills
+
 These shape how work gets done:
 
 - `using-superpowers`
@@ -213,6 +249,7 @@ These shape how work gets done:
 - `prompt-leverage`
 
 ### Backend and API skills
+
 Examples:
 
 - `backend-patterns`
@@ -225,6 +262,7 @@ Examples:
 - `golang-testing`
 
 ### Frontend and UI skills
+
 Examples:
 
 - `frontend-design`
@@ -239,12 +277,14 @@ Examples:
 - `coding-standards`
 
 ### DevOps and release skills
+
 Examples:
 
 - `docker-patterns`
 - `release-drafter`
 
 ### Agent-building skills
+
 Examples:
 
 - `agent-md-refactor`
@@ -253,6 +293,7 @@ Examples:
 - `writing-skills`
 
 ### Caveman and compression skills
+
 These provide ultra-compressed communication modes and utilities:
 
 - `caveman`
@@ -262,6 +303,7 @@ These provide ultra-compressed communication modes and utilities:
 - `compress`
 
 ### Product and documentation skills
+
 Examples:
 
 - `prd`
@@ -273,6 +315,7 @@ Profile selection determines which of these are active for a given session.
 The `.pi/prompts/` folder currently contains two reusable prompts:
 
 ### `.pi/prompts/review-implemented-plan.md`
+
 A review workflow prompt that asks Pi to:
 
 - read the relevant design and plan files
@@ -281,6 +324,7 @@ A review workflow prompt that asks Pi to:
 - save the review output under `docs/plans/...-review.md`
 
 ### `.pi/prompts/fix-issues-review.md`
+
 A follow-up workflow prompt that asks Pi to:
 
 - read a review report and plan file

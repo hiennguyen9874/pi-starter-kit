@@ -1,3 +1,10 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "context-mode": {
+      "command": "node",
+      "args": [
+        "./.pi/extensions/context-mode/start.mjs"
+      ]
+    }
+  }
 }

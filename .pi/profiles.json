@@ -36,6 +36,7 @@
         "postgres-patterns",
         "api-design"
       ],
+      "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
     },
     "frontend": {
@@ -75,7 +76,7 @@
         "shadcn-best-practices",
         "coding-standards"
       ],
-      "mcpServersEnable": ["chrome-devtools"]
+      "mcpServersEnable": ["chrome-devtools", "context-mode"]
     },
     "devops":{
       "skillsEnable": [
@@ -106,6 +107,7 @@
         "docker-patterns",
         "release-drafter"
       ],
+      "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
     },
     "agentic": {
@@ -137,6 +139,7 @@
         "agent-md-refactor",
         "skill-creator"
       ],
+      "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
     },
     "documenter": {
@@ -158,6 +161,7 @@
         "pragmatic-principles",
         "prd"
       ],
+      "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
     }
   }

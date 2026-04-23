@@ -17,7 +17,8 @@
     "./extensions/confirm-destructive.ts",
     "./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
-    "./extensions/caveman.ts"
+    "./extensions/caveman.ts",
+    "./extensions/context-mode/.pi/extensions/context-mode"
   ],
   "skills": [
     "-skills/api-design",
