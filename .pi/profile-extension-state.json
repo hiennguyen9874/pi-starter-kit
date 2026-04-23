@@ -2,7 +2,12 @@
   "managedSkillEntries": [
     "-skills/api-design",
     "-skills/backend-patterns",
+    "-skills/caveman",
+    "-skills/caveman-commit",
+    "-skills/caveman-help",
+    "-skills/caveman-review",
     "-skills/coding-standards",
+    "-skills/compress",
     "-skills/database-migrations",
     "-skills/docker-patterns",
     "-skills/frontend-design",
@@ -35,7 +40,8 @@
         "command": "node",
         "args": [
           "./.pi/extensions/context-mode/start.mjs"
-        ]
+        ],
+        "lifecycle": "keep-alive"
       }
     }
   }

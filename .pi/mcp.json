@@ -4,7 +4,8 @@
       "command": "node",
       "args": [
         "./.pi/extensions/context-mode/start.mjs"
-      ]
+      ],
+      "lifecycle": "keep-alive"
     }
   }
 }

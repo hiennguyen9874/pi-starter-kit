@@ -1,9 +1,9 @@
 {
   "packages": [
     "npm:pi-powerline-footer",
-    "npm:pi-web-access",
+    "-npm:pi-web-access",
     "npm:pi-mcp-adapter",
-    "npm:@tintinweb/pi-subagents",
+    "-npm:@tintinweb/pi-subagents",
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
     "npm:@tmustier/pi-usage-extension",
@@ -23,7 +23,12 @@
   "skills": [
     "-skills/api-design",
     "-skills/backend-patterns",
+    "-skills/caveman",
+    "-skills/caveman-commit",
+    "-skills/caveman-help",
+    "-skills/caveman-review",
     "-skills/coding-standards",
+    "-skills/compress",
     "-skills/database-migrations",
     "-skills/docker-patterns",
     "-skills/frontend-design",
