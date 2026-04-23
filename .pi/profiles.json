@@ -1,5 +1,5 @@
 {
-  "defaultProfile": "backend",
+  "defaultProfile": "base",
   "profiles": {
     "base": {
       "skillsEnable": [
