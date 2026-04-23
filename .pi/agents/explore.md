@@ -1,9 +1,9 @@
 ---
+name: Explore
 description: Fast codebase exploration agent (read-only)
-display_name: Explore
 tools: read, bash, grep, find, ls
 model: anthropic/claude-haiku-4-5-20251001
-prompt_mode: replace
+systemPromptMode: replace
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS
