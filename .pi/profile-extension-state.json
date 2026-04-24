@@ -1,9 +1,7 @@
 {
   "managedSkillEntries": [
-    "-skills/agent-md-refactor",
     "-skills/api-design",
     "-skills/backend-patterns",
-    "-skills/brainstorming",
     "-skills/caveman",
     "-skills/caveman-commit",
     "-skills/caveman-help",
@@ -20,7 +18,6 @@
     "-skills/frontend-design",
     "-skills/frontend-development",
     "-skills/frontend-skill",
-    "-skills/git-commit",
     "-skills/go-api-project-structure",
     "-skills/golang-patterns",
     "-skills/golang-pro",
@@ -33,7 +30,6 @@
     "-skills/release-drafter",
     "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/skill-creator",
     "-skills/subagent-driven-development",
     "-skills/systematic-debugging",
     "-skills/test-driven-development",
@@ -43,8 +39,7 @@
     "-skills/vercel-composition-patterns",
     "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans",
-    "-skills/writing-skills"
+    "-skills/writing-plans"
   ],
   "mcpBaseline": {
     "mcpServers": {

@@ -1,16 +1,17 @@
 {
   "packages": [
     "npm:pi-powerline-footer",
-    "-npm:pi-web-access",
-    "npm:pi-mcp-adapter",
-    "npm:pi-subagents",
-    "npm:pi-prompt-template-model",
-    "npm:pi-ask-user",
-    "npm:pi-rtk-optimizer",
     "npm:@tmustier/pi-usage-extension",
     "npm:pi-command-history",
     "git:github.com/MasuRii/pi-tool-display",
-    "git:github.com/davebcn87/pi-autoresearch"
+    "npm:pi-mcp-adapter",
+    "npm:pi-prompt-template-model",
+    "npm:pi-subagents",
+    "npm:pi-intercom",
+    "npm:pi-ask-user",
+    "npm:pi-rtk-optimizer",
+    "-npm:pi-web-access",
+    "-git:github.com/davebcn87/pi-autoresearch"
   ],
   "extensions": [
     "./extensions/permission-gate.ts",
@@ -21,11 +22,43 @@
     "./extensions/caveman.ts",
     "./extensions/context-mode/.pi/extensions/context-mode"
   ],
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "openai-codex/gpt-5.4-mini",
+        "thinking": "high"
+      },
+      "planner": {
+        "model": "openai-codex/gpt-5.5"
+      },
+      "worker": {
+        "model": "openai-codex/gpt-5.3-codex",
+        "thinking": "medium"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-5.5",
+        "thinking": "high"
+      },
+      "context-builder": {
+        "model": "openai-codex/gpt-5.5"
+      },
+      "researcher": {
+        "model": "openai-codex/gpt-5.5"
+      },
+      "delegate": {
+        "model": "openai-codex/gpt-5.5"
+      },
+      "oracle": {
+        "model": "openai-codex/gpt-5.5"
+      },
+      "oracle-executor": {
+        "model": "openai-codex/gpt-5.5"
+      }
+    }
+  },
   "skills": [
-    "-skills/agent-md-refactor",
     "-skills/api-design",
     "-skills/backend-patterns",
-    "-skills/brainstorming",
     "-skills/caveman",
     "-skills/caveman-commit",
     "-skills/caveman-help",
@@ -42,7 +75,6 @@
     "-skills/frontend-design",
     "-skills/frontend-development",
     "-skills/frontend-skill",
-    "-skills/git-commit",
     "-skills/go-api-project-structure",
     "-skills/golang-patterns",
     "-skills/golang-pro",
@@ -55,7 +87,6 @@
     "-skills/release-drafter",
     "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/skill-creator",
     "-skills/subagent-driven-development",
     "-skills/systematic-debugging",
     "-skills/test-driven-development",
@@ -65,7 +96,6 @@
     "-skills/vercel-composition-patterns",
     "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans",
-    "-skills/writing-skills"
+    "-skills/writing-plans"
   ]
 }
