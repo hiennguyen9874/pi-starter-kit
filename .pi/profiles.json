@@ -4,7 +4,13 @@
     "base": {
       "skillsEnable": [
         "grill-me",
-        "prompt-leverage"
+        "brainstorming",
+        "systematic-debugging",
+        "test-driven-development",
+        "writing-plans",
+        "executing-plans",
+        "code-reviewer",
+        "pragmatic-principles"
       ],
       "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
