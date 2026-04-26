@@ -10,7 +10,8 @@
         "writing-plans",
         "executing-plans",
         "code-reviewer",
-        "pragmatic-principles"
+        "pragmatic-principles",
+        "improve-codebase-architecture"
       ],
       "mcpServersEnable": ["context-mode"],
       "mcpServersDisable": ["chrome-devtools"]
@@ -36,6 +37,7 @@
         "executing-plans",
         "code-reviewer",
         "pragmatic-principles",
+        "improve-codebase-architecture",
         "backend-patterns",
         "database-migrations",
         "golang-patterns",
@@ -69,6 +71,7 @@
         "executing-plans",
         "code-reviewer",
         "pragmatic-principles",
+        "improve-codebase-architecture",
         "frontend-design",
         "frontend-development",
         "frontend-skill",
@@ -103,6 +106,7 @@
         "executing-plans",
         "code-reviewer",
         "pragmatic-principles",
+        "improve-codebase-architecture",
         "docker-patterns",
         "release-drafter"
       ],
@@ -134,6 +138,7 @@
         "prompt-leverage",
         "code-reviewer",
         "pragmatic-principles",
+        "improve-codebase-architecture",
         "prd"
       ],
       "mcpServersEnable": ["context-mode"],
