@@ -4,6 +4,7 @@
     "base": {
       "skillsEnable": [
         "grill-me",
+        "bootstrap-project-context",
         "brainstorming",
         "systematic-debugging",
         "test-driven-development",
@@ -20,6 +21,7 @@
       "skillsEnable": [
         "brainstorming",
         "grill-me",
+        "bootstrap-project-context",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -54,6 +56,7 @@
       "skillsEnable": [
         "brainstorming",
         "grill-me",
+        "bootstrap-project-context",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -89,6 +92,7 @@
       "skillsEnable": [
         "brainstorming",
         "grill-me",
+        "bootstrap-project-context",
         "context7-cli",
         "dispatching-parallel-agents",
         "finishing-a-development-branch",
@@ -117,6 +121,7 @@
       "skillsEnable": [
         "brainstorming",
         "grill-me",
+        "bootstrap-project-context",
         "git-commit",
         "writing-skills",
         "prompt-leverage",
@@ -130,6 +135,7 @@
       "skillsEnable": [
         "brainstorming",
         "grill-me",
+        "bootstrap-project-context",
         "context7-cli",
         "git-commit",
         "using-superpowers",
