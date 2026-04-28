@@ -3,11 +3,6 @@
   "profiles": {
     "base": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "code-reviewer",
         "context7-cli",
@@ -27,11 +22,6 @@
     },
     "superpowers": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "code-reviewer",
         "context7-cli",
@@ -62,11 +52,6 @@
     },
     "backend": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "code-reviewer",
         "context7-cli",
@@ -105,11 +90,6 @@
     },
     "frontend": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "code-reviewer",
         "context7-cli",
@@ -148,11 +128,6 @@
     },
     "devops": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "code-reviewer",
         "context7-cli",
@@ -208,11 +183,6 @@
     },
     "documenter": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
         "context7-cli",
         "git-commit",
