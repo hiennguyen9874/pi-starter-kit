@@ -158,6 +158,42 @@ export function validateProfileReferences(
   return [...new Set(warnings)];
 }
 
+function formatList(values: string[] | undefined, emptyText = "none"): string {
+  return values?.length ? values.join(", ") : emptyText;
+}
+
+export function buildProfileExplanation(input: {
+  activeProfileName?: string;
+  activeProfile?: ProfileDefinition;
+  knownSkills: string[];
+  knownMcpServers: string[];
+  resourcesRequireReload: boolean;
+}): string {
+  if (!input.activeProfileName || !input.activeProfile) {
+    return "No active profile.";
+  }
+
+  const warnings = validateProfileReferences(input.activeProfile, input.knownSkills, input.knownMcpServers);
+  const lines = [
+    `Active profile: ${input.activeProfileName}`,
+    `Skills enabled: ${formatList(input.activeProfile.skillsEnable, "all unless disabled")}`,
+    `Skills disabled: ${formatList(input.activeProfile.skillsDisable)}`,
+    `MCP servers enabled: ${formatList(input.activeProfile.mcpServersEnable, "all unless disabled")}`,
+    `MCP servers disabled: ${formatList(input.activeProfile.mcpServersDisable)}`,
+    "Rule: disable wins; non-empty enable list allow-lists; * means all.",
+  ];
+
+  if (input.resourcesRequireReload) {
+    lines.push("Reload needed: startup resource filters changed. Run /reload.");
+  }
+
+  if (warnings.length > 0) {
+    lines.push(`Warnings: ${warnings.join("; ")}`);
+  }
+
+  return lines.join("\n");
+}
+
 function getDisallowedServers(profile?: ProfileDefinition): string[] {
   return (profile?.mcpServersDisable ?? []).filter((server) => server !== PROFILE_WILDCARD);
 }
@@ -274,6 +310,20 @@ export default function profileExtension(pi: ExtensionAPI): void {
       }
 
       if (input) {
+        if (input === "explain") {
+          ctx.ui.notify(
+            buildProfileExplanation({
+              activeProfileName: state.activeProfileName,
+              activeProfile: state.activeProfile,
+              knownSkills: state.knownSkills,
+              knownMcpServers: state.knownMcpServers,
+              resourcesRequireReload: state.resourcesRequireReload,
+            }),
+            "info",
+          );
+          return;
+        }
+
         if (!state.profiles[input]) {
           ctx.ui.notify(`Unknown profile "${input}". Available: ${profileNames.join(", ")}`, "error");
           return;

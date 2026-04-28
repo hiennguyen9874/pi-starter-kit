@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import profileExtension, { resolveSelectedProfile } from "./index.ts";
+import profileExtension, { buildProfileExplanation, resolveSelectedProfile } from "./index.ts";
 
 test("CLI flag profile wins over persisted, restored, and default profile", () => {
   const result = resolveSelectedProfile({
@@ -194,6 +194,96 @@ test("session_start does not warn when skill commands are not discovered yet", a
   await handlers.session_start?.({ reason: "startup" }, ctx);
 
   assert.equal(notifications.some((message) => message.includes("Unknown skill:")), false);
+});
+
+test("buildProfileExplanation describes active profile restrictions", () => {
+  const explanation = buildProfileExplanation({
+    activeProfileName: "frontend",
+    activeProfile: {
+      skillsEnable: ["frontend-design"],
+      mcpServersEnable: ["chrome-devtools"],
+      mcpServersDisable: ["memory"],
+    },
+    knownSkills: ["frontend-design"],
+    knownMcpServers: ["chrome-devtools", "memory"],
+    resourcesRequireReload: true,
+  });
+
+  assert.match(explanation, /Active profile: frontend/);
+  assert.match(explanation, /Skills enabled: frontend-design/);
+  assert.match(explanation, /MCP servers enabled: chrome-devtools/);
+  assert.match(explanation, /MCP servers disabled: memory/);
+  assert.match(explanation, /Reload needed/);
+});
+
+test("/profile explain reports current active profile without switching", async () => {
+  const root = mkdtempSync(join(tmpdir(), "pi-profile-explain-"));
+  mkdirSync(join(root, ".pi"));
+  writeFileSync(
+    join(root, ".pi", "profiles.json"),
+    JSON.stringify({
+      defaultProfile: "backend",
+      profiles: {
+        backend: { skillsEnable: ["backend-patterns"] },
+      },
+    }),
+  );
+  writeFileSync(join(root, ".pi", "mcp.json"), JSON.stringify({ mcpServers: {} }));
+
+  const handlers: Record<string, Function> = {};
+  const commands: Record<string, { handler: (args: string, ctx: any) => Promise<void> | void }> = {};
+  const notifications: string[] = [];
+  let reloadCalls = 0;
+
+  profileExtension({
+    registerFlag() {},
+    registerCommand(name: string, options: { handler: (args: string, ctx: any) => Promise<void> | void }) {
+      commands[name] = options;
+    },
+    on(event: string, handler: Function) {
+      handlers[event] = handler;
+    },
+    appendEntry() {},
+    getFlag() {
+      return undefined;
+    },
+    getCommands() {
+      return [{ name: "backend-patterns", source: "skill" }];
+    },
+    getAllTools() {
+      return [];
+    },
+  } as any);
+
+  const ctx = {
+    cwd: root,
+    sessionManager: {
+      getEntries() {
+        return [];
+      },
+    },
+    async reload() {
+      reloadCalls += 1;
+    },
+    ui: {
+      notify(message: string) {
+        notifications.push(message);
+      },
+      setStatus() {},
+      theme: {
+        fg(_color: string, text: string) {
+          return text;
+        },
+      },
+    },
+  } as any;
+
+  await handlers.session_start?.({ reason: "startup" }, ctx);
+  await commands.profile.handler("explain", ctx);
+
+  assert.equal(reloadCalls, 0);
+  assert.equal(notifications.some((message) => message.includes("Active profile: backend")), true);
+  assert.equal(notifications.some((message) => message.includes("Skills enabled: backend-patterns")), true);
 });
 
 test("session_start prefers persisted profile state from disk", async () => {
