@@ -3,152 +3,229 @@
   "profiles": {
     "base": {
       "skillsEnable": [
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
-        "brainstorming",
-        "systematic-debugging",
-        "test-driven-development",
-        "writing-plans",
-        "executing-plans",
         "code-reviewer",
+        "context7-cli",
+        "git-commit",
+        "grill-me",
+        "improve-codebase-architecture",
         "pragmatic-principles",
-        "improve-codebase-architecture"
+        "prompt-leverage",
+        "systematic-debugging"
       ],
-      "mcpServersEnable": ["context-mode"],
-      "mcpServersDisable": ["chrome-devtools"]
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
+    },
+    "superpowers": {
+      "skillsEnable": [
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
+        "bootstrap-project-context",
+        "code-reviewer",
+        "context7-cli",
+        "git-commit",
+        "grill-me",
+        "improve-codebase-architecture",
+        "pragmatic-principles",
+        "prompt-leverage",
+        "systematic-debugging",
+        "brainstorming",
+        "dispatching-parallel-agents",
+        "executing-plans",
+        "finishing-a-development-branch",
+        "receiving-code-review",
+        "requesting-code-review",
+        "subagent-driven-development",
+        "test-driven-development",
+        "using-superpowers",
+        "verification-before-completion",
+        "writing-plans"
+      ],
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
     },
     "backend": {
       "skillsEnable": [
-        "brainstorming",
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
+        "code-reviewer",
         "context7-cli",
-        "dispatching-parallel-agents",
-        "finishing-a-development-branch",
         "git-commit",
-        "subagent-driven-development",
+        "grill-me",
+        "improve-codebase-architecture",
+        "pragmatic-principles",
+        "prompt-leverage",
         "systematic-debugging",
+        "brainstorming",
+        "dispatching-parallel-agents",
+        "executing-plans",
+        "finishing-a-development-branch",
+        "receiving-code-review",
+        "requesting-code-review",
+        "subagent-driven-development",
         "test-driven-development",
         "using-superpowers",
         "verification-before-completion",
-        "writing-skills",
         "writing-plans",
-        "requesting-code-review",
-        "receiving-code-review",
-        "prompt-leverage",
-        "executing-plans",
-        "code-reviewer",
-        "pragmatic-principles",
-        "improve-codebase-architecture",
+        "api-design",
         "backend-patterns",
         "database-migrations",
+        "go-api-project-structure",
         "golang-patterns",
         "golang-pro",
         "golang-testing",
-        "go-api-project-structure",
-        "postgres-patterns",
-        "api-design"
+        "postgres-patterns"
       ],
-      "mcpServersEnable": ["context-mode"],
-      "mcpServersDisable": ["chrome-devtools"]
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
     },
     "frontend": {
       "skillsEnable": [
-        "brainstorming",
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
+        "code-reviewer",
         "context7-cli",
-        "dispatching-parallel-agents",
-        "finishing-a-development-branch",
         "git-commit",
-        "subagent-driven-development",
+        "grill-me",
+        "improve-codebase-architecture",
+        "pragmatic-principles",
+        "prompt-leverage",
         "systematic-debugging",
+        "brainstorming",
+        "dispatching-parallel-agents",
+        "executing-plans",
+        "finishing-a-development-branch",
+        "receiving-code-review",
+        "requesting-code-review",
+        "subagent-driven-development",
         "test-driven-development",
         "using-superpowers",
         "verification-before-completion",
-        "writing-skills",
         "writing-plans",
-        "requesting-code-review",
-        "receiving-code-review",
-        "prompt-leverage",
-        "executing-plans",
-        "code-reviewer",
-        "pragmatic-principles",
-        "improve-codebase-architecture",
+        "coding-standards",
         "frontend-design",
         "frontend-development",
         "frontend-skill",
         "react-best-practices",
+        "shadcn-best-practices",
         "ui-styling",
         "ui-ux-pro-max",
         "vercel-composition-patterns",
-        "web-design-guidelines",
-        "shadcn-best-practices",
-        "coding-standards"
+        "web-design-guidelines"
       ],
-      "mcpServersEnable": ["chrome-devtools", "context-mode"]
+      "mcpServersEnable": [
+        "chrome-devtools",
+        "context-mode"
+      ]
     },
-    "devops":{
+    "devops": {
       "skillsEnable": [
-        "brainstorming",
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
+        "code-reviewer",
         "context7-cli",
-        "dispatching-parallel-agents",
-        "finishing-a-development-branch",
         "git-commit",
-        "subagent-driven-development",
+        "grill-me",
+        "improve-codebase-architecture",
+        "pragmatic-principles",
+        "prompt-leverage",
         "systematic-debugging",
+        "brainstorming",
+        "dispatching-parallel-agents",
+        "executing-plans",
+        "finishing-a-development-branch",
+        "receiving-code-review",
+        "requesting-code-review",
+        "subagent-driven-development",
         "test-driven-development",
         "using-superpowers",
         "verification-before-completion",
-        "writing-skills",
         "writing-plans",
-        "requesting-code-review",
-        "receiving-code-review",
-        "prompt-leverage",
-        "executing-plans",
-        "code-reviewer",
-        "pragmatic-principles",
-        "improve-codebase-architecture",
         "docker-patterns",
         "release-drafter"
       ],
-      "mcpServersEnable": ["context-mode"],
-      "mcpServersDisable": ["chrome-devtools"]
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
     },
     "agentic": {
       "skillsEnable": [
-        "brainstorming",
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
+        "code-reviewer",
+        "context7-cli",
         "git-commit",
-        "writing-skills",
+        "grill-me",
         "prompt-leverage",
-        "agent-md-refactor",
+        "writing-skills",
         "skill-creator"
       ],
-      "mcpServersEnable": ["context-mode"],
-      "mcpServersDisable": ["chrome-devtools"]
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
     },
     "documenter": {
       "skillsEnable": [
-        "brainstorming",
-        "grill-me",
+        "caveman",
+        "caveman-commit",
+        "caveman-help",
+        "caveman-review",
+        "compress",
         "bootstrap-project-context",
         "context7-cli",
         "git-commit",
-        "using-superpowers",
-        "writing-skills",
-        "writing-plans",
+        "grill-me",
         "prompt-leverage",
-        "code-reviewer",
-        "pragmatic-principles",
-        "improve-codebase-architecture",
         "prd"
       ],
-      "mcpServersEnable": ["context-mode"],
-      "mcpServersDisable": ["chrome-devtools"]
+      "mcpServersEnable": [
+        "context-mode"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools"
+      ]
     }
   }
 }
