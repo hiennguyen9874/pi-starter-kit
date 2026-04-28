@@ -1,6 +1,7 @@
 ---
 name: agent-md-refactor
 description: Use when creating or refactoring standard Markdown AGENTS.md, CLAUDE.md, COPILOT.md, or other agent instruction files; when root agent instructions are missing, bloated, contradictory, tool-private, generic, or need docs-only progressive disclosure under docs/agent-instructions/.
+disable-model-invocation: true
 ---
 
 # Agent MD Refactor

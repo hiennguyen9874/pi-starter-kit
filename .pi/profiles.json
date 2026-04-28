@@ -4,6 +4,8 @@
     "base": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -23,6 +25,8 @@
     "superpowers": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -53,6 +57,8 @@
     "backend": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -91,6 +97,8 @@
     "frontend": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -129,6 +137,8 @@
     "devops": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -166,6 +176,8 @@
         "caveman-review",
         "compress",
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -184,6 +196,8 @@
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "context7-cli",
         "git-commit",
         "grill-me",
