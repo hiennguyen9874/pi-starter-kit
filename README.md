@@ -42,15 +42,84 @@ Everything Pi-specific lives in `.pi/`:
 
 ### Prompt Templates
 
-Reusable prompt templates live in `.pi/prompts/`:
+Reusable prompt templates live in `.pi/prompts/`. Type `/name` in Pi to expand a template, where `name` is the filename without `.md`; pass task details after the command.
 
-- planning/design: `feature-design`, `write-implementation-plan`, `architecture-review`, `project-next-step`
-- implementation execution: `execute-plan-simple`, `execute-plan-with-subagents`, `fix-review-issues`
-- review/debug/verification: `review-code`, `debug-issue`, `verify-before-done`
-- agent-system work: `create-agent-workflow`, `improve-agent-system`, `improve-skill-system`, `refactor-agent-instructions`
-- git workflow: `commit-work`
+Example:
 
-Use them as starting points for repeatable task prompts; profiles decide which skills and MCP servers are available while those prompts run.
+```text
+/feature-design add profile import/export
+/review-code docs/plans/2026-04-29-profile-plan.md
+```
+
+Profiles decide which skills and MCP servers are available while those prompts run.
+
+Use these prompt groups when:
+
+#### Design and Discovery
+
+| Prompt | Use when |
+|---|---|
+| `/feature-design` | You want to design a feature or behavior change before implementation. |
+| `/architecture-review` | You want architecture feedback and pragmatic refactoring opportunities, not code changes. |
+| `/project-next-step` | You want repo analysis and the top 3-5 most valuable next steps, not implementation. |
+
+#### Plan
+
+| Prompt | Use when |
+|---|---|
+| `/write-implementation-plan` | You have an approved design and need a concrete implementation plan. |
+
+#### Implement
+
+| Prompt | Use when |
+|---|---|
+| `/execute-plan-simple` | You have a small implementation plan ready to execute directly. |
+| `/execute-plan-with-subagents` | You have a larger plan that should be implemented task-by-task with implementer and review subagents. |
+
+#### Review and Verify
+
+| Prompt | Use when |
+|---|---|
+| `/review-code` | You want a two-phase code review: spec alignment first, code quality second. |
+| `/verify-before-done` | You want changed work verified before claiming completion. |
+
+#### Fix Bugs and Review Issues
+
+| Prompt | Use when |
+|---|---|
+| `/debug-issue` | You have a bug, failing test, broken behavior, or performance regression to diagnose and fix. |
+| `/fix-review-issues` | You have a review report and want verified issues fixed with minimal changes. |
+
+#### Frontend Design and Audit
+
+| Prompt | Use when |
+|---|---|
+| `/frontend-design-direction` | You need visual direction for a page, app screen, dashboard, redesign, prototype, or polish pass. |
+| `/frontend-ui-audit` | You want UI, UX, accessibility, shadcn, or React frontend quality review without fixes. |
+
+#### Frontend Implement and Polish
+
+| Prompt | Use when |
+|---|---|
+| `/shadcn-ui-build` | You need shadcn/ui components, pages, forms, dialogs, tables, themes, or blocks built/fixed. |
+| `/frontend-polish-pass` | Existing UI works but needs better hierarchy, spacing, copy, motion, responsiveness, or finish. |
+| `/react-component-api-refactor` | React component APIs have boolean-prop growth or need cleaner composition. |
+| `/react-performance-pass` | React/Next.js UI is slow or has rerenders, hydration, bundle, data-fetching, or load-time issues. |
+
+#### Agent System
+
+| Prompt | Use when |
+|---|---|
+| `/create-agent-workflow` | You want a new reusable workflow prompt for a repeatable coding-agent task. |
+| `/improve-agent-system` | You want to improve the local agent, skill, and prompt system without invasive edits. |
+| `/improve-skill-system` | You want to improve, merge, split, or create skills. |
+| `/refactor-agent-instructions` | You want `AGENTS.md` or related agent instruction files made concise and shared via docs. |
+
+#### Git
+
+| Prompt | Use when |
+|---|---|
+| `/commit-work` | You want current verified changes staged and committed with a conventional commit. |
 
 ### Skill Catalog
 
