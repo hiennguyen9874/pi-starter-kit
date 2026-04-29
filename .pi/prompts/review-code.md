@@ -16,15 +16,16 @@ Task:
 1. Determine review scope.
 2. Read provided design, plan, selected phase, requirements, acceptance criteria, or task notes.
 3. If a plan folder is provided, read `design.md`, `plan.md`, and relevant `phase-x.md`; do not assume every phase was implemented.
-4. Inspect changed code or requested files.
-5. Dispatch two review subagents with same scope and source material:
+4. If reviewing plan structure, check phase count cap: small ≤3, medium ≤5, large ≤7.
+5. Inspect changed code or requested files.
+6. Dispatch two review subagents with same scope and source material:
    - `spec-reviewer`: Phase 1. Check whether code matches plan/spec and whether deviations are justified.
    - `code-quality-reviewer`: Phase 2. Check correctness, maintainability, architecture, tests, and pragmatic quality.
-6. Merge both reports into one review.
-7. De-duplicate findings. If both subagents report same issue, keep strongest severity and cite both angles if useful.
-8. Separate blocker fixes from optional improvements.
-9. Recommend minimal fixes only.
-10. Save review report if path is provided.
+7. Merge both reports into one review.
+8. De-duplicate findings. If both subagents report same issue, keep strongest severity and cite both angles if useful.
+9. Separate blocker fixes from optional improvements.
+10. Recommend minimal fixes only.
+11. Save review report if path is provided.
 
 Output path default:
 - If plan folder is `docs/plans/YYYY-MM-DD-<topic>/`, save to `docs/plans/YYYY-MM-DD-<topic>/review.md`.

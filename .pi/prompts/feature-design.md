@@ -11,14 +11,15 @@ You are designing a feature or behavior change.
 Task:
 1. Read project instructions and relevant source context.
 2. Understand the user request.
-3. Identify whether this is:
-   - small behavior change
-   - normal feature
+3. Identify feature size and risk:
+   - small feature: maximum 3 implementation phases
+   - medium feature: maximum 5 implementation phases
+   - large feature: maximum 7 implementation phases
    - architecture/API/schema/security-sensitive change
 4. Ask the user only if there is material ambiguity.
 5. Propose 2-3 approaches with trade-offs.
 6. Recommend one approach.
-7. Produce a design that can later be turned into an implementation plan folder.
+7. Produce a design that states feature size and can later be turned into an implementation plan folder.
 
 Do not implement code.
 

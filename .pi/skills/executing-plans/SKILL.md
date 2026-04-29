@@ -17,10 +17,11 @@ Load plan, review critically, execute one phase, report for review before contin
 
 ### Step 1: Load and Review Plan
 1. Read `design.md`, `plan.md`, and the selected `phase-x.md` if this is a plan folder
-2. If no phase is selected, choose the first incomplete phase and state the assumption
-3. Review critically - identify any questions or concerns about the phase
-4. If concerns: Raise them with your human partner before starting
-5. If no concerns: Create TodoWrite for this phase only and proceed
+2. Check phase count against declared/obvious size: small ≤3, medium ≤5, large ≤7
+3. If no phase is selected, choose the first incomplete phase and state the assumption
+4. Review critically - identify any questions or concerns about the phase
+5. If concerns: Raise them with your human partner before starting
+6. If no concerns: Create TodoWrite for this phase only and proceed
 
 ### Step 2: Execute Phase
 **Default: One phase only**
@@ -56,6 +57,7 @@ After all phases complete and verified:
 
 **STOP executing immediately when:**
 - Hit a blocker mid-phase (missing dependency, test fails, instruction unclear)
+- Plan exceeds phase count cap without explicit approval
 - Plan has critical gaps preventing starting
 - You don't understand an instruction
 - Verification fails repeatedly

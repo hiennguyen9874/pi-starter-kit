@@ -26,7 +26,7 @@ You MUST create a task for each of these items and complete them in order:
 1. **Explore project context** — check files, docs, recent commits
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present design** — in sections scaled to their complexity, get user approval after each section
+4. **Present design** — include feature size (small/medium/large) and get user approval after each section
 5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>/design.md` and commit
 6. **Transition to implementation** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
 
@@ -72,7 +72,8 @@ digraph brainstorming {
 - Once you believe you understand what you're building, present the design
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
-- Cover: architecture, components, data flow, error handling, testing
+- Cover: feature size, architecture, components, data flow, error handling, testing
+- Use size to constrain later planning: small ≤3 phases, medium ≤5, large ≤7
 - Be ready to go back and clarify if something doesn't make sense
 
 ## After the Design

@@ -25,11 +25,12 @@ Task:
    - linked phase list
    - any cross-phase notes or decision gates
 6. Split executable task details into `phase-x.md` files.
-7. Put 1-3 related tasks in each phase, grouped by cohesive area such as backend, frontend, database, docs, or verification.
-8. Preserve original intent, task order, file paths, commands, and acceptance criteria where valid.
-9. If old plan lacks enough detail to split safely, stop and ask one focused clarification question.
-10. Do not implement code.
-11. Do not delete old files unless explicitly requested.
+7. Apply phase count maximum by feature size: small ≤3, medium ≤5, large ≤7.
+8. Put 1-3 related tasks in each phase, grouped by cohesive area such as backend, frontend, database, docs, or verification.
+9. Preserve original intent, task order, file paths, commands, and acceptance criteria where valid.
+10. If old plan lacks enough detail to split safely, stop and ask one focused clarification question.
+11. Do not implement code.
+12. Do not delete old files unless explicitly requested.
 
 Output contract:
 - Create/update:
@@ -39,11 +40,13 @@ Output contract:
 - Report:
   - source files read
   - target folder
+  - inferred feature size and phase count cap used
   - phase list with 1-line scope per phase
   - any assumptions or unresolved gaps
 
 Verification:
 - Confirm `plan.md` links to every `phase-x.md` file.
+- Confirm phase count stays within cap: small ≤3, medium ≤5, large ≤7.
 - Confirm each phase has 1-3 related tasks.
 - Confirm task details are not duplicated wholesale in `plan.md`.
 - Confirm `design.md` exists.

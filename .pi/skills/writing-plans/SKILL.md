@@ -22,6 +22,13 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Bite-Sized Phase and Task Granularity
 
+**Phase count maximum by feature size:**
+- Small feature: maximum 3 phases
+- Medium feature: maximum 5 phases
+- Large feature: maximum 7 phases
+
+If the work appears to need more phases than the size allows, simplify scope or ask before writing the plan.
+
 **Each phase contains 1-3 related tasks.** Group tasks that belong together, such as backend API + backend tests, or frontend UI + frontend tests. Do not mix unrelated backend, frontend, infra, and docs work in one phase.
 
 **Each step is one action (2-5 minutes):**
@@ -119,6 +126,7 @@ Expected: PASS
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
+- Phase count stays within size cap: small ≤3, medium ≤5, large ≤7
 - Each phase has 1-3 related tasks
 - `plan.md` links to `phase-x.md`; task detail lives in phase files
 - Reference relevant skills with @ syntax

@@ -19,10 +19,11 @@ Task:
 5. Save/copy approved design as `design.md` if it is not already in the folder.
 6. Write `plan.md` with Plan Document Header and links to phase files.
 7. Write `phase-x.md` files with executable tasks.
-8. Put 1-3 related tasks in each phase, grouped by cohesive area such as backend or frontend.
-9. Add acceptance criteria and verification commands for each phase.
-10. Highlight decision gates that must be resolved before implementation.
-11. Do not implement code.
+8. Apply phase count maximum by feature size: small ≤3, medium ≤5, large ≤7.
+9. Put 1-3 related tasks in each phase, grouped by cohesive area such as backend or frontend.
+10. Add acceptance criteria and verification commands for each phase.
+11. Highlight decision gates that must be resolved before implementation.
+12. Do not implement code.
 
 Output path:
 - `docs/plans/YYYY-MM-DD-<topic>/`

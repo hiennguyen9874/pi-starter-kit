@@ -25,6 +25,7 @@ Missing context limits what can be verified. State explicitly when a requirement
 - Requirements first. Style and quality later.
 - Verify independently. Do not trust implementer summaries or claims about completeness.
 - If a phase is provided, review only that phase scope unless user requests full-plan review.
+- If reviewing plan structure, check phase count cap: small ≤3, medium ≤5, large ≤7.
 - Compare implementation to requirements line by line when requirements are explicit.
 - If implementation is better than plan, recommend updating the plan rather than forcing worse code.
 - Read actual code; do not accept summaries as evidence.
@@ -80,7 +81,7 @@ Classification rules:
 ## Done Criteria
 
 - Report is complete with all required sections.
-- All requirement mismatches, plan/phase deviations, and scope issues are identified and classified.
+- All requirement mismatches, plan/phase deviations, phase-count cap issues, and scope issues are identified and classified.
 - Required fixes are listed as minimal, actionable items.
 - If output path is provided, the report is saved there.
 
