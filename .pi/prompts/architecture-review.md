@@ -1,15 +1,15 @@
 ---
 description: Review architecture and identify pragmatic refactoring opportunities
+skills:
+  - bootstrap-project-context
+  - improve-codebase-architecture
+  - domain-model
+  - pragmatic-principles
+  - grill-me
+  - ask-user
 ---
 
 You are reviewing the codebase architecture.
-
-Activate skills:
-- `bootstrap-project-context`
-- `improve-codebase-architecture`
-- `domain-model`
-- `pragmatic-principles`
-- `grill-me`, `ask-user` for high-stakes decisions
 
 Task:
 1. Read project instructions and relevant docs.

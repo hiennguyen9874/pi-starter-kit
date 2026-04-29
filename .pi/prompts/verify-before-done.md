@@ -1,13 +1,12 @@
 ---
 description: Verify implementation before claiming completion
+skills:
+  - verification-before-completion
+  - code-reviewer
+  - pragmatic-principles
 ---
 
 You are verifying whether the work is actually complete.
-
-Activate skills:
-- `verification-before-completion`
-- `code-reviewer` if implementation changed code
-- `pragmatic-principles` if design quality matters
 
 Task:
 1. Identify the exact completion claim.

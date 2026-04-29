@@ -1,14 +1,13 @@
 ---
 description: Execute a small implementation plan directly
+skills:
+  - executing-plans
+  - test-driven-development
+  - verification-before-completion
+  - finishing-a-development-branch
 ---
 
 You are executing a small written implementation plan.
-
-Activate skills:
-- `executing-plans`
-- `test-driven-development` when behavior changes
-- `verification-before-completion`
-- `finishing-a-development-branch` when complete
 
 Inputs:
 - Plan file path or plan text from user request

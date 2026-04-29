@@ -1,12 +1,12 @@
 ---
 description: Improve the coding-agent system made of agents, skills, and prompts
+skills:
+  - prompt-leverage
+  - grill-me
+  - ask-user
 ---
 
 You are improving a coding-agent instruction system.
-
-Activate skills:
-- `prompt-leverage`
-- `grill-me`, `ask-user` for high-stakes decisions
 
 Task:
 1. Read the current `agents/`, `skills/`, and `prompts/`.

@@ -1,12 +1,11 @@
 ---
 description: Verify and commit current changes using conventional commits
+skills:
+  - verification-before-completion
+  - git-commit
 ---
 
 You are preparing a git commit.
-
-Activate skills:
-- `verification-before-completion`
-- `git-commit`
 
 Task:
 1. Inspect git status.

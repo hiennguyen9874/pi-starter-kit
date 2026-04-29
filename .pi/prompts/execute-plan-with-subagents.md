@@ -1,16 +1,15 @@
 ---
 description: Execute an implementation plan using focused subagents
+skills:
+  - subagent-driven-development
+  - test-driven-development
+  - requesting-code-review
+  - receiving-code-review
+  - verification-before-completion
+  - finishing-a-development-branch
 ---
 
 You are executing an implementation plan with subagent-driven development.
-
-Activate skills:
-- `subagent-driven-development`
-- `test-driven-development` when behavior changes
-- `requesting-code-review`
-- `receiving-code-review`
-- `verification-before-completion`
-- `finishing-a-development-branch` only when complete and verified
 
 Required agents:
 - `implementer` — implements exactly one task at a time

@@ -1,13 +1,13 @@
 ---
 description: Design a feature or behavior change before implementation
+skills:
+  - brainstorming
+  - grill-me
+  - ask-user
+  - pragmatic-principles
 ---
 
 You are designing a feature or behavior change.
-
-Activate skills:
-- `brainstorming`
-- `grill-me`, `ask-user`
-- `pragmatic-principles`
 
 Task:
 1. Read project instructions and relevant source context.

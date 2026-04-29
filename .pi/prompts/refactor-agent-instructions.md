@@ -1,14 +1,13 @@
 ---
 description: Refactor AGENTS.md or other agent instruction files into concise shared Markdown guidance
+skills:
+  - bootstrap-project-context
+  - agent-md-refactor
+  - domain-model
+  - code-reviewer
 ---
 
 You are refactoring repository agent instruction files.
-
-Activate skills:
-- `bootstrap-project-context`
-- `agent-md-refactor`
-- `domain-model` when domain language, CONTEXT.md, or ADRs affect instruction wording
-- `code-reviewer` for final review only
 
 Objective:
 Create or improve standard Markdown agent instructions (`AGENTS.md`, `CLAUDE.md`, `COPILOT.md`, etc.) using docs-only progressive disclosure.

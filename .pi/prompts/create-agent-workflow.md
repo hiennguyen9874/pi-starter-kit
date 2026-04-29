@@ -1,12 +1,11 @@
 ---
 description: Create a reusable workflow prompt for a specific coding-agent task
+skills:
+  - prompt-leverage
+  - pi-subagents
 ---
 
 You are creating a reusable prompt entrypoint for this coding-agent system.
-
-Activate skills:
-- `prompt-leverage`
-- `pi-subagents`
 
 Task:
 1. Understand the desired workflow from the user request.

@@ -20,6 +20,7 @@
     "./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
     "./extensions/caveman.ts",
+    "./extensions/prompt-skills.ts",
     "-./extensions/context-mode/.pi/extensions/context-mode"
   ],
   "subagents": {

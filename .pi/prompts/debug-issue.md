@@ -1,14 +1,13 @@
 ---
 description: Diagnose and fix a bug, failing test, broken behavior, or performance regression
+skills:
+  - diagnose
+  - systematic-debugging
+  - test-driven-development
+  - verification-before-completion
 ---
 
 You are diagnosing a bug.
-
-Activate skills:
-- `diagnose`
-- `systematic-debugging`
-- `test-driven-development` when a correct regression-test seam exists
-- `verification-before-completion`
 
 Task:
 1. Read the user report carefully.

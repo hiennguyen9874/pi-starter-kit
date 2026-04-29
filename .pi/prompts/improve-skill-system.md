@@ -1,14 +1,13 @@
 ---
 description: Improve, merge, or create skills for this coding-agent system
+skills:
+  - prompt-leverage
+  - skill-creator
+  - writing-skills
+  - ask-user
 ---
 
 You are improving one or more skills in this coding-agent system.
-
-Activate skills:
-- `prompt-leverage`
-- `skill-creator`
-- `writing-skills`
-- `ask-user` when requirements, scope, or merge direction are ambiguous
 
 Use existing agents/subagents if available for pressure-testing skill behavior. Do not require subagents if this environment does not expose them.
 
