@@ -1,6 +1,5 @@
 {
   "managedSkillEntries": [
-    "-skills/agent-md-refactor",
     "-skills/api-design",
     "-skills/architecture-diagram",
     "-skills/backend-patterns",
@@ -20,7 +19,6 @@
     "-skills/receiving-code-review",
     "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/skill-creator",
     "-skills/subagent-driven-development",
     "-skills/test-driven-development",
     "-skills/ui-ux-pro-max",
@@ -28,8 +26,7 @@
     "-skills/vercel-composition-patterns",
     "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans",
-    "-skills/writing-skills"
+    "-skills/writing-plans"
   ],
   "mcpBaseline": {
     "mcpServers": {

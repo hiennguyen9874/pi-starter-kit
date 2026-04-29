@@ -6,21 +6,6 @@ description: Use when the user asks to explore or choose UI/UX reference options
 
 Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
 
-
-## Ownership
-
-This is a reference lookup skill, not the default frontend implementation skill.
-
-Use:
-
-- `frontend-skill` for visual direction and polished frontend design.
-- `shadcn-best-practices` for shadcn/ui implementation.
-- `react-best-practices` for React/Next performance.
-- `vercel-composition-patterns` for React component API architecture.
-- `web-design-guidelines` for UI audits and accessibility reviews.
-
-Use this skill when the task needs searchable design knowledge: palettes, typography, chart choice, UX rules, visual styles, or stack-specific UI references.
-
 ## When to Apply
 
 Reference these guidelines when:
