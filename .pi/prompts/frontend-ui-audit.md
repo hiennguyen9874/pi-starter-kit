@@ -7,8 +7,6 @@ skills:
   - react-best-practices
   - vercel-composition-patterns
   - ui-ux-pro-max
-  - code-reviewer
-  - pragmatic-principles
 ---
 
 You are auditing frontend UI. Do not implement fixes.

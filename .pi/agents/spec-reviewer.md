@@ -5,7 +5,7 @@ description: |
 tools: read, bash, grep, find, ls
 systemPromptMode: replace
 inheritProjectContext: true
-skills: code-reviewer, pragmatic-principles
+skills: code-reviewer
 model: openai-codex/gpt-5.4
 thinking: medium
 extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts

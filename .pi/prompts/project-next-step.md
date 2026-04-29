@@ -3,8 +3,6 @@ description: Analyze the project and recommend the most valuable next steps
 skills:
   - bootstrap-project-context
   - improve-codebase-architecture
-  - pragmatic-principles
-  - prompt-leverage
 ---
 
 You are evaluating the project and recommending next steps.

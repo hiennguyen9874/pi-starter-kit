@@ -2,8 +2,6 @@
 description: Verify implementation before claiming completion
 skills:
   - verification-before-completion
-  - code-reviewer
-  - pragmatic-principles
 ---
 
 You are verifying whether the work is actually complete.

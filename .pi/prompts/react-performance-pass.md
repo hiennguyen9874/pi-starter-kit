@@ -2,7 +2,6 @@
 description: Improve React or Next.js frontend performance
 skills:
   - react-best-practices
-  - pragmatic-principles
   - verification-before-completion
   - ask-user
 ---
