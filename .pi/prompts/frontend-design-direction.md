@@ -1,8 +1,9 @@
 ---
 description: Create frontend visual direction before implementation
 skills:
-  - frontend-skill
   - ui-ux-pro-max
+  - frontend-skill
+  - grill-me
   - ask-user
 ---
 
@@ -11,9 +12,6 @@ You are defining frontend design direction. Do not implement code.
 When to use:
 - Landing page, app screen, dashboard, redesign, prototype, or visual polish.
 - User needs style, layout, color, typography, motion, or UX direction.
-
-Agents:
-- None required.
 
 Inputs:
 - Product/page goal

@@ -14,9 +14,6 @@ When to use:
 - Component has many boolean props.
 - Need compound components, provider boundary, reusable component API, or cleaner composition.
 
-Agents:
-- None required.
-
 Inputs:
 - Target component/files
 - Desired API behavior

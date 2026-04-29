@@ -16,9 +16,6 @@ You are auditing frontend UI. Do not implement fixes.
 When to use:
 - User asks review, audit, accessibility check, UX critique, visual polish list, shadcn review, or React frontend quality review.
 
-Agents:
-- Optional: `code-quality-reviewer` for larger PR review.
-
 Inputs:
 - Files/routes/diff/screenshots
 - Optional design brief or acceptance criteria

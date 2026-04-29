@@ -12,9 +12,6 @@ When to use:
 - UI works but feels generic, cluttered, weak, or unfinished.
 - Need better hierarchy, spacing, copy, motion, imagery, or responsive polish.
 
-Agents:
-- None required.
-
 Inputs:
 - Files/routes/components to polish
 - Optional design goal or screenshot

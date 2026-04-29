@@ -14,9 +14,6 @@ When to use:
 - User asks for shadcn component, page, form, dialog, table, dashboard, theme, or block.
 - shadcn/ui correctness matters.
 
-Agents:
-- None required.
-
 Inputs:
 - Component/page request
 - Target files/routes

@@ -12,9 +12,6 @@ You are improving React/Next.js performance.
 When to use:
 - User mentions slow page, rerenders, hydration, bundle size, waterfalls, data fetching, Suspense, server/client boundary, or load time.
 
-Agents:
-- None required.
-
 Inputs:
 - Files/routes/components
 - Symptom or performance goal
