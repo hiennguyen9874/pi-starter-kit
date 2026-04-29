@@ -4,12 +4,12 @@
     "npm:@tmustier/pi-usage-extension",
     "npm:pi-command-history",
     "git:github.com/MasuRii/pi-tool-display",
-    "npm:pi-mcp-adapter",
-    "npm:pi-prompt-template-model",
-    "npm:pi-subagents",
-    "npm:pi-intercom",
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
+    "npm:pi-mcp-adapter",
+    "-npm:pi-prompt-template-model",
+    "-npm:pi-subagents",
+    "-npm:pi-intercom",
     "-npm:pi-web-access",
     "-git:github.com/davebcn87/pi-autoresearch"
   ],
@@ -25,77 +25,60 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "model": "openai-codex/gpt-5.4-mini",
-        "thinking": "high"
+        "disabled": true
       },
       "planner": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       },
       "worker": {
-        "model": "openai-codex/gpt-5.3-codex",
-        "thinking": "medium"
+        "disabled": true
       },
       "reviewer": {
-        "model": "openai-codex/gpt-5.5",
-        "thinking": "high"
+        "disabled": true
       },
       "context-builder": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       },
       "researcher": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       },
       "delegate": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       },
       "oracle": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       },
       "oracle-executor": {
-        "model": "openai-codex/gpt-5.5"
+        "disabled": true
       }
     }
   },
   "skills": [
-    "-skills/agent-md-refactor",
     "-skills/api-design",
     "-skills/backend-patterns",
     "-skills/brainstorming",
-    "-skills/caveman",
-    "-skills/caveman-commit",
-    "-skills/caveman-help",
-    "-skills/caveman-review",
     "-skills/coding-standards",
-    "-skills/compress",
     "-skills/database-migrations",
     "-skills/dispatching-parallel-agents",
     "-skills/docker-patterns",
     "-skills/executing-plans",
     "-skills/finishing-a-development-branch",
-    "-skills/frontend-design",
-    "-skills/frontend-development",
     "-skills/frontend-skill",
-    "-skills/go-api-project-structure",
     "-skills/golang-patterns",
-    "-skills/golang-pro",
     "-skills/golang-testing",
     "-skills/postgres-patterns",
     "-skills/prd",
     "-skills/react-best-practices",
     "-skills/receiving-code-review",
-    "-skills/release-drafter",
     "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/skill-creator",
     "-skills/subagent-driven-development",
     "-skills/test-driven-development",
-    "-skills/ui-styling",
     "-skills/ui-ux-pro-max",
     "-skills/using-superpowers",
     "-skills/vercel-composition-patterns",
     "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans",
-    "-skills/writing-skills"
+    "-skills/writing-plans"
   ]
 }
