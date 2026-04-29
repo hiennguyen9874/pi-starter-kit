@@ -2,7 +2,6 @@
 description: Convert old standalone design/plan files into the plan folder format
 skills:
   - writing-plans
-  - pragmatic-principles
 ---
 
 You are converting old-style planning files into the current plan folder format.
