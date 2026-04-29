@@ -16,10 +16,10 @@ Core idea: switch profiles to change which skills and MCP servers Pi exposes for
 ## 5-Minute Tour
 
 1. Start Pi in this repo.
-2. Check active profile in startup context/status.
-3. Switch profile with the profile command if available in your Pi session.
-4. Ask for backend, frontend, devops, or agent-authoring work.
-5. Observe that only profile-relevant skills and MCP servers are available.
+2. Check the footer/status for `profile:<name>`.
+3. Run `/profile explain` to see active skill and MCP policy.
+4. Switch profile with `/profile <name>` or select one with `/profile`.
+5. Reload when prompted so startup skill and MCP filtering takes effect.
 
 Default profile: `base`.
 
@@ -35,7 +35,51 @@ Everything Pi-specific lives in `.pi/`:
 - `.pi/agents/` — reusable agents
 - `.pi/skills/` — local skills
 - `.pi/prompts/` — prompt templates
-- `AGENTS.md` — agent working rules for this repo
+- `AGENTS.md` — concise agent working rules and instruction index
+- `docs/agent-instructions/` — shared detailed agent guidance for repo workflow and profiles
+
+## Local Prompts and Skills
+
+### Prompt Templates
+
+Reusable prompt templates live in `.pi/prompts/`:
+
+- planning/design: `feature-design`, `write-implementation-plan`, `architecture-review`, `project-next-step`
+- implementation execution: `execute-plan-simple`, `execute-plan-with-subagents`, `fix-review-issues`
+- review/debug/verification: `review-code`, `debug-issue`, `verify-before-done`
+- agent-system work: `create-agent-workflow`, `improve-agent-system`, `improve-skill-system`, `refactor-agent-instructions`
+- git workflow: `commit-work`
+
+Use them as starting points for repeatable task prompts; profiles decide which skills and MCP servers are available while those prompts run.
+
+### Skill Catalog
+
+Local skills live in `.pi/skills/`. Profiles expose only task-relevant subsets.
+
+Core workflow skills:
+
+- `bootstrap-project-context` — repo onboarding from docs and source
+- `diagnose` / `systematic-debugging` — bug and failure diagnosis
+- `code-reviewer`, `requesting-code-review`, `receiving-code-review` — review workflows
+- `git-commit`, `verification-before-completion`, `finishing-a-development-branch` — completion and commit workflows
+- `brainstorming`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
+- `grill-me`, `domain-model`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
+
+Domain and stack skills:
+
+- backend/API/data: `api-design`, `backend-patterns`, `database-migrations`, `postgres-patterns`
+- Go: `golang-patterns`, `golang-testing`
+- frontend/design: `frontend-skill`, `coding-standards`, `react-best-practices`, `shadcn-best-practices`, `ui-ux-pro-max`, `vercel-composition-patterns`, `web-design-guidelines`
+- DevOps: `docker-patterns`
+
+Agent-authoring and docs skills:
+
+- `agent-md-refactor` — restructure agent instruction files with docs-only progressive disclosure
+- `context7-cli` — fetch library docs and manage Context7/ctx7 skill workflows
+- `prompt-leverage` — upgrade raw prompts into execution-ready prompts
+- `prd` — create product requirements documents
+- `skill-creator`, `writing-skills` — create, test, and improve skills
+- `using-superpowers`, `test-driven-development` — imported workflow skills used by broader profiles
 
 ## Profiles
 
@@ -53,7 +97,25 @@ Current profiles:
 
 Profile config lives in `.pi/profiles.json`.
 
-Detailed guide: [docs/profiles.md](docs/profiles.md).
+### Runtime Behavior
+
+The profile extension (`.pi/extensions/profile/`) loads `.pi/profiles.json` at session start and selects a profile in this order:
+
+1. `--profile <name>` startup flag
+2. `.pi/profile-state.json` persisted profile
+3. restored session profile
+4. `defaultProfile`
+
+It then:
+
+- shows `profile:<name>` in the Pi status area
+- injects active profile restrictions into agent prompts
+- blocks `/skill:<name>` commands for skills disabled by the profile
+- blocks MCP gateway calls to disabled servers
+- rewrites managed startup filters in `.pi/settings.json` and `.pi/mcp.json`
+- asks for `/reload` when startup filters changed during an active session
+
+Use `/profile explain` to inspect the active policy and reference warnings.
 
 ### Profile Semantics
 
@@ -114,6 +176,16 @@ npm run build
 ### Web Access
 
 - https://github.com/nicobailon/pi-web-access
+
+## Agent Instructions
+
+Agent-facing instructions use docs-only progressive disclosure:
+
+- `AGENTS.md` — start here; contains quick commands, repo map, critical rules, and read triggers
+- `docs/agent-instructions/repo-workflow.md` — read when changing repo structure, Pi config, extensions, skills, agents, prompts, or verification workflows
+- `docs/agent-instructions/profiles.md` — read when changing profiles, skill/MCP availability, profile sync behavior, or profile docs
+
+Keep detailed shared agent guidance under `docs/agent-instructions/`, not under `.pi/`, `.claude/`, `.codex/`, `.cursor/`, or other tool-private directories.
 
 ## Test
 

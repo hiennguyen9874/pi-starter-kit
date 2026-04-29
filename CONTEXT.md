@@ -22,7 +22,7 @@ Profiles reduce context noise for AI agents and make tool/skill availability mor
 
 - `AGENTS.md` — repo working rules for AI agents. Read first.
 - `README.md` — human overview and install notes.
-- `docs/profiles.md` — profile mental model, switching, troubleshooting, verification.
+- `docs/agent-instructions/profiles.md` — profile mental model, switching, troubleshooting, verification for agents.
 - `.pi/settings.json` — Pi packages, extensions, skills, and subagent model overrides.
 - `.pi/profiles.json` — profile definitions and default profile.
 - `.pi/mcp.json` — project MCP server config.
@@ -114,7 +114,7 @@ git status --short
 
 1. Read `AGENTS.md` and `README.md` completely.
 2. Read this `CONTEXT.md`.
-3. For profile behavior, read `docs/profiles.md`.
+3. For profile behavior, read `docs/agent-instructions/profiles.md`.
 4. Inspect `.pi/profiles.json`, `.pi/settings.json`, and relevant source under `.pi/extensions/profile/`.
 5. Verify with profile tests before claiming profile changes work.
 
@@ -124,7 +124,7 @@ git status --short
 2. Keep allow-lists small unless broad mode is intentional.
 3. Check for unknown skill or MCP names.
 4. Run `node --test .pi/extensions/profile/*.test.ts`.
-5. Update `docs/profiles.md` if profile meaning changes.
+5. Update `docs/agent-instructions/profiles.md` if profile meaning changes.
 
 ### Add skill
 
@@ -137,7 +137,7 @@ git status --short
 
 1. Add server to `.pi/mcp.json`.
 2. Add server to relevant profile `mcpServersEnable` lists.
-3. Document expected use in `docs/profiles.md` when user-facing.
+3. Document expected use in `docs/agent-instructions/profiles.md` when user-facing.
 
 ## Design constraints
 
