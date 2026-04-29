@@ -25,34 +25,5 @@ Task:
 
 Do not implement changes.
 
-Output structure:
-
-# Project Assessment
-
-## Project Purpose
-...
-
-## What Is Good
-...
-
-## Main Problems
-...
-
-## Architecture Assessment
-...
-
-## AI-Agent Navigability
-...
-
-## Top Next Steps
-1. **...**
-   - Impact:
-   - Effort:
-   - Risk:
-   - Suggested workflow:
-
-## Recommended First Action
-...
-
 User Request:
 $ARGUMENTS

@@ -17,31 +17,5 @@ Task:
 6. If verification fails, do not claim completion. Recommend next fix.
 7. If verification passes, state exactly what is verified and what remains unverified.
 
-Output format:
-
-# Verification Report
-
-## Claim
-...
-
-## Commands Run
-| Command | Result | Notes |
-|---|---|---|
-
-## Evidence
-...
-
-## Verified
-- ...
-
-## Not Verified
-- ...
-
-## Result
-- pass / fail / partial
-
-## Next Step
-...
-
 User Request:
 $ARGUMENTS

@@ -28,22 +28,5 @@ Rules:
 - Do not add speculative features.
 - Do not claim success without command output.
 
-Final response format:
-Batch completed:
-- ...
-
-Changed files:
-- ...
-
-Verification:
-- command:
-- result:
-
-Plan deviations:
-- ...
-
-Blocked questions:
-- ...
-
 User Request:
 $ARGUMENTS

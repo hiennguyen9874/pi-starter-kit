@@ -20,24 +20,5 @@ Task:
    - skills that should eventually be merged or refactored
 6. Produce concrete file contents when asked.
 
-Output structure:
-
-# Agent System Improvement Plan
-
-## Current Structure
-...
-
-## Problems
-...
-
-## Non-invasive Prompt Additions
-- `prompts/...`
-
-## Optional Future Skill Changes
-- ...
-
-## Recommended Implementation Order
-1. ...
-
 User Request:
 $ARGUMENTS

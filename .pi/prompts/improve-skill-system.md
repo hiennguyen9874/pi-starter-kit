@@ -11,18 +11,6 @@ You are improving one or more skills in this coding-agent system.
 
 Use existing agents/subagents if available for pressure-testing skill behavior. Do not require subagents if this environment does not expose them.
 
-## When To Use This Prompt
-
-Use this prompt when the user wants to:
-
-- improve an existing skill
-- merge overlapping skills
-- split an overloaded skill
-- create a new skill only when existing skills cannot cover the workflow
-- review skill triggering accuracy
-- make skills more practical, concise, testable, or reusable
-- improve skill system structure without broadly changing agents or prompts
-
 ## Objective
 
 Improve the skill system with minimum necessary change.
@@ -160,72 +148,6 @@ Check:
 - output contract clear
 - done criteria clear
 - no unrelated edits
-
-## Output Contract
-
-When producing a plan, use:
-
-```markdown
-# Skill System Improvement Plan
-
-## Goal
-...
-
-## Existing Skills Reviewed
-- `path`: keep/improve/merge/split/create rationale
-
-## Recommended Change
-...
-
-## Why This Is Better Than New Skill
-...
-
-## Files To Change
-- ...
-
-## Verification Plan
-- ...
-
-## Open Question
-...
-```
-
-When producing skill file content, return full file content:
-
-```markdown
----
-name: skill-name
-description: Use when ...
----
-
-# Skill Name
-
-...
-```
-
-When producing an implementation summary, use:
-
-```markdown
-# Skill System Change Summary
-
-## Changed
-- `path`: ...
-
-## Reused Existing Skills
-- ...
-
-## Created New Skills
-- ...
-
-## Merged/Split Skills
-- ...
-
-## Verification
-- ...
-
-## Remaining Risks
-- ...
-```
 
 ## Done Criteria
 

@@ -23,11 +23,5 @@ Rules:
 - Do not force push.
 - Do not commit unrelated files.
 
-Output:
-- committed files
-- commit message
-- verification summary
-- remaining uncommitted changes
-
 User Request:
 $ARGUMENTS

@@ -30,29 +30,5 @@ Task:
 8. Run final verification.
 9. Do not add unrelated improvements.
 
-Output format:
-
-# Review Fix Summary
-
-## Fixed
-- finding:
-- files:
-- verification:
-
-## Deferred
-- finding:
-- reason:
-
-## Rejected
-- finding:
-- reason:
-
-## Changed Files
-- ...
-
-## Verification
-- command:
-- result:
-
 User Request:
 $ARGUMENTS

@@ -26,47 +26,5 @@ Do not implement code.
 Design output path:
 - `docs/plans/YYYY-MM-DD-<topic>-design.md`
 
-Required output structure:
-
-# Feature Design
-
-## Goal
-What outcome this change should achieve.
-
-## User Request
-Restate the request in concrete terms.
-
-## Current System Context
-Relevant files, architecture, and constraints discovered from the repo.
-
-## Options Considered
-### Option A
-- Summary:
-- Pros:
-- Cons:
-- Risk:
-
-### Option B
-- Summary:
-- Pros:
-- Cons:
-- Risk:
-
-## Recommended Approach
-State the recommended option and why.
-
-## Proposed Design
-- Components:
-- Data flow:
-- API/interface changes:
-- Error handling:
-- Testing strategy:
-
-## Decision Gates
-List decisions that need explicit user approval before implementation.
-
-## Open Questions
-Only include questions that cannot be answered from code inspection.
-
 User Request:
 $ARGUMENTS

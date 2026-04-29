@@ -37,43 +37,5 @@ Work plan:
 6. Update root instruction index with clear read triggers.
 7. Review result against `agent-md-refactor` verification checklist.
 
-Output when planning only:
-# Agent Instruction Refactor Plan
-
-## Current State
-...
-
-## Problems
-...
-
-## Proposed Files
-- `AGENTS.md` — ...
-- `docs/agent-instructions/...` — ...
-
-## Contradictions / Questions
-...
-
-## Verification Plan
-...
-
-Output after editing:
-# Agent Instruction Refactor Report
-
-## Changed Files
-- `path` — summary
-
-## Key Decisions
-- ...
-
-## Commands Verified
-- ...
-
-## Checklist
-- root concise: pass/fail
-- detailed docs under `docs/agent-instructions/`: pass/fail
-- links work: pass/fail
-- commands exact or marked unknown: pass/fail
-- contradictions resolved or surfaced: pass/fail
-
 User Request:
 $ARGUMENTS

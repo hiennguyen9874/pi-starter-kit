@@ -65,29 +65,5 @@ Implementer dispatch contract:
 Progress file:
 - Maintain `progress.md` if the environment supports it or the plan requests it.
 
-Final response format:
-Implemented:
-- ...
-
-Changed files:
-- ...
-
-Verification:
-- command:
-- result:
-
-Review:
-- spec compliance:
-- code quality:
-
-Plan deviations:
-- ...
-
-Open risks/questions:
-- ...
-
-Recommended next step:
-- ...
-
 User Request:
 $ARGUMENTS

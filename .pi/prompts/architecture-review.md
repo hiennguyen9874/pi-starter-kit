@@ -32,30 +32,5 @@ Task:
 
 Do not implement code.
 
-Output:
-
-# Architecture Review
-
-## Current Architecture
-...
-
-## Strengths
-...
-
-## Friction Points
-...
-
-## Deepening Opportunities
-1. ...
-
-## Domain Language Issues
-...
-
-## Recommended Refactor Plan
-...
-
-## Decision Gates
-...
-
 User Request:
 $ARGUMENTS

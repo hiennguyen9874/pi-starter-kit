@@ -25,47 +25,5 @@ Task:
 Output path:
 - `docs/plans/YYYY-MM-DD-<topic>-plan.md`
 
-Required output structure:
-
-# Implementation Plan
-
-## Goal
-One-sentence outcome.
-
-## Source Design
-Path or summary of the design this plan implements.
-
-## Assumptions
-Only assumptions supported by code or explicitly provided by the user.
-
-## Decision Gates
-- Resolved:
-- Still blocked:
-
-## Tasks
-1. **Task name**
-   - Files:
-   - Changes:
-   - Acceptance:
-   - Verification command:
-   - Risk:
-
-## Files to Modify
-- `path/to/file` — reason
-
-## New Files
-- `path/to/file` — purpose
-
-## Dependencies
-Task ordering and dependencies.
-
-## Verification Plan
-Commands to run before claiming completion.
-
-## Review Plan
-- Spec compliance review:
-- Code quality review:
-- Final verification:
-
 User Request:
 $ARGUMENTS

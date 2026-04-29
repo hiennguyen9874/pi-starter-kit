@@ -2,7 +2,8 @@
 description: Create a reusable workflow prompt for a specific coding-agent task
 skills:
   - prompt-leverage
-  - pi-subagents
+  - grill-me
+  - ask-user
 ---
 
 You are creating a reusable prompt entrypoint for this coding-agent system.
@@ -18,17 +19,6 @@ Task:
    - output contract
    - verification/done criteria
 4. Keep the prompt practical and directly usable.
-5. Return the full markdown file content.
-
-Required output:
-
-```markdown
----
-description: <short description>
----
-
-<full prompt content>
-````
 
 User Request:
 $ARGUMENTS
