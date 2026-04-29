@@ -1,16 +1,11 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, Skill } from "@mariozechner/pi-coding-agent";
 
 interface PromptMetadata {
   skills: string[];
-}
-
-interface SkillSource {
-  name: string;
-  path: string;
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
@@ -37,25 +32,25 @@ export default function (pi: ExtensionAPI) {
     return { action: "continue" };
   });
 
-  pi.on("before_agent_start", async (_event, ctx) => {
+  pi.on("before_agent_start", async (event, ctx) => {
     const skillNames = pendingPromptSkills;
     pendingPromptSkills = [];
 
     if (skillNames.length === 0) return;
 
-    const skillIndex = discoverSkills(ctx.cwd);
+    const skillIndex = indexLoadedSkills(event.systemPromptOptions.skills ?? []);
     const loaded: string[] = [];
     const missing: string[] = [];
 
     for (const skillName of skillNames) {
-      const source = skillIndex.get(skillName);
-      if (!source) {
+      const skill = skillIndex.get(skillName);
+      if (!skill) {
         missing.push(skillName);
         continue;
       }
 
-      const content = stripFrontmatter(readFileSync(source.path, "utf8"));
-      loaded.push(formatSkill(source.name, source.path, content));
+      const content = stripFrontmatter(readFileSync(skill.filePath, "utf8"));
+      loaded.push(formatSkill(skill.name, skill.filePath, content));
     }
 
     if (loaded.length === 0 && missing.length === 0) return;
@@ -146,46 +141,12 @@ function cleanSkillName(value: string): string {
   return value.trim().replace(/^['"]|['"]$/g, "");
 }
 
-function discoverSkills(cwd: string): Map<string, SkillSource> {
-  const roots = [
-    join(cwd, ".pi", "skills"),
-    join(cwd, ".agents", "skills"),
-    join(homedir(), ".pi", "agent", "skills"),
-    join(homedir(), ".agents", "skills"),
-  ];
-
-  const skills = new Map<string, SkillSource>();
-  for (const root of roots) {
-    for (const source of discoverSkillsInRoot(root)) {
-      if (!skills.has(source.name)) skills.set(source.name, source);
-    }
+function indexLoadedSkills(skills: Skill[]): Map<string, Skill> {
+  const index = new Map<string, Skill>();
+  for (const skill of skills) {
+    if (!index.has(skill.name)) index.set(skill.name, skill);
   }
-  return skills;
-}
-
-function discoverSkillsInRoot(root: string): SkillSource[] {
-  if (!existsSync(root)) return [];
-
-  const result: SkillSource[] = [];
-  const entries = readdirSync(root, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const path = join(root, entry.name);
-    if (entry.isDirectory()) {
-      const skillPath = join(path, "SKILL.md");
-      if (existsSync(skillPath)) {
-        result.push({ name: entry.name, path: skillPath });
-      }
-      result.push(...discoverSkillsInRoot(path));
-      continue;
-    }
-
-    if (entry.isFile() && entry.name.endsWith(".md") && dirname(path) === root) {
-      result.push({ name: entry.name.slice(0, -3), path });
-    }
-  }
-
-  return result;
+  return index;
 }
 
 function stripFrontmatter(content: string): string {
