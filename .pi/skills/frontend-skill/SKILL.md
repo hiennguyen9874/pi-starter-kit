@@ -1,6 +1,6 @@
 ---
 name: frontend-skill
-description: Use when the task asks for a visually strong landing page, website, app, prototype, demo, or game UI. This skill enforces restrained composition, image-led hierarchy, cohesive content structure, and tasteful motion while avoiding generic cards, weak branding, and UI clutter.
+description: Use when building or improving visually strong landing pages, websites, app screens, prototypes, demos, game UIs, hero sections, marketing pages, or polished frontend interfaces where art direction, hierarchy, imagery, copy, motion, and avoiding generic AI aesthetics matter.
 ---
 
 # Frontend Skill
@@ -8,6 +8,22 @@ description: Use when the task asks for a visually strong landing page, website,
 Use this skill when the quality of the work depends on art direction, hierarchy, restraint, imagery, and motion rather than component count.
 
 Goal: ship interfaces that feel deliberate, premium, and current. Default toward award-level composition: one big idea, strong imagery, sparse copy, rigorous spacing, and a small number of memorable motions.
+
+
+## Aesthetic Direction
+
+Before code, choose one clear point of view and execute it with restraint. Good directions include editorial, luxury, brutalist, playful, industrial, organic, retro-futuristic, or calm product utility. Do not mix many aesthetics.
+
+Ask:
+
+- Who is this for?
+- What should the first viewport make them feel or understand?
+- What is the one memorable visual idea?
+- What constraints matter: framework, performance, accessibility, brand, content?
+
+Avoid generic AI defaults: purple gradients on white, interchangeable SaaS cards, random glassmorphism, emoji decoration, predictable centered hero stacks, and fonts/colors that do not match the product.
+
+Use typography, color, composition, texture, and motion to support the chosen direction. Bold maximalism and refined minimalism both work; indecision does not.
 
 ## Working Model
 

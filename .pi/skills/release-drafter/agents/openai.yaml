@@ -1,4 +1,0 @@
-interface:
-  display_name: "Release Drafter"
-  short_description: "Configure and troubleshoot Release Drafter v6"
-  default_prompt: "Use $release-drafter to set up a GitHub Actions workflow and .github/release-drafter.yml for this repo."

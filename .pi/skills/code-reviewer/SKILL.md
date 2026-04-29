@@ -1,19 +1,22 @@
 ---
 name: code-reviewer
-description: Use when reviewing completed implementation work, validating a finished task or plan step, comparing code against requirements or intended architecture, checking whether a change is complete and appropriately scoped, or performing a PR-style review that should distinguish blockers from follow-up improvements.
+description: "Use when reviewing completed implementation work, validating a finished task or plan step, comparing code against requirements or intended architecture, or performing a PR-style review. Reviews must run in two phases: spec alignment first, code quality second."
 ---
 
 # Code Reviewer
 
 ## Overview
 
-Review completed implementation against the original plan, requirements, and project standards.
+Review completed implementation in two phases:
 
-Prioritize what matters now: requirement coverage, scope discipline, maintainability, architecture, defensive correctness, and pragmatic next actions. Produce high-signal feedback, not noise.
+1. **Spec Review**: Does code match plan, requirements, acceptance criteria, and intended architecture?
+2. **Code Quality Review**: Is code correct, maintainable, testable, simple, and well-bounded?
+
+Spec alignment always comes first. Missing required behavior beats style and cleanup concerns.
 
 ## When to Use
 
-Use this skill when the user asks to:
+Use this skill when user asks to:
 - review completed implementation work
 - review a finished step from a plan
 - compare code against requirements, acceptance criteria, or intended architecture
@@ -23,68 +26,77 @@ Use this skill when the user asks to:
 Do not use this skill for:
 - implementing fixes
 - brainstorming new features
-- responding to review feedback after the findings are already known
+- responding to review feedback after findings are already known
 - generic code explanation without evaluative judgment
 
-## Core Review Sequence
+## Two-Phase Review Sequence
 
-Follow this order unless the user asks for a narrower review:
+### Phase 1: Spec Review
 
-1. Acknowledge what was done well.
-2. Check plan alignment and requirement coverage first.
-3. Identify scope creep, speculative complexity, and YAGNI issues.
-4. Evaluate simplicity, duplication, naming, readability, and maintainability.
-5. Assess architecture, coupling, and boundary integrity.
-6. Review defensive correctness, validation, and error handling.
-7. Check tests, documentation, and local codebase health in touched areas.
-8. End with minimal next actions.
-
-## Review Priorities
-
-Review with these priorities, in order:
-
-1. Plan alignment and requirement coverage
-2. Scope discipline and simplicity
-3. Code quality and maintainability
-4. Architecture and design integrity
-5. Defensive correctness and error boundaries
-6. Pragmatic long-term sustainability
-
-When evaluating deviations from the plan, do not assume every deviation is bad. Classify each meaningful deviation as one of:
-- beneficial improvement
-- acceptable tradeoff
-- problematic deviation
-- evidence the original plan should be updated
-
-If implementation departs significantly from the plan, explicitly ask the coding agent to review and confirm the rationale.
-If the original plan appears weaker than the implementation, say so directly and recommend updating the plan instead of forcing a worse design.
-
-## Review Principles
-
-### Plan alignment first
-Start by comparing what was supposed to be built with what was actually built.
+Goal: verify implementation matches requested behavior and plan.
 
 Check for:
 - missing required behavior
 - partial implementation
-- deviations from the plan
+- contradicted requirements
 - unplanned additions or feature creep
-- architectural departures
+- architectural departures from plan
+- tests missing for required behavior
 
-For each meaningful mismatch, explain:
+Classify each meaningful deviation as:
+- beneficial improvement
+- acceptable tradeoff
+- problematic deviation
+- evidence original plan should be updated
+
+If implementation departs significantly from plan, explicitly ask coding agent to confirm rationale.
+If original plan appears weaker than implementation, say so and recommend updating plan instead of forcing worse design.
+
+### Phase 2: Code Quality Review
+
+Goal: verify implementation quality after spec alignment is understood.
+
+Check for:
+- correctness and edge cases
+- validation and defensive boundaries
+- error handling
+- maintainability, naming, readability
+- architecture boundaries and coupling
+- tests and verification strength
+- security or performance risks with current impact
+- YAGNI, KISS, and pragmatic DRY
+
+Do not let optional quality improvements obscure spec blockers.
+
+## Review Priorities
+
+1. Requirement coverage and plan alignment
+2. Scope discipline and missing scope
+3. Correctness and defensive boundaries
+4. Tests and verification
+5. Maintainability and simplicity
+6. Architecture/design integrity
+7. Pragmatic long-term sustainability
+
+## Review Principles
+
+### Plan alignment first
+
+Start by comparing what was supposed to be built with what was actually built.
+
+For each mismatch, explain:
 - what changed
 - why it matters now
-- whether it should be fixed now or can be deferred
+- whether it must be fixed now or can be deferred
 
 ### YAGNI
-Prefer what is needed now over speculative flexibility.
 
 Flag:
 - extension points with no current use
 - premature abstraction
 - dormant or dead code
 - premature optimization without evidence
-- optional layers not required by the acceptance criteria
+- optional layers not required by acceptance criteria
 
 Ask:
 - Is this needed now?
@@ -92,7 +104,6 @@ Ask:
 - Does this complexity solve a current problem?
 
 ### KISS
-Prefer the simplest design that is clear, testable, and correct.
 
 Flag:
 - deep nesting
@@ -105,6 +116,7 @@ Flag:
 Prefer readability over cleverness and explicit logic over hidden magic.
 
 ### DRY, applied pragmatically
+
 Treat DRY as duplicated knowledge, not merely similar syntax.
 
 Flag:
@@ -113,20 +125,18 @@ Flag:
 - repeated literals or constants with drift risk
 - copy-paste logic where one change must imply another
 
-Be careful not to force abstraction too early. Small local duplication can be better than the wrong shared helper.
+Small local duplication can be better than wrong shared abstraction.
 
 ### Architecture and orthogonality
-Evaluate whether concerns remain well separated and change is localized.
 
 Flag:
 - business logic leaking into transport, UI, or infrastructure layers
 - hidden coupling through global state
 - vendor-specific details leaking into business logic
-- architecture that makes future change unnecessarily expensive
+- architecture that makes current or near-term change unnecessarily expensive
 - over-engineered flexibility with no present value
 
 ### Defensive correctness
-Check whether assumptions are explicit and protected.
 
 Flag:
 - missing validation at external boundaries
@@ -137,32 +147,21 @@ Flag:
 
 Prefer explicit contracts, meaningful errors, and failures that surface problems early.
 
-### Codebase health
-Look for unmanaged mess in the touched area.
-
-Flag:
-- TODOs without ownership or tracking
-- skipped tests
-- dead code
-- commented-out code
-- unexplained hacks or temporary workarounds
-- inconsistent style in touched files
-
-Reward local cleanup that leaves the code better than before.
-
 ### Documentation and standards
+
 Verify:
 - comments explain why, not what
 - public APIs and complex logic are documented when needed
 - documentation matches implementation
 - project conventions are followed
 
-If the input is a packed repository artifact or merged analysis file, treat it as read-only and point recommendations to the real source repository files instead of suggesting edits to the packed artifact.
+If input is packed repository artifact or merged analysis file, treat it as read-only and point recommendations to real source repository files.
 
 ## Severity Model
 
 ### Critical
-Must fix before considering the implementation complete or safe.
+
+Must fix before implementation is complete or safe.
 
 Examples:
 - missing required behavior
@@ -173,7 +172,8 @@ Examples:
 - unsafe boundary handling
 
 ### Important
-Should fix soon because it materially affects maintainability, correctness, or ease of future change.
+
+Should fix soon because it materially affects maintainability, correctness, or future change.
 
 Examples:
 - unnecessary coupling
@@ -183,6 +183,7 @@ Examples:
 - repeated logic with meaningful drift risk
 
 ### Suggestions
+
 Useful improvements that can be deferred.
 
 Examples:
@@ -196,7 +197,7 @@ Examples:
 For every meaningful finding, include:
 - what is wrong
 - why it matters now
-- the minimal fix
+- minimal fix
 - whether it must be fixed now or can be deferred
 
 Also:
@@ -211,9 +212,7 @@ Do not:
 - demand speculative refactors
 - optimize for theoretical purity over delivery
 - confuse similar-looking code with duplicated knowledge
-- recommend large redesigns when a local fix is enough
-
-When helpful, include a short code example to clarify a fix.
+- recommend large redesigns when local fix is enough
 
 ## Required Output Format
 
@@ -225,11 +224,19 @@ Always use this markdown structure:
 ## What Was Done Well
 - ...
 
-## Requirement Mismatches
+## Phase 1: Spec Alignment
+### Requirement Mismatches
 - ...
 
-## Critical
-### [Finding title]
+### Plan Deviations
+- ...
+
+### Scope Creep / Missing Scope
+- ...
+
+## Phase 2: Code Quality
+### Critical
+#### [Finding title]
 - Category: ...
 - Files: ...
 - Problem: ...
@@ -237,8 +244,8 @@ Always use this markdown structure:
 - Recommended fix: ...
 - Timing: Must fix now
 
-## Important
-### [Finding title]
+### Important
+#### [Finding title]
 - Category: ...
 - Files: ...
 - Problem: ...
@@ -246,8 +253,8 @@ Always use this markdown structure:
 - Recommended fix: ...
 - Timing: Should fix soon / Can defer with note
 
-## Suggestions
-### [Finding title]
+### Suggestions
+#### [Finding title]
 - Category: ...
 - Files: ...
 - Observation: ...
@@ -255,7 +262,17 @@ Always use this markdown structure:
 - Suggested refinement: ...
 - Timing: Optional
 
-## Plan Deviation Assessment
+## Tests and Verification
+- ...
+
+## Consolidated Findings
+### Critical
+- ...
+
+### Important
+- ...
+
+### Suggestions
 - ...
 
 ## Recommended Next Actions
@@ -264,15 +281,15 @@ Always use this markdown structure:
 3. ...
 ```
 
-If a section has no findings, keep the section and state `- None.` rather than omitting it.
+If section has no findings, keep section and state `- None.`.
 
 ## Review Checklist
 
-Before finishing, verify that your review:
+Before finishing, verify review:
 - starts with strengths
 - checks requirement mismatches before code-style concerns
-- classifies deviations from the plan
+- classifies deviations from plan
 - separates Critical, Important, and Suggestions clearly
 - explains why each issue matters now
-- recommends the smallest reasonable fix
+- recommends smallest reasonable fix
 - ends with concrete next actions

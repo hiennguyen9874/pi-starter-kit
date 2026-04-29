@@ -255,28 +255,6 @@ export default function cavemanExtension(pi: ExtensionAPI) {
 			const cmd = parts[0];
 			const arg = parts[1] || "";
 
-			if (cmd === "/caveman-commit") {
-				setMode("commit");
-				ctx.ui.notify("🪨 Caveman commit mode", "info");
-				updateStatus(ctx);
-				return { action: "transform", text: "/skill:caveman-commit" };
-			}
-			if (cmd === "/caveman-review") {
-				setMode("review");
-				ctx.ui.notify("🪨 Caveman review mode", "info");
-				updateStatus(ctx);
-				return { action: "transform", text: "/skill:caveman-review" };
-			}
-			if (cmd === "/caveman-compress" || cmd === "/caveman:compress") {
-				setMode("compress");
-				ctx.ui.notify("🪨 Caveman compress mode", "info");
-				updateStatus(ctx);
-				const rest = parts.slice(1).join(" ");
-				return { action: "transform", text: rest ? `/skill:compress ${rest}` : "/skill:compress" };
-			}
-			if (cmd === "/caveman-help") {
-				return { action: "transform", text: "/skill:caveman-help" };
-			}
 			if (cmd === "/caveman" || cmd === "/caveman:caveman") {
 				let newMode: CavemanMode = "full";
 				if (arg === "lite") newMode = "lite";
@@ -331,31 +309,6 @@ export default function cavemanExtension(pi: ExtensionAPI) {
 				ctx.ui.notify(`Unknown mode: ${arg}. Valid: ${VALID_MODES.join(", ")}`, "warning");
 			}
 			updateStatus(ctx);
-		},
-	});
-
-	pi.registerCommand("caveman-commit", {
-		description: "Activate caveman commit message mode",
-		handler: async (_args, ctx) => {
-			setMode("commit");
-			ctx.ui.notify("🪨 Caveman commit mode", "info");
-			updateStatus(ctx);
-		},
-	});
-
-	pi.registerCommand("caveman-review", {
-		description: "Activate caveman code review mode",
-		handler: async (_args, ctx) => {
-			setMode("review");
-			ctx.ui.notify("🪨 Caveman review mode", "info");
-			updateStatus(ctx);
-		},
-	});
-
-	pi.registerCommand("caveman-help", {
-		description: "Show caveman help",
-		handler: async (_args, ctx) => {
-			ctx.ui.notify("Try: /caveman [lite|full|ultra|wenyan|off] | /caveman-commit | /caveman-review", "info");
 		},
 	});
 }

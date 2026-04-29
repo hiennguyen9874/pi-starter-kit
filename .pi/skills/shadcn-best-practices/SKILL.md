@@ -1,7 +1,6 @@
 ---
 name: shadcn-best-practices
-description: Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for "shadcn init", "create an app with --preset", or "switch to --preset".
-user-invocable: false
+description: Use when working with shadcn/ui, components.json, shadcn CLI init/add/search, registries, presets, component composition, forms, dialogs, tables, semantic theme tokens, Tailwind classes inside shadcn components, or fixing shadcn UI/accessibility issues.
 ---
 
 # shadcn/ui
@@ -17,6 +16,10 @@ A framework for building ui, components and design systems. Components are added
 ```
 
 The JSON above contains the project config and installed components. Use `npx shadcn@latest docs <component>` to get documentation and example URLs for any component.
+
+## Ownership
+
+This is the frontend system owner for shadcn/ui implementation. Use `frontend-skill` for visual art direction, `react-best-practices` for performance, and `vercel-composition-patterns` for reusable React API architecture.
 
 ## Principles
 

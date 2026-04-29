@@ -4,6 +4,8 @@
     "base": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -23,6 +25,8 @@
     "superpowers": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -53,6 +57,8 @@
     "backend": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -75,9 +81,7 @@
         "api-design",
         "backend-patterns",
         "database-migrations",
-        "go-api-project-structure",
         "golang-patterns",
-        "golang-pro",
         "golang-testing",
         "postgres-patterns"
       ],
@@ -91,6 +95,8 @@
     "frontend": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -111,12 +117,9 @@
         "verification-before-completion",
         "writing-plans",
         "coding-standards",
-        "frontend-design",
-        "frontend-development",
         "frontend-skill",
         "react-best-practices",
         "shadcn-best-practices",
-        "ui-styling",
         "ui-ux-pro-max",
         "vercel-composition-patterns",
         "web-design-guidelines"
@@ -129,6 +132,8 @@
     "devops": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
@@ -148,8 +153,7 @@
         "using-superpowers",
         "verification-before-completion",
         "writing-plans",
-        "docker-patterns",
-        "release-drafter"
+        "docker-patterns"
       ],
       "mcpServersEnable": [
         "context-mode"
@@ -160,17 +164,18 @@
     },
     "agentic": {
       "skillsEnable": [
-        "caveman",
-        "caveman-commit",
-        "caveman-help",
-        "caveman-review",
-        "compress",
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "code-reviewer",
         "context7-cli",
         "git-commit",
         "grill-me",
+        "improve-codebase-architecture",
+        "pragmatic-principles",
         "prompt-leverage",
+        "systematic-debugging",
+        "agent-md-refactor",
         "writing-skills",
         "skill-creator"
       ],
@@ -184,6 +189,8 @@
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "domain-model",
+        "diagnose",
         "context7-cli",
         "git-commit",
         "grill-me",
