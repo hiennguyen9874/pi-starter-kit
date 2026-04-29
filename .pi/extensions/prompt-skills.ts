@@ -54,7 +54,7 @@ export default function (pi: ExtensionAPI) {
         continue;
       }
 
-      const content = readFileSync(source.path, "utf8");
+      const content = stripFrontmatter(readFileSync(source.path, "utf8"));
       loaded.push(formatSkill(source.name, source.path, content));
     }
 
@@ -186,6 +186,10 @@ function discoverSkillsInRoot(root: string): SkillSource[] {
   }
 
   return result;
+}
+
+function stripFrontmatter(content: string): string {
+  return content.replace(FRONTMATTER_RE, "").trimStart();
 }
 
 function formatSkill(name: string, path: string, content: string): string {
