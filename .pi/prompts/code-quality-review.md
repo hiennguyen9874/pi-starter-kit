@@ -15,14 +15,14 @@ Evaluate whether implementation is correct, maintainable, testable, and appropri
 Inputs may include any of:
 - Changed files, diff, or file list
 - Branch name or base/head SHAs
-- Spec alignment context (if available)
+- Spec alignment context, plan folder, or selected `phase-x.md` if available
 - Output path for saving the report
 
 If spec alignment is unknown or was not reviewed, state that quality approval does not imply requirements are satisfied.
 
 ## Work Style
 
-- Focus on touched code. Avoid reviewing unrelated systems.
+- Focus on touched code and selected phase scope when provided. Avoid reviewing unrelated systems or future phases.
 - Prefer local fixes over redesign.
 - Treat DRY as duplicated knowledge, not similar syntax.
 - Use first-principles reasoning: does this code actually work and can it be understood?

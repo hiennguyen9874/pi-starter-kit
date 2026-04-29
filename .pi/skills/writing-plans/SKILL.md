@@ -7,15 +7,22 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plan folders assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized phases and tasks. DRY. YAGNI. TDD. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to folder:** `docs/plans/YYYY-MM-DD-<feature-name>/`
 
-## Bite-Sized Task Granularity
+**Required files:**
+- `design.md` — approved design or copied design context
+- `plan.md` — Plan Document Header plus phase list with links to `phase-x.md`
+- `phase-x.md` — executable phase files
+
+## Bite-Sized Phase and Task Granularity
+
+**Each phase contains 1-3 related tasks.** Group tasks that belong together, such as backend API + backend tests, or frontend UI + frontend tests. Do not mix unrelated backend, frontend, infra, and docs work in one phase.
 
 **Each step is one action (2-5 minutes):**
 - "Write the failing test" - step
@@ -26,12 +33,12 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**`plan.md` MUST start with this header:**
 
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan one phase at a time. Execute only one phase per user request unless explicitly told otherwise.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -42,9 +49,26 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ---
 ```
 
-## Task Structure
+After the header, list phases only:
+
+```markdown
+## Phases
+
+1. [Phase 1: Backend API and tests](phase-1.md)
+2. [Phase 2: Frontend UI and tests](phase-2.md)
+```
+
+## Phase File Structure
+
+Each `phase-x.md` uses this structure:
 
 ````markdown
+# Phase X: [Related Work Group]
+
+**Goal:** [What this phase completes]
+
+**Tasks:** 1-3 related tasks only.
+
 ### Task N: [Component Name]
 
 **Files:**
@@ -83,32 +107,40 @@ Expected: PASS
 git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
+
+## Phase Verification
+
+Run: `pytest tests/path -v`
+Expected: PASS
 ````
 
 ## Remember
+- Plan output is a folder, not one `plan.md` containing many tasks
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
+- Each phase has 1-3 related tasks
+- `plan.md` links to `phase-x.md`; task detail lives in phase files
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD, frequent commits
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the plan folder, offer execution choice:
 
-**"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `docs/plans/<folder>/`. Two execution options:**
 
-**1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
+**1. Current Session** - I execute one selected phase now, then stop for review
 
-**2. Parallel Session (separate)** - Open new session with executing-plans, batch execution with checkpoints
+**2. Parallel Session (separate)** - Open new session with executing-plans; execute one phase at a time
 
-**Which approach?"**
+**Which approach and which phase?"**
 
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use subagent-driven-development
-- Stay in this session
-- Fresh subagent per task + code review
+**If Current Session chosen:**
+- Read `design.md`, `plan.md`, and selected `phase-x.md`
+- Implement only that phase
+- Stop before starting another phase
 
 **If Parallel Session chosen:**
 - Guide them to open a new session
-- **REQUIRED SUB-SKILL:** New session uses executing-plans
+- **REQUIRED SUB-SKILL:** New session uses executing-plans one phase at a time

@@ -10,23 +10,25 @@ skills:
 You are orchestrating a two-phase code review.
 
 Inputs:
-- User request may include design path, plan path, review scope, branch, base/head SHAs, diff, file list, or output path.
+- User request may include design path, plan folder, `plan.md`, `phase-x.md`, review scope, branch, base/head SHAs, diff, file list, or output path.
 
 Task:
 1. Determine review scope.
-2. Read provided design, plan, requirements, acceptance criteria, or task notes.
-3. Inspect changed code or requested files.
-4. Dispatch two review subagents with same scope and source material:
+2. Read provided design, plan, selected phase, requirements, acceptance criteria, or task notes.
+3. If a plan folder is provided, read `design.md`, `plan.md`, and relevant `phase-x.md`; do not assume every phase was implemented.
+4. Inspect changed code or requested files.
+5. Dispatch two review subagents with same scope and source material:
    - `spec-reviewer`: Phase 1. Check whether code matches plan/spec and whether deviations are justified.
    - `code-quality-reviewer`: Phase 2. Check correctness, maintainability, architecture, tests, and pragmatic quality.
-5. Merge both reports into one review.
-6. De-duplicate findings. If both subagents report same issue, keep strongest severity and cite both angles if useful.
-7. Separate blocker fixes from optional improvements.
-8. Recommend minimal fixes only.
-9. Save review report if path is provided.
+6. Merge both reports into one review.
+7. De-duplicate findings. If both subagents report same issue, keep strongest severity and cite both angles if useful.
+8. Separate blocker fixes from optional improvements.
+9. Recommend minimal fixes only.
+10. Save review report if path is provided.
 
 Output path default:
-- If plan path is `docs/plans/YYYY-MM-DD-<topic>-plan.md`, save to `docs/plans/YYYY-MM-DD-<topic>-review.md`.
+- If plan folder is `docs/plans/YYYY-MM-DD-<topic>/`, save to `docs/plans/YYYY-MM-DD-<topic>/review.md`.
+- If reviewing a specific phase, save to `docs/plans/YYYY-MM-DD-<topic>/phase-x-review.md`.
 
 Rules:
 - Spec alignment findings come before quality findings.

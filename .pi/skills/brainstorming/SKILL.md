@@ -27,8 +27,8 @@ You MUST create a task for each of these items and complete them in order:
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>-design.md` and commit
-6. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>/design.md` and commit
+6. **Transition to implementation** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
 
 ## Process Flow
 
@@ -39,7 +39,7 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
+    "Write design.md in plan folder" [shape=box];
     "Invoke writing-plans skill" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
@@ -47,8 +47,8 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Invoke writing-plans skill";
+    "User approves design?" -> "Write design.md in plan folder" [label="yes"];
+    "Write design.md in plan folder" -> "Invoke writing-plans skill";
 }
 ```
 
@@ -78,12 +78,12 @@ digraph brainstorming {
 ## After the Design
 
 **Documentation:**
-- Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+- Write the validated design to `docs/plans/YYYY-MM-DD-<topic>/design.md`
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
 **Implementation:**
-- Invoke the writing-plans skill to create a detailed implementation plan
+- Invoke the writing-plans skill to create a detailed implementation plan folder
 - Do NOT invoke any other skill. writing-plans is the next step.
 
 ## Key Principles

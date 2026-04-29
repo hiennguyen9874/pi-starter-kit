@@ -18,12 +18,12 @@ Task:
 4. Ask the user only if there is material ambiguity.
 5. Propose 2-3 approaches with trade-offs.
 6. Recommend one approach.
-7. Produce a design that can later be turned into an implementation plan.
+7. Produce a design that can later be turned into an implementation plan folder.
 
 Do not implement code.
 
 Design output path:
-- `docs/plans/YYYY-MM-DD-<topic>-design.md`
+- `docs/plans/YYYY-MM-DD-<topic>/design.md`
 
 User Request:
 $ARGUMENTS
