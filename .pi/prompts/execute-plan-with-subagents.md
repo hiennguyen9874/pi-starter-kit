@@ -1,12 +1,9 @@
 ---
 description: Execute an implementation plan using focused subagents
 skills:
+  - executing-plans
   - subagent-driven-development
   - test-driven-development
-  - requesting-code-review
-  - receiving-code-review
-  - verification-before-completion
-  - finishing-a-development-branch
 ---
 
 You are executing an implementation plan with subagent-driven development.

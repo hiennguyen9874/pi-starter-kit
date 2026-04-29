@@ -467,17 +467,17 @@ export default function profileExtension(pi: ExtensionAPI): void {
     };
   });
 
-  pi.on("before_agent_start", async (event) => {
-    if (!state.activeProfileName || !state.activeProfile) {
-      return;
-    }
+  // pi.on("before_agent_start", async (event) => {
+  //   if (!state.activeProfileName || !state.activeProfile) {
+  //     return;
+  //   }
 
-    return {
-      systemPrompt: `${event.systemPrompt}\n\n${buildProfilePrompt(
-        state.activeProfileName,
-        state.activeProfile,
-        state.resourcesRequireReload ? "detailed" : "compact",
-      )}`,
-    };
-  });
+  //   return {
+  //     systemPrompt: `${event.systemPrompt}\n\n${buildProfilePrompt(
+  //       state.activeProfileName,
+  //       state.activeProfile,
+  //       state.resourcesRequireReload ? "detailed" : "compact",
+  //     )}`,
+  //   };
+  // });
 }

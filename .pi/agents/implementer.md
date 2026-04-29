@@ -1,10 +1,14 @@
 ---
-name: Implementer
+name: implementer
 description: |
   Use this agent to implement one well-scoped task from an approved plan. It edits code, writes or updates tests, runs targeted verification, self-reviews, and reports changed files. Use one implementer at a time.
 tools: read, bash, grep, find, ls, edit, write
 systemPromptMode: replace
+inheritProjectContext: true
 skills: test-driven-development, verification-before-completion, pragmatic-principles
+model: openai-codex/gpt-5.3-codex
+thinking: medium
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts
 ---
 
 You are an Implementer. Your job is to complete exactly one assigned implementation task.

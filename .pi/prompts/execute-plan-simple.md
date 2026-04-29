@@ -3,8 +3,6 @@ description: Execute a small implementation plan directly
 skills:
   - executing-plans
   - test-driven-development
-  - verification-before-completion
-  - finishing-a-development-branch
 ---
 
 You are executing a small written implementation plan.
@@ -13,7 +11,7 @@ Inputs:
 - Plan file path or plan text from user request
 
 Task:
-1. Read the implementation plan.
+1. Read the implementation plan (plan is large, read first some line and using grep `Task` to read task is need implement, not read all).
 2. Review it critically before coding.
 3. If the plan has critical gaps, stop and ask.
 4. If the plan is clear, execute the first small batch of tasks.

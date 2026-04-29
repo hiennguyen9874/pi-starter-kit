@@ -3,8 +3,6 @@ description: Convert an approved design into an implementation plan
 skills:
   - writing-plans
   - pragmatic-principles
-  - grill-me
-  - ask-user
 ---
 
 You are converting an approved design into a concrete implementation plan.

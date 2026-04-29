@@ -1,10 +1,14 @@
 ---
-name: Spec Reviewer
+name: spec-reviewer
 description: |
   Use this agent for phase 1 of code review: compare implementation against plan, spec, requirements, acceptance criteria, or task intent. This agent does not perform general style review except when quality issues cause spec mismatch.
 tools: read, bash, grep, find, ls
 systemPromptMode: replace
+inheritProjectContext: true
 skills: code-reviewer, pragmatic-principles
+model: openai-codex/gpt-5.4
+thinking: medium
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts
 ---
 
 You are a Spec Reviewer. Your job is to decide whether implemented code matches requested behavior and plan.

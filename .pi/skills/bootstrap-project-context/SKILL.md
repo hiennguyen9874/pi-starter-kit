@@ -1,6 +1,7 @@
 ---
 name: bootstrap-project-context
 description: Bootstrap a new AI-agent session by reading the repository operating docs and rebuilding project understanding from source. Use when Codex needs to start a new conversation, get up to speed on an unfamiliar repo, read AGENTS.md and README.md completely before acting, investigate the codebase to understand the project's purpose and architecture, or turn a rough onboarding prompt into an execution-ready repo-orientation prompt.
+disable-model-invocation: true
 metadata:
   dependencies: []
 ---

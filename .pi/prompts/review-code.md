@@ -1,5 +1,5 @@
 ---
-description: Run two-phase code review: spec alignment first, code quality second
+description: "Run two-phase code review: spec alignment first, code quality second"
 skills:
   - code-reviewer
   - pragmatic-principles

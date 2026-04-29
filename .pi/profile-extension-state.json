@@ -1,31 +1,24 @@
 {
   "managedSkillEntries": [
+    "-skills/agent-md-refactor",
     "-skills/api-design",
+    "-skills/architecture-diagram",
     "-skills/backend-patterns",
-    "-skills/brainstorming",
     "-skills/coding-standards",
     "-skills/database-migrations",
-    "-skills/dispatching-parallel-agents",
     "-skills/docker-patterns",
-    "-skills/executing-plans",
-    "-skills/finishing-a-development-branch",
     "-skills/frontend-skill",
     "-skills/golang-patterns",
     "-skills/golang-testing",
     "-skills/postgres-patterns",
     "-skills/prd",
     "-skills/react-best-practices",
-    "-skills/receiving-code-review",
-    "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/subagent-driven-development",
-    "-skills/test-driven-development",
+    "-skills/skill-creator",
     "-skills/ui-ux-pro-max",
-    "-skills/using-superpowers",
     "-skills/vercel-composition-patterns",
-    "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans"
+    "-skills/writing-skills"
   ],
   "mcpBaseline": {
     "mcpServers": {
@@ -37,10 +30,7 @@
         ]
       },
       "context-mode": {
-        "command": "node",
-        "args": [
-          "./.pi/extensions/context-mode/start.mjs"
-        ],
+        "command": "context-mode",
         "lifecycle": "keep-alive"
       }
     }

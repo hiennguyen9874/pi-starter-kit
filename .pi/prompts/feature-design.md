@@ -4,7 +4,6 @@ skills:
   - brainstorming
   - grill-me
   - ask-user
-  - pragmatic-principles
 ---
 
 You are designing a feature or behavior change.

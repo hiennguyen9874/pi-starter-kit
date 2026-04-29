@@ -7,6 +7,7 @@
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
     "npm:pi-mcp-adapter",
+    "npm:context-mode",
     "-npm:pi-prompt-template-model",
     "-npm:pi-subagents",
     "-npm:pi-intercom",
@@ -21,7 +22,7 @@
     "./extensions/inline-bash.ts",
     "./extensions/caveman.ts",
     "./extensions/prompt-skills.ts",
-    "-./extensions/context-mode/.pi/extensions/context-mode"
+    "./extensions/dump-system-prompt.ts"
   ],
   "subagents": {
     "agentOverrides": {
@@ -55,31 +56,24 @@
     }
   },
   "skills": [
+    "-skills/agent-md-refactor",
     "-skills/api-design",
+    "-skills/architecture-diagram",
     "-skills/backend-patterns",
-    "-skills/brainstorming",
     "-skills/coding-standards",
     "-skills/database-migrations",
-    "-skills/dispatching-parallel-agents",
     "-skills/docker-patterns",
-    "-skills/executing-plans",
-    "-skills/finishing-a-development-branch",
     "-skills/frontend-skill",
     "-skills/golang-patterns",
     "-skills/golang-testing",
     "-skills/postgres-patterns",
     "-skills/prd",
     "-skills/react-best-practices",
-    "-skills/receiving-code-review",
-    "-skills/requesting-code-review",
     "-skills/shadcn-best-practices",
-    "-skills/subagent-driven-development",
-    "-skills/test-driven-development",
+    "-skills/skill-creator",
     "-skills/ui-ux-pro-max",
-    "-skills/using-superpowers",
     "-skills/vercel-composition-patterns",
-    "-skills/verification-before-completion",
     "-skills/web-design-guidelines",
-    "-skills/writing-plans"
+    "-skills/writing-skills"
   ]
 }
