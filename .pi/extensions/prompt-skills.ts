@@ -9,6 +9,7 @@ interface PromptMetadata {
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
+const TRUNCATE_LINES = 10;
 
 export default function (pi: ExtensionAPI) {
   let pendingPromptSkills: string[] = [];
@@ -39,7 +40,8 @@ export default function (pi: ExtensionAPI) {
     if (skillNames.length === 0) return;
 
     const skillIndex = indexLoadedSkills(event.systemPromptOptions.skills ?? []);
-    const loaded: string[] = [];
+    const loadedFull: string[] = [];
+    const loadedDisplay: string[] = [];
     const missing: string[] = [];
 
     for (const skillName of skillNames) {
@@ -50,25 +52,31 @@ export default function (pi: ExtensionAPI) {
       }
 
       const content = stripFrontmatter(readFileSync(skill.filePath, "utf8"));
-      loaded.push(formatSkill(skill.name, skill.filePath, content));
+      loadedFull.push(formatSkill(skill.name, skill.filePath, content));
+      loadedDisplay.push(formatSkill(skill.name, skill.filePath, truncateLines(content, TRUNCATE_LINES)));
     }
 
-    if (loaded.length === 0 && missing.length === 0) return;
+    if (loadedFull.length === 0 && missing.length === 0) return;
 
     const missingText = missing.length > 0
       ? `\n\nMissing prompt-declared skills: ${missing.map((name) => `\`${name}\``).join(", ")}`
       : "";
 
     ctx.ui.notify(
-      `Prompt skills: ${loaded.length} loaded${missing.length > 0 ? `, ${missing.length} missing` : ""}`,
+      `Prompt skills: ${loadedFull.length} loaded${missing.length > 0 ? `, ${missing.length} missing` : ""}`,
       missing.length > 0 ? "warning" : "info",
     );
 
+    const header = "Prompt-declared skills loaded before executing prompt. Follow these skill instructions when relevant.";
+    const fullSkillsContent = loadedFull.join("\n\n---\n\n");
+    const displayContent = `${header}\n\n${loadedDisplay.join("\n\n---\n\n")}${missingText}`;
+
     return {
+      systemPrompt: event.systemPrompt + "\n\n" + header + "\n\n" + fullSkillsContent,
       message: {
         customType: "prompt-skills",
         display: true,
-        content: `Prompt-declared skills loaded before executing prompt. Follow these skill instructions when relevant.\n\n${loaded.join("\n\n---\n\n")}${missingText}`,
+        content: displayContent,
         details: { loaded: skillNames.filter((name) => !missing.includes(name)), missing },
       },
     };
@@ -155,6 +163,12 @@ function stripFrontmatter(content: string): string {
 
 function formatSkill(name: string, path: string, content: string): string {
   return `<skill name="${escapeXml(name)}" path="${escapeXml(resolve(path))}">\n${content}\n</skill>`;
+}
+
+function truncateLines(content: string, maxLines: number): string {
+  const lines = content.split("\n");
+  if (lines.length <= maxLines) return content;
+  return lines.slice(0, maxLines).join("\n") + "\n...";
 }
 
 function escapeXml(value: string): string {
