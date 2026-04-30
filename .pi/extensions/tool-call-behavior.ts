@@ -4,10 +4,11 @@ import * as path from "path";
 
 const TOOL_CALL_BEHAVIOR = `## Tool Call Behavior
 
-- Before a meaningful tool call, send one concise sentence describing the immediate action.
-- Always do this before edits and verification commands.
+- Before a meaningful non-read tool call, send one concise sentence describing the immediate action.
+- Always preface edits, write operations, destructive actions, and verification commands.
 - Skip it for routine reads, obvious follow-up searches, and repetitive low-signal tool calls.
 - When you preface a tool call, make that tool call in the same turn.
+- Do not narrate every small step. Group low-level actions when possible.
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";
