@@ -9,7 +9,7 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
-**Core principle:** Verify tests → Present options → Execute choice → Clean up what is safe to remove.
+**Core principle:** Verify tests → Present options → Execute choice → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -80,7 +80,7 @@ git merge <feature-branch>
 # Verify tests on merged result
 <test command>
 
-# If tests pass, continue to cleanup
+# If tests pass, continue to cleanu
 ```
 
 Then: Cleanup branch state if appropriate (Step 5)
