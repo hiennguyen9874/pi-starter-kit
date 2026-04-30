@@ -7,9 +7,9 @@
     "npm:pi-rtk-optimizer",
     "npm:pi-mcp-adapter",
     "npm:context-mode",
-    "-npm:pi-prompt-template-model",
-    "-npm:pi-subagents",
-    "-npm:pi-intercom",
+    "npm:pi-prompt-template-model",
+    "npm:pi-subagents",
+    "npm:pi-intercom",
     "-npm:pi-web-access",
     "-git:github.com/davebcn87/pi-autoresearch"
   ],
@@ -29,7 +29,7 @@
   "extensionState": {
     "toolCallBehaviorEnabled": true,
     "behavioralGuidelinesEnabled": true,
-    "piDocumentationEnabled": false,
+    "piDocumentationEnabled": true,
     "cavemanDefaultMode": "full",
     "cavemanMode": "full"
   },
