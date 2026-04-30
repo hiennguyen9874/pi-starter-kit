@@ -4,7 +4,7 @@ skills:
   - bootstrap-project-context
   - agent-md-refactor
   - domain-model
-  - code-reviewer
+  - grill-with-docs
 ---
 
 You are refactoring repository agent instruction files.
