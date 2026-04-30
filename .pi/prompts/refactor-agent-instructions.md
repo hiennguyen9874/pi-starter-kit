@@ -3,7 +3,6 @@ description: Refactor AGENTS.md or other agent instruction files into concise sh
 skills:
   - bootstrap-project-context
   - agent-md-refactor
-  - domain-model
   - grill-with-docs
 ---
 

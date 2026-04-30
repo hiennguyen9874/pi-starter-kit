@@ -60,7 +60,9 @@ Use these prompt groups when:
 | Prompt | Use when |
 |---|---|
 | `/feature-design` | You want to design a feature or behavior change before implementation. |
+| `/grill-with-docs-session` | You want to stress-test a plan against project docs, domain language, code evidence, and ADRs. |
 | `/architecture-review` | You want architecture feedback and pragmatic refactoring opportunities, not code changes. |
+| `/architecture-deepening` | You want architecture deepening candidates, then interactive exploration of one candidate. |
 | `/project-next-step` | You want repo analysis and the top 3-5 most valuable next steps, not implementation. |
 
 #### Plan
@@ -132,7 +134,7 @@ Core workflow skills:
 - `code-reviewer`, `requesting-code-review`, `receiving-code-review` — review workflows
 - `git-commit`, `verification-before-completion`, `finishing-a-development-branch` — completion and commit workflows
 - `brainstorming`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
-- `grill-me`, `domain-model`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
+- `grill-me`, `grill-with-docs`, `domain-model`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
 
 Domain and stack skills:
 

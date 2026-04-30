@@ -3,9 +3,8 @@ description: Review architecture and identify pragmatic refactoring opportunitie
 skills:
   - bootstrap-project-context
   - improve-codebase-architecture
-  - domain-model
+  - grill-with-docs
   - pragmatic-principles
-  - grill-me
   - ask-user
 ---
 
@@ -31,6 +30,8 @@ Task:
    - verification strategy
 
 Do not implement code.
+
+For interactive candidate exploration, use `/architecture-deepening`.
 
 User Request:
 $ARGUMENTS
