@@ -12,9 +12,6 @@ When to use:
 - User wants the plan challenged against existing `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs, and code.
 - User wants resolved terms or decisions captured inline in docs.
 
-Required agents:
-- None.
-
 Input contract:
 User should provide:
 - plan, idea, workflow, or decision to stress-test

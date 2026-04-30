@@ -16,11 +16,6 @@ When to use:
 - User wants architecture analysis informed by domain language and ADRs.
 - User wants to explore one candidate interactively before implementation.
 
-Required agents:
-- None required.
-- If an Explore subagent exists, use it for codebase exploration.
-- If no Explore subagent exists, inspect files directly.
-
 Input contract:
 User should provide:
 - target repo, module, feature area, or pain point

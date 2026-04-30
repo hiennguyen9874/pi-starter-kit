@@ -14,14 +14,12 @@ Inputs:
 Task:
 1. Resolve the plan folder and selected phase.
 2. Read `design.md`, `plan.md`, and only the selected `phase-x.md` when using plan folder format.
-3. Check phase count against declared/obvious feature size: small ≤3, medium ≤5, large ≤7.
-4. If no phase is selected, choose the first incomplete phase and state that assumption.
-5. Review the selected phase critically before coding.
-6. If the phase has critical gaps, stop and ask.
-7. If clear, execute only that phase.
-8. Run verification specified in the phase.
-9. Report progress and wait for feedback.
-10. Stop after the phase. Do not merge, commit, or delete branches unless explicitly requested.
+3. Review the selected phase critically before coding.
+4. If the phase has critical gaps, stop and ask.
+5. If clear, execute only that phase.
+6. Run verification specified in the phase.
+7. Report progress and wait for feedback.
+8. Stop after the phase. Do not merge, commit, or delete branches unless explicitly requested.
 
 Rules:
 - Follow the phase exactly unless the code proves the plan is wrong.
