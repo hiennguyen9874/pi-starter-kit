@@ -20,18 +20,19 @@ Inputs:
 
 Task:
 1. Resolve the plan folder.
-2. Read `design.md`, `plan.md`, and every `phase-x.md` in the plan folder.
+2. Read `design.md`, `plan.md`, and phase file names/links in the plan folder. Read phase files as needed to understand dependencies and sequencing.
 3. Check phase count against declared/obvious feature size: small ≤3, medium ≤5, large ≤7.
 4. If a starting phase is specified, start there; otherwise start with the first incomplete phase and state that assumption.
 5. Review the full plan critically before implementation.
 6. If the plan has critical gaps, plan/code conflicts, unresolved high-stakes decisions, or critical ambiguity, stop and ask before coding.
-7. Extract every phase, phase dependency, phase verification command, task, acceptance criterion, and file list.
+7. Extract every phase path, phase dependency, and phase-level verification command from the plan.
 8. Create a checklist for all remaining phases.
 9. For each phase, in dependency order:
    - dispatch exactly one `implementer` agent for the entire phase
-   - provide the full phase text; do not make the agent rediscover the plan
-   - provide relevant context from `design.md`, `plan.md`, prior completed phases, constraints, dependencies, and acceptance criteria
-   - instruct the implementer to complete every task and every checkbox in the phase
+   - provide the phase file path, not copied phase contents
+   - instruct the implementer to read `design.md`, `plan.md`, and its assigned `phase-x.md` before implementing
+   - provide relevant context from prior completed phases, constraints, dependencies, and any important orchestration notes
+   - instruct the implementer to complete every task and every checkbox in the assigned phase
    - require TDD when behavior changes and a practical test seam exists
    - require phase verification output, changed files, self-review, and open risks
 10. After the implementer completes a phase:
@@ -67,12 +68,12 @@ Hard rules:
 Phase implementer dispatch contract:
 - Plan folder path
 - Phase name and number
-- Full phase text copied from `phase-x.md`
-- All tasks and checkboxes in the phase
-- Acceptance criteria
-- Relevant design context, dependencies, and prior phase outputs
-- Files listed by the phase, if known
-- Verification command(s)
+- `design.md` path
+- `plan.md` path
+- Assigned `phase-x.md` path
+- Instruction to read those files before implementing
+- Relevant dependencies, constraints, orchestration notes, and prior phase outputs
+- Verification command(s), if known from orchestration
 - Constraints and non-goals
 
 Progress tracking:
