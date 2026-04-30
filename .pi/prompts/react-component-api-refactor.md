@@ -1,9 +1,9 @@
 ---
 description: Refactor React component APIs using composition patterns
 skills:
-  - vercel-composition-patterns
+  - composition-patterns
   - react-best-practices
-  - pragmatic-principles
+  - grill-me
   - ask-user
 ---
 

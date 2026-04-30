@@ -3,6 +3,7 @@ description: Improve React or Next.js frontend performance
 skills:
   - react-best-practices
   - ask-user
+  - react-view-transitions
 ---
 
 You are improving React/Next.js performance.

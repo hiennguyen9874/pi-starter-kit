@@ -138,7 +138,7 @@ Domain and stack skills:
 
 - backend/API/data: `api-design`, `backend-patterns`, `database-migrations`, `postgres-patterns`
 - Go: `golang-patterns`, `golang-testing`
-- frontend/design: `frontend-skill`, `coding-standards`, `react-best-practices`, `shadcn-best-practices`, `ui-ux-pro-max`, `vercel-composition-patterns`, `web-design-guidelines`
+- frontend/design: `frontend-skill`, `coding-standards`, `react-best-practices`, `shadcn-best-practices`, `ui-ux-pro-max`, `composition-patterns`, `web-design-guidelines`
 - DevOps: `docker-patterns`
 
 Agent-authoring and docs skills:

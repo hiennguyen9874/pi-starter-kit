@@ -19,7 +19,7 @@ The JSON above contains the project config and installed components. Use `npx sh
 
 ## Ownership
 
-This is the frontend system owner for shadcn/ui implementation. Use `frontend-skill` for visual art direction, `react-best-practices` for performance, and `vercel-composition-patterns` for reusable React API architecture.
+This is the frontend system owner for shadcn/ui implementation. Use `frontend-skill` for visual art direction, `react-best-practices` for performance, and `composition-patterns` for reusable React API architecture.
 
 ## Principles
 

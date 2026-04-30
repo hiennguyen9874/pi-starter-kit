@@ -5,7 +5,7 @@ skills:
   - frontend-skill
   - shadcn-best-practices
   - react-best-practices
-  - vercel-composition-patterns
+  - composition-patterns
   - ui-ux-pro-max
 ---
 

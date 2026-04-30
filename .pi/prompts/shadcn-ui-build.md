@@ -4,6 +4,7 @@ skills:
   - shadcn-best-practices
   - frontend-skill
   - react-best-practices
+  - grill-me
   - ask-user
 ---
 
