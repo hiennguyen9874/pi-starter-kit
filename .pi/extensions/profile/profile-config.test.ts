@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { loadProfilesConfig } from "./profile-config.ts";
+import { createProfilePolicy } from "./profile-policy.ts";
 
 function createRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-config-"));
@@ -55,6 +56,17 @@ test("loads valid profiles config", () => {
     skillsEnable: ["backend-patterns"],
     mcpServersDisable: ["chrome-devtools"],
   });
+});
+
+test("repository base profile allows bundled extension skills used by prompts", () => {
+  const result = loadProfilesConfig(process.cwd());
+  const baseProfile = result.config?.profiles.base;
+  assert.ok(baseProfile);
+
+  const policy = createProfilePolicy(baseProfile);
+
+  assert.equal(policy.isSkillAllowed("ask-user"), true);
+  assert.equal(policy.isSkillAllowed("ctx-doctor"), true);
 });
 
 test("unknown top-level shapes are rejected safely", () => {
