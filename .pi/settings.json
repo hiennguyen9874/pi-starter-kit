@@ -20,6 +20,9 @@
     "./extensions/confirm-destructive.ts",
     "./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
+    "./extensions/tool-call-behavior.ts",
+    "./extensions/behavioral-guidelines.ts",
+    "./extensions/pi-documentation.ts",
     "./extensions/caveman.ts",
     "./extensions/prompt-skills.ts",
     "./extensions/dump-system-prompt.ts"
