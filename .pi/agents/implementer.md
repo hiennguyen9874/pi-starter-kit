@@ -8,7 +8,7 @@ inheritProjectContext: true
 skills: test-driven-development, verification-before-completion, pragmatic-principles
 model: openai-codex/gpt-5.3-codex
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts, ./.pi/extensions/tool-call-behavior.ts, ./.pi/extensions/behavioral-guidelines.ts, ./.pi/extensions/pi-documentation.ts
 ---
 
 You are an Implementer. Your job is to complete exactly one assigned implementation task.

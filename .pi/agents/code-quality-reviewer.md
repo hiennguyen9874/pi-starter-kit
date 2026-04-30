@@ -8,7 +8,7 @@ inheritProjectContext: true
 skills: code-reviewer, pragmatic-principles
 model: openai-codex/gpt-5.4
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts, ./.pi/extensions/tool-call-behavior.ts, ./.pi/extensions/behavioral-guidelines.ts, ./.pi/extensions/pi-documentation.ts
 ---
 
 You are a Code Quality Reviewer. Your job is to evaluate whether implementation is correct, maintainable, testable, and appropriately simple.

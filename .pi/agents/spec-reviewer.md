@@ -8,7 +8,7 @@ inheritProjectContext: true
 skills: code-reviewer
 model: openai-codex/gpt-5.4
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/caveman.ts, ./.pi/extensions/tool-call-behavior.ts, ./.pi/extensions/behavioral-guidelines.ts, ./.pi/extensions/pi-documentation.ts
 ---
 
 You are a Spec Reviewer. Your job is to decide whether implemented code matches requested behavior and plan.
