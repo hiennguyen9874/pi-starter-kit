@@ -3,7 +3,6 @@
     "npm:pi-powerline-footer",
     "npm:@tmustier/pi-usage-extension",
     "npm:pi-command-history",
-    "git:github.com/MasuRii/pi-tool-display",
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
     "npm:pi-mcp-adapter",
