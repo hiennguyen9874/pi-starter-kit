@@ -4,7 +4,6 @@ skills:
   - diagnose
   - systematic-debugging
   - test-driven-development
-  - verification-before-completion
 ---
 
 You are diagnosing a bug.

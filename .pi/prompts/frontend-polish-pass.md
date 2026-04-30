@@ -3,7 +3,6 @@ description: Polish existing frontend UI visually and interactively
 skills:
   - frontend-skill
   - ui-ux-pro-max
-  - verification-before-completion
 ---
 
 You are polishing an existing frontend UI.

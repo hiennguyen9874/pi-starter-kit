@@ -3,7 +3,6 @@ description: Verify and fix issues from a code review report
 skills:
   - receiving-code-review
   - executing-plans
-  - verification-before-completion
 ---
 
 You are fixing issues from a review report.

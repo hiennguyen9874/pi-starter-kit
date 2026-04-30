@@ -4,7 +4,6 @@ skills:
   - shadcn-best-practices
   - frontend-skill
   - react-best-practices
-  - verification-before-completion
   - ask-user
 ---
 

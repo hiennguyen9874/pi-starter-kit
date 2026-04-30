@@ -4,7 +4,6 @@ skills:
   - vercel-composition-patterns
   - react-best-practices
   - pragmatic-principles
-  - verification-before-completion
   - ask-user
 ---
 
