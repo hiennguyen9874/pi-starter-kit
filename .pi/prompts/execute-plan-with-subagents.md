@@ -1,9 +1,7 @@
 ---
 description: Execute a full plan folder using phase-level subagents
 skills:
-  - executing-plans
   - subagent-driven-development
-  - test-driven-development
 ---
 
 You are executing a full written implementation plan folder using subagent-driven development.

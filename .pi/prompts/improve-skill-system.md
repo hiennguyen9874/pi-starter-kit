@@ -29,9 +29,6 @@ Read relevant files before proposing or editing:
 
 - requested skill directories
 - `.pi/skills/*/SKILL.md` that may overlap
-- `.pi/skills/prompt-leverage/SKILL.md`
-- `.pi/skills/skill-creator/SKILL.md`
-- `.pi/skills/writing-skills/SKILL.md`
 
 If user names specific skills, start there.
 

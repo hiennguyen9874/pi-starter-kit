@@ -5,14 +5,19 @@ Use this template when dispatching a spec compliance reviewer subagent.
 **Purpose:** Verify implementer built what was requested (nothing more, nothing less)
 
 ```
-Task tool (general-purpose):
-  description: "Review spec compliance for Task N"
+Task tool (spec-reviewer):
+  description: "Review spec compliance for Phase N: [phase name]"
   prompt: |
-    You are reviewing whether an implementation matches its specification.
+    You are reviewing whether a full phase implementation matches its specification.
 
     ## What Was Requested
 
-    [FULL TEXT of task requirements]
+    Plan folder: [path]
+    Design: [path/to/design.md]
+    Plan: [path/to/plan.md]
+    Assigned phase: [path/to/phase-x.md]
+
+    Read these files and compare the implementation against the full assigned phase.
 
     ## What Implementer Claims They Built
 
@@ -36,11 +41,11 @@ Task tool (general-purpose):
 
     ## Your Job
 
-    Read the implementation code and verify:
+    Read the phase plan, design, implementation code, and tests. Verify:
 
     **Missing requirements:**
-    - Did they implement everything that was requested?
-    - Are there requirements they skipped or missed?
+    - Did they implement every task and checkbox in the assigned phase?
+    - Are there phase requirements they skipped or missed?
     - Did they claim something works but didn't actually implement it?
 
     **Extra/unneeded work:**
@@ -50,8 +55,8 @@ Task tool (general-purpose):
 
     **Misunderstandings:**
     - Did they interpret requirements differently than intended?
-    - Did they solve the wrong problem?
-    - Did they implement the right feature but wrong way?
+    - Did they solve the wrong phase problem?
+    - Did they implement the right phase behavior but wrong way?
 
     **Verify by reading code, not by trusting report.**
 

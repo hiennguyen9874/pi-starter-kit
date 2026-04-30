@@ -1,78 +1,75 @@
-# Implementer Subagent Prompt Template
+# Phase Implementer Subagent Prompt Template
 
-Use this template when dispatching an implementer subagent.
+Use this template when dispatching one implementer subagent for one whole phase.
 
 ```
-Task tool (general-purpose):
-  description: "Implement Task N: [task name]"
+Task tool (implementer):
+  description: "Implement Phase N: [phase name]"
   prompt: |
-    You are implementing Task N: [task name]
+    You are implementing Phase N: [phase name]
 
-    ## Task Description
+    ## Plan Files
 
-    [FULL TEXT of task from plan - paste it here, don't make subagent read file]
+    Plan folder: [path]
+    Design: [path/to/design.md]
+    Plan: [path/to/plan.md]
+    Assigned phase: [path/to/phase-x.md]
 
     ## Context
 
-    [Scene-setting: where this fits, dependencies, architectural context]
+    [Prior completed phases, dependencies, constraints, orchestration notes, and non-goals]
 
     ## Before You Begin
 
-    If you have questions about:
-    - The requirements or acceptance criteria
-    - The approach or implementation strategy
-    - Dependencies or assumptions
-    - Anything unclear in the task description
+    Read `design.md`, `plan.md`, and your assigned `phase-x.md` before implementing.
 
-    **Ask them now.** Raise any concerns before starting work.
+    If the phase conflicts with code, requirements are unclear, dependencies are missing, or a high-stakes decision appears, stop and ask before coding.
 
     ## Your Job
 
     Once you're clear on requirements:
-    1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    1. Complete every task and checkbox in the assigned phase
+    2. Follow the design and plan unless code proves the plan wrong
+    3. Write or update tests; follow TDD when behavior changes and a practical test seam exists
+    4. Run phase verification command(s): [commands, if known]
+    5. Self-review the full phase implementation
+    6. Commit only if the orchestrator explicitly instructed you to commit
+    7. Report back
 
     Work from: [directory]
 
-    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-    It's always OK to pause and clarify. Don't guess or make assumptions.
-
-    ## Before Reporting Back: Self-Review
-
-    Review your work with fresh eyes. Ask yourself:
-
-    **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
-    - Are there edge cases I didn't handle?
-
-    **Quality:**
-    - Is this my best work?
-    - Are names clear and accurate (match what things do, not how they work)?
-    - Is the code clean and maintainable?
-
-    **Discipline:**
-    - Did I avoid overbuilding (YAGNI)?
-    - Did I only build what was requested?
-    - Did I follow existing patterns in the codebase?
-
-    **Testing:**
-    - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
-    - Are tests comprehensive?
-
-    If you find issues during self-review, fix them now before reporting.
-
     ## Report Format
 
-    When done, report:
-    - What you implemented
-    - What you tested and test results
-    - Files changed
-    - Self-review findings (if any)
-    - Any issues or concerns
+    # Phase Implementation Report
+
+    ## Implemented
+    - ...
+
+    ## Completed Phase Items
+    - ...
+
+    ## Changed Files
+    - `path` — summary
+
+    ## Tests / Verification
+    - command: `...`
+    - result: ...
+
+    ## Self-Review
+    - completeness: pass/fail + notes
+    - quality: pass/fail + notes
+    - scope discipline: pass/fail + notes
+
+    ## Issues / Risks / Questions
+    - ...
 ```
+
+## Rules
+
+- Implement only assigned phase.
+- Do not add speculative features.
+- Do not silently change architecture, APIs, schemas, data models, security posture, or public behavior beyond assigned phase scope.
+- Do not edit unrelated files.
+- Do not start broad refactors while implementing a phase.
+- Do not claim completion without command output or concrete verification evidence.
+- If you find issues during self-review, fix them before reporting.
