@@ -13,7 +13,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
-import * as os from "os";
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -70,75 +69,43 @@ Boundaries: code/commits/PRs write normal. "stop caveman" or "normal mode" to re
 
 // ─── Config Resolution ───────────────────────────────────────────────────────
 
-function getConfigDir(): string {
-	if (process.env.XDG_CONFIG_HOME) {
-		return path.join(process.env.XDG_CONFIG_HOME, "caveman");
-	}
-	if (process.platform === "win32") {
-		return path.join(
-			process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming"),
-			"caveman"
-		);
-	}
-	return path.join(os.homedir(), ".config", "caveman");
+function getSettingsPath(): string {
+	const piDir = process.env.PI_CONFIG_DIR || path.join(process.cwd(), ".pi");
+	return path.join(piDir, "settings.json");
 }
 
-function getConfigPath(): string {
-	return path.join(getConfigDir(), "config.json");
+function readSettings(): any {
+	try {
+		return JSON.parse(fs.readFileSync(getSettingsPath(), "utf8"));
+	} catch {
+		return {};
+	}
+}
+
+function writeSettings(settings: any): void {
+	fs.writeFileSync(getSettingsPath(), `${JSON.stringify(settings, null, 2)}\n`);
 }
 
 function getDefaultMode(): CavemanMode {
-	const envMode = process.env.CAVEMAN_DEFAULT_MODE;
-	if (envMode && VALID_MODES.includes(envMode.toLowerCase() as CavemanMode)) {
-		return envMode.toLowerCase() as CavemanMode;
-	}
-	try {
-		const config = JSON.parse(fs.readFileSync(getConfigPath(), "utf8"));
-		if (config.defaultMode && VALID_MODES.includes(config.defaultMode.toLowerCase() as CavemanMode)) {
-			return config.defaultMode.toLowerCase() as CavemanMode;
-		}
-	} catch {
-		// config missing or invalid
+	const value = readSettings().extensionState?.cavemanDefaultMode;
+	if (typeof value === "string" && VALID_MODES.includes(value.toLowerCase() as CavemanMode)) {
+		return value.toLowerCase() as CavemanMode;
 	}
 	return "full";
 }
 
-// ─── Flag File ───────────────────────────────────────────────────────────────
-
-function getFlagPath(): string {
-	const piDir = process.env.PI_CONFIG_DIR || path.join(os.homedir(), ".pi");
-	return path.join(piDir, ".caveman-active");
+function readSavedMode(): CavemanMode | null {
+	const value = readSettings().extensionState?.cavemanMode;
+	if (typeof value !== "string") return null;
+	const mode = value.toLowerCase();
+	return VALID_MODES.includes(mode as CavemanMode) ? mode as CavemanMode : null;
 }
 
-function safeWriteFlag(mode: CavemanMode): void {
+function writeSavedMode(mode: CavemanMode | null): void {
 	try {
-		const flagPath = getFlagPath();
-		const flagDir = path.dirname(flagPath);
-		fs.mkdirSync(flagDir, { recursive: true });
-		const tempPath = path.join(flagDir, `.caveman-active.${process.pid}.${Date.now()}`);
-		fs.writeFileSync(tempPath, mode, { mode: 0o600 });
-		fs.renameSync(tempPath, flagPath);
-	} catch {
-		// best-effort
-	}
-}
-
-function readFlag(): CavemanMode | null {
-	try {
-		const flagPath = getFlagPath();
-		const st = fs.lstatSync(flagPath);
-		if (st.isSymbolicLink() || !st.isFile() || st.size > 64) return null;
-		const raw = fs.readFileSync(flagPath, "utf8").trim().toLowerCase();
-		if (!VALID_MODES.includes(raw as CavemanMode)) return null;
-		return raw as CavemanMode;
-	} catch {
-		return null;
-	}
-}
-
-function clearFlag(): void {
-	try {
-		fs.unlinkSync(getFlagPath());
+		const settings = readSettings();
+		settings.extensionState = { ...(settings.extensionState || {}), cavemanMode: mode };
+		writeSettings(settings);
 	} catch {
 		// best-effort
 	}
@@ -151,16 +118,12 @@ let initialized = false;
 
 function setMode(mode: CavemanMode | null): void {
 	activeMode = mode;
-	if (mode && mode !== "off") {
-		safeWriteFlag(mode);
-	} else {
-		clearFlag();
-	}
+	writeSavedMode(mode && mode !== "off" ? mode : null);
 }
 
 function getEffectiveMode(): CavemanMode | null {
 	if (activeMode && activeMode !== "off") return activeMode;
-	return readFlag();
+	return readSavedMode();
 }
 
 function getRules(mode: CavemanMode): string {

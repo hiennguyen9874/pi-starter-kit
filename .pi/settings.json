@@ -27,6 +27,13 @@
     "./extensions/prompt-skills.ts",
     "./extensions/dump-system-prompt.ts"
   ],
+  "extensionState": {
+    "toolCallBehaviorEnabled": true,
+    "behavioralGuidelinesEnabled": true,
+    "piDocumentationEnabled": false,
+    "cavemanDefaultMode": "full",
+    "cavemanMode": "full"
+  },
   "subagents": {
     "agentOverrides": {
       "scout": {

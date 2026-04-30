@@ -1,6 +1,5 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 
 const TOOL_CALL_BEHAVIOR = `## tool_call_behavior
@@ -19,34 +18,31 @@ let enabled = true;
 let initialized = false;
 let warnedMissingMarker = false;
 
-function getFlagPath(): string {
-	const piDir = process.env.PI_CONFIG_DIR || path.join(os.homedir(), ".pi");
-	return path.join(piDir, ".tool-call-behavior-enabled");
+function getSettingsPath(): string {
+	const piDir = process.env.PI_CONFIG_DIR || path.join(process.cwd(), ".pi");
+	return path.join(piDir, "settings.json");
+}
+
+function readSettings(): any {
+	try {
+		return JSON.parse(fs.readFileSync(getSettingsPath(), "utf8"));
+	} catch {
+		return {};
+	}
 }
 
 function readEnabled(): boolean {
-	try {
-		const flagPath = getFlagPath();
-		const st = fs.lstatSync(flagPath);
-		if (st.isSymbolicLink() || !st.isFile() || st.size > 16) return true;
-		const raw = fs.readFileSync(flagPath, "utf8").trim().toLowerCase();
-		if (raw === "off" || raw === "false" || raw === "0") return false;
-		if (raw === "on" || raw === "true" || raw === "1") return true;
-	} catch {
-		// Default on when no flag exists.
-	}
-	return true;
+	const value = readSettings().extensionState?.toolCallBehaviorEnabled;
+	return typeof value === "boolean" ? value : true;
 }
 
 function writeEnabled(value: boolean): void {
 	enabled = value;
 	try {
-		const flagPath = getFlagPath();
-		const flagDir = path.dirname(flagPath);
-		fs.mkdirSync(flagDir, { recursive: true });
-		const tempPath = path.join(flagDir, `.tool-call-behavior-enabled.${process.pid}.${Date.now()}`);
-		fs.writeFileSync(tempPath, value ? "on" : "off", { mode: 0o600 });
-		fs.renameSync(tempPath, flagPath);
+		const settingsPath = getSettingsPath();
+		const settings = readSettings();
+		settings.extensionState = { ...(settings.extensionState || {}), toolCallBehaviorEnabled: value };
+		fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 	} catch {
 		// best-effort
 	}
