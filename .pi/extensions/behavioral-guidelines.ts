@@ -67,7 +67,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
-
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";
@@ -113,7 +112,7 @@ function injectGuidelines(systemPrompt: string): string {
 	let markerIndex = systemPrompt.indexOf(PRIMARY_MARKER);
 	if (markerIndex === -1) markerIndex = systemPrompt.indexOf(FALLBACK_MARKER);
 	if (markerIndex === -1) {
-		return `${systemPrompt}\n\n${GUIDELINES}`;
+		return `${systemPrompt}\n${GUIDELINES}`;
 	}
 
 	return `${systemPrompt.slice(0, markerIndex)}\n\n${GUIDELINES}${systemPrompt.slice(markerIndex)}`;

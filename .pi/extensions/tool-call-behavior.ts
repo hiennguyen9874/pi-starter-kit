@@ -2,13 +2,12 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const TOOL_CALL_BEHAVIOR = `## tool_call_behavior
+const TOOL_CALL_BEHAVIOR = `## Tool Call Behavior
 
 - Before a meaningful tool call, send one concise sentence describing the immediate action.
 - Always do this before edits and verification commands.
 - Skip it for routine reads, obvious follow-up searches, and repetitive low-signal tool calls.
 - When you preface a tool call, make that tool call in the same turn.
-
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";
@@ -65,7 +64,7 @@ function injectToolCallBehavior(systemPrompt: string): string {
 
 	const insertIndex = findInsertIndex(systemPrompt);
 	if (insertIndex === -1) {
-		return `${systemPrompt}\n\n${TOOL_CALL_BEHAVIOR}`;
+		return `${systemPrompt}\n${TOOL_CALL_BEHAVIOR}`;
 	}
 
 	return `${systemPrompt.slice(0, insertIndex)}\n\n${TOOL_CALL_BEHAVIOR}${systemPrompt.slice(insertIndex)}`;
