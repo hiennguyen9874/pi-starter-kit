@@ -1,6 +1,10 @@
 ---
 name: web-design-guidelines
-description: Use when asked to review UI code, check accessibility, audit design, review UX, or check a site against Web Interface Guidelines or frontend best practices.
+description: Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices".
+metadata:
+  author: vercel
+  version: "1.0.0"
+  argument-hint: <file-or-pattern>
 ---
 
 # Web Interface Guidelines

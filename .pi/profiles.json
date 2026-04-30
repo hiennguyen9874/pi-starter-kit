@@ -122,7 +122,9 @@
         "shadcn-best-practices",
         "ui-ux-pro-max",
         "vercel-composition-patterns",
-        "web-design-guidelines"
+        "web-design-guidelines",
+        "react-view-transitions",
+        "composition-patterns"
       ],
       "mcpServersEnable": [
         "chrome-devtools",
