@@ -2,28 +2,19 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const TOOL_CALL_BEHAVIOR = `## Tool Call Behavior
+const REPOSITORY_INSTRUCTIONS = `## Repository Instructions
 
-- Before meaningful non-read tool calls, send one concise sentence describing the immediate action.
-- Always preface edits, writes, destructive actions, installs, tests, formatting, and verification commands.
-- Skip prefaces for routine reads, obvious follow-up searches, and repetitive low-signal tool calls.
-- Group related actions into one preface instead of narrating every command.
-- If previous work was done, connect the preface to current progress.
-- When you preface a tool call, make that tool call in the same turn.
-
-Good:
-- \`Repo shape clear. Now checking route handlers.\`
-- \`Bug surface found. Patching minimal validation path.\`
-- \`Patch done. Running focused test for changed module.\`
-
-Bad:
-- \`I will read another file.\`
-- \`Now I will run grep.\`
-- \`Next I will inspect this one small thing.\`
+- Repositories may contain \`AGENTS.md\` files with project-specific instructions.
+- An \`AGENTS.md\` applies to all files under the directory that contains it.
+- For every file you edit, obey all applicable \`AGENTS.md\` files.
+- More deeply nested \`AGENTS.md\` files override parent \`AGENTS.md\` files.
+- Direct system, developer, and user instructions override \`AGENTS.md\`.
+- When working outside the current directory or inside a new subdirectory, check for applicable \`AGENTS.md\` before editing.
+- If instructions conflict, state conflict briefly and follow highest-priority instruction.
 `;
 
-const PRIMARY_MARKER = "\nPi documentation (read only";
-const FALLBACK_MARKERS = ["\n## Behavioral guidelines", "\n# Project Context\n"];
+const PRIMARY_MARKER = "\n## Behavioral guidelines";
+const FALLBACK_MARKERS = ["\nPi documentation (read only", "\n# Project Context\n"];
 
 let enabled = true;
 let initialized = false;
@@ -43,7 +34,7 @@ function readSettings(): any {
 }
 
 function readEnabled(): boolean {
-	const value = readSettings().extensionState?.toolCallBehaviorEnabled;
+	const value = readSettings().extensionState?.repositoryInstructionsEnabled;
 	return typeof value === "boolean" ? value : true;
 }
 
@@ -52,7 +43,7 @@ function writeEnabled(value: boolean): void {
 	try {
 		const settingsPath = getSettingsPath();
 		const settings = readSettings();
-		settings.extensionState = { ...(settings.extensionState || {}), toolCallBehaviorEnabled: value };
+		settings.extensionState = { ...(settings.extensionState || {}), repositoryInstructionsEnabled: value };
 		fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 	} catch {
 		// best-effort
@@ -71,27 +62,27 @@ function findInsertIndex(systemPrompt: string): number {
 	return -1;
 }
 
-function injectToolCallBehavior(systemPrompt: string): string {
-	if (systemPrompt.includes(TOOL_CALL_BEHAVIOR)) return systemPrompt;
+function injectRepositoryInstructions(systemPrompt: string): string {
+	if (systemPrompt.includes(REPOSITORY_INSTRUCTIONS)) return systemPrompt;
 
 	const insertIndex = findInsertIndex(systemPrompt);
 	if (insertIndex === -1) {
-		return `${systemPrompt}\n${TOOL_CALL_BEHAVIOR}`;
+		return `${systemPrompt}\n${REPOSITORY_INSTRUCTIONS}`;
 	}
 
-	return `${systemPrompt.slice(0, insertIndex)}\n\n${TOOL_CALL_BEHAVIOR}${systemPrompt.slice(insertIndex)}`;
+	return `${systemPrompt.slice(0, insertIndex)}\n\n${REPOSITORY_INSTRUCTIONS}${systemPrompt.slice(insertIndex)}`;
 }
 
 function updateStatus(ctx: any): void {
 	if (!ctx.hasUI) return;
 	if (!enabled) {
-		ctx.ui.setStatus("tool-call-behavior", undefined);
+		ctx.ui.setStatus("repository-instructions", undefined);
 		return;
 	}
-	ctx.ui.setStatus("tool-call-behavior", ctx.ui.theme.fg("accent", "[TOOL-CALL]"));
+	ctx.ui.setStatus("repository-instructions", ctx.ui.theme.fg("accent", "[REPO]"));
 }
 
-export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
+export default function repositoryInstructionsExtension(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		enabled = readEnabled();
 		initialized = true;
@@ -108,15 +99,15 @@ export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
 		if (findInsertIndex(event.systemPrompt) === -1 && !warnedMissingMarker) {
 			warnedMissingMarker = true;
 			if (ctx.hasUI) {
-				ctx.ui.notify("Tool call behavior: insertion marker missing; appending at end", "warning");
+				ctx.ui.notify("Repository instructions: insertion marker missing; appending at end", "warning");
 			}
 		}
 
-		return { systemPrompt: injectToolCallBehavior(event.systemPrompt) };
+		return { systemPrompt: injectRepositoryInstructions(event.systemPrompt) };
 	});
 
-	pi.registerCommand("tool-call-behavior", {
-		description: "Toggle tool call behavior system prompt injection (on/off/status)",
+	pi.registerCommand("repository-instructions", {
+		description: "Toggle repository instructions system prompt injection (on/off/status)",
 		handler: async (args, ctx) => {
 			const arg = args.trim().toLowerCase();
 			if (!arg || arg === "toggle") {
@@ -126,15 +117,15 @@ export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
 			} else if (arg === "off" || arg === "disable" || arg === "disabled") {
 				writeEnabled(false);
 			} else if (arg === "status") {
-				ctx.ui.notify(`Tool call behavior: ${enabled ? "on" : "off"}`, "info");
+				ctx.ui.notify(`Repository instructions: ${enabled ? "on" : "off"}`, "info");
 				return;
 			} else {
-				ctx.ui.notify("Usage: /tool-call-behavior [on|off|toggle|status]", "warning");
+				ctx.ui.notify("Usage: /repository-instructions [on|off|toggle|status]", "warning");
 				return;
 			}
 
 			updateStatus(ctx);
-			ctx.ui.notify(`Tool call behavior: ${enabled ? "on" : "off"}`, "info");
+			ctx.ui.notify(`Repository instructions: ${enabled ? "on" : "off"}`, "info");
 		},
 	});
 }

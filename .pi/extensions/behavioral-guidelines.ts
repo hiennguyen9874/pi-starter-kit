@@ -13,10 +13,11 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+- State important assumptions explicitly.
+- If ambiguity blocks safe progress, ask one focused question.
+- If multiple valid interpretations exist and choice affects outcome, present tradeoffs and ask.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- If uncertainty is minor and reversible, state assumption and proceed.
 
 ### 2. Simplicity First
 

@@ -20,7 +20,11 @@
     "./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
     "./extensions/tool-call-behavior.ts",
+    "./extensions/repository-instructions.ts",
     "./extensions/behavioral-guidelines.ts",
+    "./extensions/code-change-guidelines.ts",
+    "./extensions/validation-rules.ts",
+    "./extensions/final-response.ts",
     "./extensions/pi-documentation.ts",
     "./extensions/caveman.ts",
     "./extensions/prompt-skills.ts",
@@ -28,7 +32,11 @@
   ],
   "extensionState": {
     "toolCallBehaviorEnabled": true,
+    "repositoryInstructionsEnabled": true,
     "behavioralGuidelinesEnabled": true,
+    "codeChangeGuidelinesEnabled": true,
+    "validationRulesEnabled": true,
+    "finalResponseEnabled": true,
     "piDocumentationEnabled": true,
     "cavemanDefaultMode": "full",
     "cavemanMode": "full"

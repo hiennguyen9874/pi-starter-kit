@@ -248,6 +248,9 @@ npm run build
 
 - https://github.com/nicobailon/pi-web-access
 
+### Ripgrep
+- https://github.com/burntsushi/ripgrep
+
 ## Agent Instructions
 
 Agent-facing instructions use docs-only progressive disclosure:

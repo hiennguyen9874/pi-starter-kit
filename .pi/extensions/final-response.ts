@@ -2,28 +2,32 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const TOOL_CALL_BEHAVIOR = `## Tool Call Behavior
+const FINAL_RESPONSE = `## Final Response
 
-- Before meaningful non-read tool calls, send one concise sentence describing the immediate action.
-- Always preface edits, writes, destructive actions, installs, tests, formatting, and verification commands.
-- Skip prefaces for routine reads, obvious follow-up searches, and repetitive low-signal tool calls.
-- Group related actions into one preface instead of narrating every command.
-- If previous work was done, connect the preface to current progress.
-- When you preface a tool call, make that tool call in the same turn.
+When handing off code work, provide a concise final response using this structure:
 
-Good:
-- \`Repo shape clear. Now checking route handlers.\`
-- \`Bug surface found. Patching minimal validation path.\`
-- \`Patch done. Running focused test for changed module.\`
+**Result**
+- Summarize the outcome first: what changed and why.
 
-Bad:
-- \`I will read another file.\`
-- \`Now I will run grep.\`
-- \`Next I will inspect this one small thing.\`
+**Files**
+- Mention changed files with clear, clickable paths when possible.
+- Wrap file paths, commands, environment variables, and code identifiers in backticks.
+- Include line numbers for important file references when useful, for example: \`path/to/file.ext:42\`.
+- Do not paste large files unless the user asks.
+
+**Validation**
+- Mention the validation command or check that was run.
+- State the result clearly: pass, fail, or blocked, including the reason when relevant.
+
+**Notes**
+- Mention known limitations, assumptions, skipped checks, or unrelated failures.
+- Suggest at most one next step.
+
+Keep the response concise unless the user asks for more detail.
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";
-const FALLBACK_MARKERS = ["\n## Behavioral guidelines", "\n# Project Context\n"];
+const FALLBACK_MARKERS = ["\nCAVEMAN MODE:", "\n# Project Context\n"];
 
 let enabled = true;
 let initialized = false;
@@ -43,7 +47,7 @@ function readSettings(): any {
 }
 
 function readEnabled(): boolean {
-	const value = readSettings().extensionState?.toolCallBehaviorEnabled;
+	const value = readSettings().extensionState?.finalResponseEnabled;
 	return typeof value === "boolean" ? value : true;
 }
 
@@ -52,7 +56,7 @@ function writeEnabled(value: boolean): void {
 	try {
 		const settingsPath = getSettingsPath();
 		const settings = readSettings();
-		settings.extensionState = { ...(settings.extensionState || {}), toolCallBehaviorEnabled: value };
+		settings.extensionState = { ...(settings.extensionState || {}), finalResponseEnabled: value };
 		fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 	} catch {
 		// best-effort
@@ -71,27 +75,27 @@ function findInsertIndex(systemPrompt: string): number {
 	return -1;
 }
 
-function injectToolCallBehavior(systemPrompt: string): string {
-	if (systemPrompt.includes(TOOL_CALL_BEHAVIOR)) return systemPrompt;
+function injectFinalResponse(systemPrompt: string): string {
+	if (systemPrompt.includes(FINAL_RESPONSE)) return systemPrompt;
 
 	const insertIndex = findInsertIndex(systemPrompt);
 	if (insertIndex === -1) {
-		return `${systemPrompt}\n${TOOL_CALL_BEHAVIOR}`;
+		return `${systemPrompt}\n${FINAL_RESPONSE}`;
 	}
 
-	return `${systemPrompt.slice(0, insertIndex)}\n\n${TOOL_CALL_BEHAVIOR}${systemPrompt.slice(insertIndex)}`;
+	return `${systemPrompt.slice(0, insertIndex)}\n\n${FINAL_RESPONSE}${systemPrompt.slice(insertIndex)}`;
 }
 
 function updateStatus(ctx: any): void {
 	if (!ctx.hasUI) return;
 	if (!enabled) {
-		ctx.ui.setStatus("tool-call-behavior", undefined);
+		ctx.ui.setStatus("final-response", undefined);
 		return;
 	}
-	ctx.ui.setStatus("tool-call-behavior", ctx.ui.theme.fg("accent", "[TOOL-CALL]"));
+	ctx.ui.setStatus("final-response", ctx.ui.theme.fg("accent", "[FINAL]"));
 }
 
-export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
+export default function finalResponseExtension(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		enabled = readEnabled();
 		initialized = true;
@@ -108,15 +112,15 @@ export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
 		if (findInsertIndex(event.systemPrompt) === -1 && !warnedMissingMarker) {
 			warnedMissingMarker = true;
 			if (ctx.hasUI) {
-				ctx.ui.notify("Tool call behavior: insertion marker missing; appending at end", "warning");
+				ctx.ui.notify("Final response: insertion marker missing; appending at end", "warning");
 			}
 		}
 
-		return { systemPrompt: injectToolCallBehavior(event.systemPrompt) };
+		return { systemPrompt: injectFinalResponse(event.systemPrompt) };
 	});
 
-	pi.registerCommand("tool-call-behavior", {
-		description: "Toggle tool call behavior system prompt injection (on/off/status)",
+	pi.registerCommand("final-response", {
+		description: "Toggle final response system prompt injection (on/off/status)",
 		handler: async (args, ctx) => {
 			const arg = args.trim().toLowerCase();
 			if (!arg || arg === "toggle") {
@@ -126,15 +130,15 @@ export default function toolCallBehaviorExtension(pi: ExtensionAPI) {
 			} else if (arg === "off" || arg === "disable" || arg === "disabled") {
 				writeEnabled(false);
 			} else if (arg === "status") {
-				ctx.ui.notify(`Tool call behavior: ${enabled ? "on" : "off"}`, "info");
+				ctx.ui.notify(`Final response: ${enabled ? "on" : "off"}`, "info");
 				return;
 			} else {
-				ctx.ui.notify("Usage: /tool-call-behavior [on|off|toggle|status]", "warning");
+				ctx.ui.notify("Usage: /final-response [on|off|toggle|status]", "warning");
 				return;
 			}
 
 			updateStatus(ctx);
-			ctx.ui.notify(`Tool call behavior: ${enabled ? "on" : "off"}`, "info");
+			ctx.ui.notify(`Final response: ${enabled ? "on" : "off"}`, "info");
 		},
 	});
 }
