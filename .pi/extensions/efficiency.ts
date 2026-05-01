@@ -4,11 +4,11 @@ import * as path from "path";
 
 const EFFICIENCY = `## Efficiency
 
-- Prefer targeted reads over large file dumps.
-- Prefer one focused search over repeated broad searches.
-- Stop investigating once enough evidence exists to make safe change.
-- Do not re-read files after successful \`edit\` or \`write\` unless verification needs exact resulting content.
-- Do not paste large files unless user asks.
+* Prefer targeted reads over large file dumps.
+* Prefer one focused search over repeated broad searches.
+* Stop investigating once enough evidence exists to make safe change.
+* Do not re-read files after successful \`edit\` or \`write\` unless verification, debugging, or final line references require exact resulting content.
+* Do not paste large files unless user asks.
 `;
 
 const VALIDATION_MARKER = "\n## Validation Rules\n";

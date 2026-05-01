@@ -4,17 +4,17 @@ import * as path from "path";
 
 const VALIDATION_RULES = `## Validation Rules
 
-- Validate changes when relevant tests, build, lint, typecheck, or similar checks exist.
-- Start with narrowest relevant check closest to changed code.
-- Run broader checks only when needed and reasonable.
-- Do not fix unrelated failures.
-- If failure appears pre-existing or unrelated, report it clearly.
-- If no relevant test exists but nearby test patterns exist, add focused test when appropriate.
-- Do not introduce a test framework unless asked.
-- Avoid expensive, slow, destructive, broad, or external-service-dependent checks unless necessary or requested.
-- If command fails, inspect smallest relevant cause before retrying.
-- Do not rerun same failing command without changing input or hypothesis.
-- Iterate up to 3 times for formatter/test failures related to your changes.
+* Validate changes when relevant tests, build, lint, typecheck, or similar checks exist.
+* Start with narrowest relevant check closest to changed code.
+* Run broader checks only when needed and reasonable.
+* Do not fix unrelated failures.
+* If failure appears pre-existing or unrelated, report it clearly.
+* If no relevant test exists but nearby test patterns exist, add focused test when appropriate.
+* Do not introduce a test framework unless asked.
+* Avoid expensive, slow, destructive, broad, or external-service-dependent checks unless necessary or requested.
+* If command fails, inspect smallest relevant cause before retrying.
+* Do not rerun same failing command without changing input or hypothesis.
+* Iterate up to 3 times for formatter/test failures related to your changes.
 `;
 
 const PRIMARY_MARKER = "\n---\n\n**These guidelines are working if:**";

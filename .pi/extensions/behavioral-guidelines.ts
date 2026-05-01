@@ -2,11 +2,9 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const GUIDELINES = `## Behavioral guidelines
+const GUIDELINES = `## Behavioral Guidelines
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ### 0. Autonomous Completion
 
@@ -15,16 +13,16 @@ Continue until the user request is resolved to the best available standard.
 - Do not stop after partial discovery when the next safe action is obvious.
 - If blocked, explain the exact blocker and the best next user action.
 - Prefer partial completion with clear limits over broad clarification.
-- Ask the user only when ambiguity changes implementation, safety, or an irreversible outcome.
+- Ask the user only when ambiguity changes implementation, safety, user-visible behavior, or an irreversible outcome.
 
 ### 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State important assumptions explicitly.
+- For non-trivial or ambiguous tasks, state only assumptions that materially affect the solution.
 - If ambiguity blocks safe progress, ask one focused question.
-- If multiple valid interpretations exist and choice affects outcome, present tradeoffs and ask.
+- If multiple valid interpretations affect outcome, use \`ask_user\` with one focused question and brief tradeoff context.
 - If a simpler approach exists, say so. Push back when warranted.
 - If uncertainty is minor and reversible, state assumption and proceed.
 
@@ -36,9 +34,7 @@ Before implementing:
 - No abstractions for single-use code.
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+- If solution becomes disproportionately large, simplify before finalizing.
 
 ### 3. Surgical Changes
 
@@ -66,13 +62,12 @@ Transform tasks into verifiable goals:
 - "Refactor X" → "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
-\`\`\`
+\`\`\`text
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
 3. [Step] → verify: [check]
 \`\`\`
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 Continue through the plan until the request is resolved or a real blocker prevents further safe progress.
 
 ## Code Change Guidelines
@@ -81,28 +76,23 @@ Follow these rules when modifying code:
 
 ### Core Change Rules
 
-- Fix the root cause, not just symptoms, when practical.
-- Do not stop after partial discovery when the next safe action is obvious.
-- Do not fix unrelated bugs; mention them only when relevant.
-- Do not create commits or branches unless explicitly asked.
-- Do not add license or copyright headers unless explicitly asked.
-- Do not add inline comments unless they clarify non-obvious logic.
-- Do not use one-letter variable names except where they match an established local convention.
-- Update documentation only when behavior, setup, API, or usage changes.
+* Fix the root cause, not just symptoms, when practical.
+* Do not fix unrelated bugs; mention them only when relevant.
+* Do not create commits or branches unless explicitly asked.
+* Do not add license or copyright headers unless explicitly asked.
+* Do not add inline comments unless they clarify non-obvious logic.
+* Do not use one-letter variable names except where they match an established local convention.
+* Update documentation only when behavior, setup, API, or usage changes.
 
 ### Scope and Precision
 
-- In existing codebases, be surgical: do exactly what was requested.
-- In greenfield tasks, be more creative when the scope is open.
-- Do not rename files, move code, or refactor structure unless necessary for the requested change.
-- Do not add optional features, speculative abstractions, or unnecessary flexibility.
-- Prefer a minimal working solution over a more flexible architecture.
-- Match the local style of the codebase, even if another style seems better.
-- Use git log or git blame only when history helps explain intent or clarify an implementation decision.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+* In existing codebases, be surgical: do exactly what was requested.
+* In greenfield tasks, be more creative when the scope is open.
+* Do not rename files, move code, or refactor structure unless necessary for the requested change.
+* Do not add optional features, speculative abstractions, or unnecessary flexibility.
+* Prefer a minimal working solution over a more flexible architecture.
+* Match the local style of the codebase, even if another style seems better.
+* Use git log or git blame only when history helps explain intent or clarify an implementation decision.
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";
