@@ -10,7 +10,7 @@ Core idea: switch profiles to change which skills and MCP servers Pi exposes for
 - Local skills for repeatable agent workflows
 - Reusable subagents
 - Prompt templates
-- Safety and behavior extensions
+- Safety and behavior extensions (see [Extensions](#extensions))
 - Project-local Pi config under `.pi/`
 
 ## 5-Minute Tour
@@ -30,13 +30,53 @@ Everything Pi-specific lives in `.pi/`:
 - `.pi/settings.json` — base Pi config, packages, extensions, skills
 - `.pi/profiles.json` — profile definitions
 - `.pi/mcp.json` — MCP server definitions
-- `.pi/extensions/` — custom extensions
+- `.pi/extensions/` — custom extensions (see [Extensions](#extensions))
 - `.pi/extensions/profile/` — profile filtering/sync extension
 - `.pi/agents/` — reusable agents
 - `.pi/skills/` — local skills
 - `.pi/prompts/` — prompt templates
 - `AGENTS.md` — concise agent working rules and instruction index
 - `docs/agent-instructions/` — shared detailed agent guidance for repo workflow and profiles
+
+## Extensions
+
+`.pi/extensions/` contains local Pi extensions that add safety guards, productivity features, and behavior shaping.
+
+### Safety Guards
+
+| Extension | What it does |
+|---|---|
+| `permission-gate.ts` | Blocks dangerous bash commands (`rm -rf`, `sudo`, `chmod 777`) unless confirmed in UI. Blocks by default in non-interactive mode. |
+| `protected-paths.ts` | Blocks `write` and `edit` operations to `.env`, `.git/`, and `node_modules/`. |
+| `confirm-destructive.ts` | Prompts for confirmation before clearing, switching, or forking a session. |
+| `dirty-repo-guard.ts` | Warns and optionally blocks session switches/forks when uncommitted git changes exist. |
+
+### Productivity
+
+| Extension | What it does |
+|---|---|
+| `inline-bash.ts` | Expands `!{command}` patterns in user prompts with live command output before sending to the agent. |
+| `prompt-skills.ts` | Auto-loads skills declared in prompt template frontmatter (`skills: [name1, name2]`) before execution. |
+| `dump-system-prompt.ts` | Adds `--dump-system-prompt` flag to print the assembled system prompt and exit. |
+
+### Behavior / Prompt Injection
+
+These extensions inject guidelines into the system prompt. Each can be toggled with a `/command` and persists state in `.pi/settings.json` under `extensionState`.
+
+| Extension | Command | Default | Injected guidelines |
+|---|---|---|---|
+| `tool-call-behavior.ts` | `/tool-call-behavior` | on | Preface meaningful tool calls; skip fluff for routine reads. |
+| `repository-instructions.ts` | `/repository-instructions` | on | Respect `AGENTS.md` hierarchy and priority rules. |
+| `behavioral-guidelines.ts` | `/behavioral-guidelines` | on | Think before coding, simplicity first, surgical changes, goal-driven execution. |
+| `validation-rules.ts` | `/validation-rules` | on | Run narrow checks first, iterate up to 3 times on related failures. |
+| `efficiency.ts` | `/efficiency` | on | Prefer targeted reads, avoid re-reading after successful edits. |
+| `final-response.ts` | `/final-response` | on | Concise handoff format: Result, Files, Validation, Notes. |
+| `pi-documentation.ts` | `/pi-documentation` | off | Removes the Pi documentation section from the system prompt when off. |
+| `caveman.ts` | `/caveman` | full | Terse communication mode (lite/full/ultra/wenyan/commit/review/compress). |
+
+### Profile Extension
+
+`profile/` is a multi-module extension that loads `.pi/profiles.json`, enforces skill/MCP filtering, and syncs managed state into `.pi/settings.json` and `.pi/mcp.json`. It provides the `/profile` command family and shows `profile:<name>` in the Pi status area.
 
 ## Local Prompts and Skills
 
