@@ -8,6 +8,15 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
+### 0. Autonomous Completion
+
+Continue until the user request is resolved to the best available standard.
+
+- Do not stop after partial discovery when the next safe action is obvious.
+- If blocked, explain the exact blocker and the best next user action.
+- Prefer partial completion with clear limits over broad clarification.
+- Ask the user only when ambiguity changes implementation, safety, or an irreversible outcome.
+
 ### 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
@@ -64,6 +73,7 @@ For multi-step tasks, state a brief plan:
 \`\`\`
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+Continue through the plan until the request is resolved or a real blocker prevents further safe progress.
 
 ## Code Change Guidelines
 
@@ -72,6 +82,8 @@ Follow these rules when modifying code:
 ### Core Change Rules
 
 - Fix the root cause, not just symptoms, when practical.
+- Do not stop after partial discovery when the next safe action is obvious.
+- Do not fix unrelated bugs; mention them only when relevant.
 - Do not create commits or branches unless explicitly asked.
 - Do not add license or copyright headers unless explicitly asked.
 - Do not add inline comments unless they clarify non-obvious logic.
