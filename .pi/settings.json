@@ -37,7 +37,7 @@
     "validationRulesEnabled": true,
     "efficiencyEnabled": true,
     "finalResponseEnabled": true,
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "cavemanDefaultMode": "full",
     "cavemanMode": "full"
   },
