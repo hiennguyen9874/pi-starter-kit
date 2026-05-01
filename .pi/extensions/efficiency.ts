@@ -2,22 +2,16 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const VALIDATION_RULES = `## Validation Rules
+const EFFICIENCY = `## Efficiency
 
-- Validate changes when relevant tests, build, lint, typecheck, or similar checks exist.
-- Start with narrowest relevant check closest to changed code.
-- Run broader checks only when needed and reasonable.
-- Do not fix unrelated failures.
-- If failure appears pre-existing or unrelated, report it clearly.
-- If no relevant test exists but nearby test patterns exist, add focused test when appropriate.
-- Do not introduce a test framework unless asked.
-- Avoid expensive, slow, destructive, broad, or external-service-dependent checks unless necessary or requested.
-- If command fails, inspect smallest relevant cause before retrying.
-- Do not rerun same failing command without changing input or hypothesis.
-- Iterate up to 3 times for formatter/test failures related to your changes.
+- Prefer targeted reads over large file dumps.
+- Prefer one focused search over repeated broad searches.
+- Stop investigating once enough evidence exists to make safe change.
+- Do not re-read files after successful \`edit\` or \`write\` unless verification needs exact resulting content.
+- Do not paste large files unless user asks.
 `;
 
-const PRIMARY_MARKER = "\n---\n\n**These guidelines are working if:**";
+const VALIDATION_MARKER = "\n## Validation Rules\n";
 const FALLBACK_MARKERS = ["\n## Final Response", "\nPi documentation (read only", "\n# Project Context\n"];
 
 let enabled = true;
@@ -38,7 +32,7 @@ function readSettings(): any {
 }
 
 function readEnabled(): boolean {
-	const value = readSettings().extensionState?.validationRulesEnabled;
+	const value = readSettings().extensionState?.efficiencyEnabled;
 	return typeof value === "boolean" ? value : true;
 }
 
@@ -47,16 +41,27 @@ function writeEnabled(value: boolean): void {
 	try {
 		const settingsPath = getSettingsPath();
 		const settings = readSettings();
-		settings.extensionState = { ...(settings.extensionState || {}), validationRulesEnabled: value };
+		settings.extensionState = { ...(settings.extensionState || {}), efficiencyEnabled: value };
 		fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 	} catch {
 		// best-effort
 	}
 }
 
+function findNextSectionIndex(systemPrompt: string, startIndex: number): number {
+	const sectionRegex = /\n## [^\n]+/g;
+	sectionRegex.lastIndex = startIndex;
+	const match = sectionRegex.exec(systemPrompt);
+	return match?.index ?? -1;
+}
+
 function findInsertIndex(systemPrompt: string): number {
-	const primaryIndex = systemPrompt.indexOf(PRIMARY_MARKER);
-	if (primaryIndex !== -1) return primaryIndex;
+	const validationIndex = systemPrompt.indexOf(VALIDATION_MARKER);
+	if (validationIndex !== -1) {
+		const afterValidationHeading = validationIndex + VALIDATION_MARKER.length;
+		const nextSectionIndex = findNextSectionIndex(systemPrompt, afterValidationHeading);
+		if (nextSectionIndex !== -1) return nextSectionIndex;
+	}
 
 	for (const marker of FALLBACK_MARKERS) {
 		const index = systemPrompt.indexOf(marker);
@@ -66,27 +71,27 @@ function findInsertIndex(systemPrompt: string): number {
 	return -1;
 }
 
-function injectValidationRules(systemPrompt: string): string {
-	if (systemPrompt.includes(VALIDATION_RULES)) return systemPrompt;
+function injectEfficiency(systemPrompt: string): string {
+	if (systemPrompt.includes(EFFICIENCY)) return systemPrompt;
 
 	const insertIndex = findInsertIndex(systemPrompt);
 	if (insertIndex === -1) {
-		return `${systemPrompt}\n${VALIDATION_RULES}`;
+		return `${systemPrompt}\n${EFFICIENCY}`;
 	}
 
-	return `${systemPrompt.slice(0, insertIndex)}\n\n${VALIDATION_RULES}${systemPrompt.slice(insertIndex)}`;
+	return `${systemPrompt.slice(0, insertIndex)}\n\n${EFFICIENCY}${systemPrompt.slice(insertIndex)}`;
 }
 
 function updateStatus(ctx: any): void {
 	if (!ctx.hasUI) return;
 	if (!enabled) {
-		ctx.ui.setStatus("validation-rules", undefined);
+		ctx.ui.setStatus("efficiency", undefined);
 		return;
 	}
-	ctx.ui.setStatus("validation-rules", ctx.ui.theme.fg("accent", "[VALIDATE]"));
+	ctx.ui.setStatus("efficiency", ctx.ui.theme.fg("accent", "[EFF]"));
 }
 
-export default function validationRulesExtension(pi: ExtensionAPI) {
+export default function efficiencyExtension(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		enabled = readEnabled();
 		initialized = true;
@@ -103,15 +108,15 @@ export default function validationRulesExtension(pi: ExtensionAPI) {
 		if (findInsertIndex(event.systemPrompt) === -1 && !warnedMissingMarker) {
 			warnedMissingMarker = true;
 			if (ctx.hasUI) {
-				ctx.ui.notify("Validation rules: insertion marker missing; appending at end", "warning");
+				ctx.ui.notify("Efficiency: insertion marker missing; appending at end", "warning");
 			}
 		}
 
-		return { systemPrompt: injectValidationRules(event.systemPrompt) };
+		return { systemPrompt: injectEfficiency(event.systemPrompt) };
 	});
 
-	pi.registerCommand("validation-rules", {
-		description: "Toggle validation rules system prompt injection (on/off/status)",
+	pi.registerCommand("efficiency", {
+		description: "Toggle efficiency system prompt injection (on/off/status)",
 		handler: async (args, ctx) => {
 			const arg = args.trim().toLowerCase();
 			if (!arg || arg === "toggle") {
@@ -121,15 +126,15 @@ export default function validationRulesExtension(pi: ExtensionAPI) {
 			} else if (arg === "off" || arg === "disable" || arg === "disabled") {
 				writeEnabled(false);
 			} else if (arg === "status") {
-				ctx.ui.notify(`Validation rules: ${enabled ? "on" : "off"}`, "info");
+				ctx.ui.notify(`Efficiency: ${enabled ? "on" : "off"}`, "info");
 				return;
 			} else {
-				ctx.ui.notify("Usage: /validation-rules [on|off|toggle|status]", "warning");
+				ctx.ui.notify("Usage: /efficiency [on|off|toggle|status]", "warning");
 				return;
 			}
 
 			updateStatus(ctx);
-			ctx.ui.notify(`Validation rules: ${enabled ? "on" : "off"}`, "info");
+			ctx.ui.notify(`Efficiency: ${enabled ? "on" : "off"}`, "info");
 		},
 	});
 }

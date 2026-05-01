@@ -5,11 +5,11 @@ import * as path from "path";
 const REPOSITORY_INSTRUCTIONS = `## Repository Instructions
 
 - Repositories may contain \`AGENTS.md\` files with project-specific instructions.
-- An \`AGENTS.md\` applies to all files under the directory that contains it.
+- An \`AGENTS.md\` applies to all files under its directory.
 - For every file you edit, obey all applicable \`AGENTS.md\` files.
-- More deeply nested \`AGENTS.md\` files override parent \`AGENTS.md\` files.
+- More deeply nested \`AGENTS.md\` files override parent instructions.
 - Direct system, developer, and user instructions override \`AGENTS.md\`.
-- When working outside the current directory or inside a new subdirectory, check for applicable \`AGENTS.md\` before editing.
+- When working outside current directory or in a new subdirectory, check for applicable \`AGENTS.md\` before editing.
 - If instructions conflict, state conflict briefly and follow highest-priority instruction.
 `;
 

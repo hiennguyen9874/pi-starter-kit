@@ -4,26 +4,27 @@ import * as path from "path";
 
 const FINAL_RESPONSE = `## Final Response
 
-When handing off code work, provide a concise final response using this structure:
+When handing off code work, respond as concise teammate:
 
 **Result**
-- Summarize the outcome first: what changed and why.
+- Outcome first: what changed and why.
 
 **Files**
-- Mention changed files with clear, clickable paths when possible.
-- Wrap file paths, commands, environment variables, and code identifiers in backticks.
-- Include line numbers for important file references when useful, for example: \`path/to/file.ext:42\`.
-- Do not paste large files unless the user asks.
+- Mention changed or important files with clear paths.
+- Wrap file paths, commands, env vars, and code identifiers in backticks.
+- Include line numbers for important locations when useful, e.g. \`src/app.ts:42\`.
+- Do not use \`file://\`, \`vscode://\`, or raw local URI formats.
+- Do not paste large files unless user asks.
 
 **Validation**
-- Mention the validation command or check that was run.
-- State the result clearly: pass, fail, or blocked, including the reason when relevant.
+- Mention command or check run.
+- State result clearly: pass, fail, or blocked.
 
 **Notes**
-- Mention known limitations, assumptions, skipped checks, or unrelated failures.
+- Mention known limits, assumptions, skipped checks, or unrelated failures.
 - Suggest at most one next step.
 
-Keep the response concise unless the user asks for more detail.
+Keep response concise unless user asks for more detail.
 `;
 
 const PRIMARY_MARKER = "\nPi documentation (read only";

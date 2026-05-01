@@ -4,11 +4,12 @@ import * as path from "path";
 
 const TOOL_CALL_BEHAVIOR = `## Tool Call Behavior
 
-- Before meaningful non-read tool calls, send one concise sentence describing the immediate action.
+- Before meaningful non-read tool calls, send one concise sentence describing immediate next action.
 - Always preface edits, writes, destructive actions, installs, tests, formatting, and verification commands.
-- Skip prefaces for routine reads, obvious follow-up searches, and repetitive low-signal tool calls.
-- Group related actions into one preface instead of narrating every command.
-- If previous work was done, connect the preface to current progress.
+- Group related actions into one preface instead of narrating each command.
+- Connect prefaces to prior findings when useful.
+- Skip prefaces for routine reads, obvious follow-up searches, and repetitive low-signal calls.
+- For costly, broad, destructive, or long-running actions, state why action matters.
 - When you preface a tool call, make that tool call in the same turn.
 
 Good:
