@@ -1,7 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 const TOOL_USAGE_GUIDELINES = [
-	"- Prefer `rg` for searching text and `rg --files` for listing files when available.",
 	"- Use `read` for inspecting file contents; avoid `cat`, `sed`, or large shell output for routine file reads.",
 	"- Use `bash` for discovery, search, test, build, and filesystem operations.",
 ];
