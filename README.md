@@ -136,7 +136,8 @@ Use these prompt groups when:
 
 | Prompt | Use when |
 |---|---|
-| `/frontend-design-direction` | You need visual direction for a page, app screen, dashboard, redesign, prototype, or polish pass. |
+| `/frontend-design-direction` | Landing page, portfolio, or marketing site needs visual direction. |
+| `/interface-design-direction` | Dashboard, app, admin panel, or product surface needs design direction. |
 | `/frontend-ui-audit` | You want UI, UX, accessibility, shadcn, or React frontend quality review without fixes. |
 
 #### Frontend Implement and Polish
@@ -144,7 +145,9 @@ Use these prompt groups when:
 | Prompt | Use when |
 |---|---|
 | `/shadcn-ui-build` | You need shadcn/ui components, pages, forms, dialogs, tables, themes, or blocks built/fixed. |
-| `/frontend-polish-pass` | Existing UI works but needs better hierarchy, spacing, copy, motion, responsiveness, or finish. |
+| `/frontend-polish-pass` | Marketing UI feels generic, cluttered, or weak — hierarchy, spacing, copy, motion. |
+| `/interface-polish-pass` | Product UI needs density, navigation, data presentation, or information architecture fixes. |
+| `/react-view-transitions-build` | Add page transitions, shared element animations, or View Transition API integration. |
 | `/react-component-api-refactor` | React component APIs have boolean-prop growth or need cleaner composition. |
 | `/react-performance-pass` | React/Next.js UI is slow or has rerenders, hydration, bundle, data-fetching, or load-time issues. |
 
@@ -180,7 +183,8 @@ Domain and stack skills:
 
 - backend/API/data: `api-design`, `backend-patterns`, `database-migrations`, `postgres-patterns`
 - Go: `golang-patterns`, `golang-testing`
-- frontend/design: `frontend-skill`, `coding-standards`, `react-best-practices`, `shadcn-best-practices`, `ui-ux-pro-max`, `composition-patterns`, `web-design-guidelines`
+- frontend/design: `frontend-skill`, `interface-design`, `coding-standards`, `react-best-practices`, `react-view-transitions`, `shadcn-best-practices`, `composition-patterns`, `ui-ux-pro-max`, `web-design-guidelines`
+- brand/design-system: `brand`, `design-system`, `banner-design`, `slides`
 - DevOps: `docker-patterns`
 
 Agent-authoring and docs skills:
@@ -363,7 +367,45 @@ Check:
 
 Some profile entries may refer to skills provided by external Pi packages or user-level skill directories. If a skill is missing, either install it, remove it from the profile, or keep it only in profiles where that external dependency exists.
 
-## Design Notes
+## Frontend Workflow
+
+Frontend prompts distinguish **marketing surfaces** (landing pages, portfolios, hero sections) from **product surfaces** (dashboards, admin panels, SaaS apps). Use `frontend-*` prompts for marketing, `interface-*` prompts for product.
+
+### Workflow Chains
+
+**Landing Page:**
+```
+frontend-design-direction → shadcn-ui-build → frontend-polish-pass → frontend-ui-audit
+```
+
+**Dashboard / SaaS App:**
+```
+interface-design-direction → shadcn-ui-build → interface-polish-pass → frontend-ui-audit → react-performance-pass (if needed)
+```
+
+**Component Refactor:**
+```
+react-component-api-refactor → frontend-ui-audit → react-performance-pass (if perf issues found)
+```
+
+**Animation Add-on:**
+```
+react-view-transitions-build → frontend-ui-audit
+```
+
+### Skill Groupings
+
+| Group | Skills | Purpose |
+|-------|--------|---------|
+| React Development | `composition-patterns`, `react-best-practices`, `react-view-transitions` | Architecture, performance, animations |
+| Visual Design | `frontend-skill` (marketing), `interface-design` (product) | Surface-specific art direction |
+| Design Reference | `ui-ux-pro-max` | Color palettes, fonts, styles, UX guidelines |
+| Brand & System | `brand`, `design-system` | Identity → tokens → CSS vars pipeline |
+| UI Implementation | `shadcn-best-practices` | shadcn/ui + Tailwind + canvas visual design |
+| Graphic & Presentation | `banner-design`, `slides` | Banners, HTML presentations |
+| Audit | `web-design-guidelines` | Review code against Vercel guidelines |
+
+### Design Notes
 
 This repo is meant to be edited. Treat it as a starter kit, not a framework:
 
@@ -371,3 +413,4 @@ This repo is meant to be edited. Treat it as a starter kit, not a framework:
 - Add only skills/tools you actively use.
 - Prefer task-shaped profiles over one giant all-tools profile.
 - Keep agent instructions explicit and test important extension behavior.
+- See `docs/FRONTEND_PROMPT.md` for full prompt guide and `docs/FRONTEND_SKILL.md` for detailed skill analysis.
