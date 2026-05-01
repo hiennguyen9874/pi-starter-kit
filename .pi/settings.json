@@ -34,7 +34,6 @@
     "toolCallBehaviorEnabled": true,
     "repositoryInstructionsEnabled": true,
     "behavioralGuidelinesEnabled": true,
-    "codeChangeGuidelinesEnabled": true,
     "validationRulesEnabled": true,
     "efficiencyEnabled": true,
     "finalResponseEnabled": true,
