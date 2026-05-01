@@ -1,6 +1,6 @@
 ---
 name: shadcn-best-practices
-description: Use when working with shadcn/ui, components.json, shadcn CLI init/add/search, registries, presets, component composition, forms, dialogs, tables, semantic theme tokens, Tailwind classes inside shadcn components, or fixing shadcn UI/accessibility issues.
+description: Use when working with shadcn/ui, components.json, shadcn CLI init/add/search, registries, presets, component composition, forms, dialogs, tables, semantic theme tokens, Tailwind CSS customization, responsive design, canvas-based visual design, or fixing shadcn UI/accessibility issues.
 ---
 
 # shadcn/ui
@@ -242,3 +242,46 @@ npx shadcn@latest view @shadcn/button
 - [rules/base-vs-radix.md](./rules/base-vs-radix.md) — asChild vs render, Select, ToggleGroup, Slider, Accordion
 - [cli.md](./cli.md) — Commands, flags, presets, templates
 - [customization.md](./customization.md) — Theming, CSS variables, extending components
+
+## Tailwind CSS & Visual Design (from merged ui-styling)
+
+This skill also covers Tailwind CSS customization, responsive design patterns, utility references, and canvas-based visual design systems.
+
+### Tailwind Customization
+
+See: [references/tailwind-customization.md](./references/tailwind-customization.md)
+- `@theme` directive for custom tokens
+- Color palettes and semantic colors
+- Typography and font customization
+- Custom utilities, plugins, and theme extensions
+
+### Responsive Design
+
+See: [references/tailwind-responsive.md](./references/tailwind-responsive.md)
+- Mobile-first breakpoints
+- Responsive layout patterns
+- Visibility, typography, spacing, width utilities
+
+### Utility Reference
+
+See: [references/tailwind-utilities.md](./references/tailwind-utilities.md)
+- Layout utilities (flexbox, grid, positioning)
+- Spacing, typography, colors, borders, shadows
+
+### Canvas Visual Design
+
+See: [references/canvas-design-system.md](./references/canvas-design-system.md)
+- Visual design philosophy and composition
+- Museum-quality execution patterns
+- Systematic visual communication (90% visual, 10% text)
+
+## Scripts
+
+- [scripts/shadcn_add.py](./scripts/shadcn_add.py) — Programmatic shadcn/ui component installation
+- [scripts/tailwind_config_gen.py](./scripts/tailwind_config_gen.py) — Generate tailwind.config.js/ts with custom theme
+
+## Resources
+
+- shadcn/ui Docs: https://ui.shadcn.com
+- Tailwind CSS Docs: https://tailwindcss.com
+- Radix UI: https://radix-ui.com

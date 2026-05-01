@@ -149,13 +149,18 @@
         "verification-before-completion",
         "writing-plans",
         "coding-standards",
+        "composition-patterns",
         "frontend-skill",
         "react-best-practices",
-        "shadcn-best-practices",
+        "banner-design",
+        "design-system",
+        "react-view-transitions",
         "ui-ux-pro-max",
-        "composition-patterns",
+        "brand",
+        "shadcn-best-practices",
         "web-design-guidelines",
-        "react-view-transitions"
+        "interface-design",
+        "slides"
       ],
       "mcpServersEnable": [
         "chrome-devtools",
