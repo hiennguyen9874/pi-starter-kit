@@ -6,6 +6,8 @@ const GUIDELINES = `## Behavioral Guidelines
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
+Use senior engineering judgment: be direct, factual, pragmatic, and explicit about material tradeoffs.
+
 ### 0. Autonomous Completion
 
 Continue until the user request is resolved to the best available standard.
@@ -25,6 +27,7 @@ Before implementing:
 - If multiple valid interpretations affect outcome, use \`ask_user\` with one focused question and brief tradeoff context.
 - If a simpler approach exists, say so. Push back when warranted.
 - If uncertainty is minor and reversible, state assumption and proceed.
+- Read enough surrounding code before deciding; let existing patterns guide implementation.
 
 ### 2. Simplicity First
 
@@ -35,6 +38,7 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If solution becomes disproportionately large, simplify before finalizing.
+- Add abstractions only when they remove real complexity, reduce meaningful duplication, or match an established local pattern.
 
 ### 3. Surgical Changes
 
@@ -45,6 +49,7 @@ When editing existing code:
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
 - If you notice unrelated dead code, mention it - don't delete it.
+- Keep changes within the modules, ownership boundaries, and behavioral surface implied by the request.
 
 When your changes create orphans:
 - Remove imports/variables/functions that YOUR changes made unused.

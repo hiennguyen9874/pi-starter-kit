@@ -27,6 +27,7 @@ When handing off code work, respond as concise teammate:
 
 * Mention known limits, assumptions, skipped checks, or unrelated failures.
 * Suggest at most one next step.
+* When a command output matters to the user, summarize or quote the important lines in the response; do not assume the user saw raw tool output.
 
 Keep response concise unless user asks for more detail.
 `;

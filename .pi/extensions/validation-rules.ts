@@ -15,6 +15,7 @@ const VALIDATION_RULES = `## Validation Rules
 * If command fails, inspect smallest relevant cause before retrying.
 * Do not rerun same failing command without changing input or hypothesis.
 * Iterate up to 3 times for formatter/test failures related to your changes.
+* Let validation scale with risk and blast radius: focused checks for narrow changes, broader checks for shared contracts or user-facing workflows.
 `;
 
 const PRIMARY_MARKER = "\n---\n\n**These guidelines are working if:**";
