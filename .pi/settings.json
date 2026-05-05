@@ -19,27 +19,14 @@
     "-./extensions/confirm-destructive.ts",
     "-./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
-    "./extensions/tool-call-behavior.ts",
-    "./extensions/repository-instructions.ts",
     "./extensions/behavioral-guidelines.ts",
-    "./extensions/validation-rules.ts",
-    "./extensions/final-response.ts",
-    "./extensions/efficiency.ts",
     "./extensions/pi-documentation.ts",
-    "./extensions/caveman.ts",
     "./extensions/prompt-skills.ts",
     "./extensions/dump-system-prompt.ts"
   ],
   "extensionState": {
-    "toolCallBehaviorEnabled": true,
-    "repositoryInstructionsEnabled": true,
     "behavioralGuidelinesEnabled": true,
-    "validationRulesEnabled": true,
-    "efficiencyEnabled": true,
-    "finalResponseEnabled": true,
-    "piDocumentationEnabled": false,
-    "cavemanDefaultMode": "full",
-    "cavemanMode": "full"
+    "piDocumentationEnabled": false
   },
   "subagents": {
     "agentOverrides": {
