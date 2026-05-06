@@ -265,6 +265,15 @@
       "mcpServersDisable": [
         "chrome-devtools"
       ]
+    },
+    "readiness-report": {
+      "skillsEnable": [
+        "readiness-report"
+      ],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode"
+      ]
     }
   }
 }
