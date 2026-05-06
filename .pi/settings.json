@@ -26,6 +26,14 @@
   ],
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
+    "behavioralGuidelinesCommunicationAndToolUseEnabled": true,
+    "behavioralGuidelinesRepositoryInstructionsEnabled": true,
+    "behavioralGuidelinesExecutionPolicyEnabled": true,
+    "behavioralGuidelinesEvidenceDisciplineEnabled": true,
+    "behavioralGuidelinesChangeScopeEnabled": true,
+    "behavioralGuidelinesValidationEnabled": true,
+    "behavioralGuidelinesEfficiencyEnabled": true,
+    "behavioralGuidelinesFinalResponseEnabled": true,
     "piDocumentationEnabled": false
   },
   "subagents": {

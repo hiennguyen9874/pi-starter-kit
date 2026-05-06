@@ -10,7 +10,7 @@ const OPERATING_CONTEXT = `## Operating Context
 - If evidence is missing, inspect the workspace with available tools or state the uncertainty clearly.
 `;
 
-const GUIDELINES = `## Communication and Tool Use
+const COMMUNICATION_AND_TOOL_USE = `## Communication and Tool Use
 
 - For longer tasks with multiple tool calls or distinct phases, provide brief progress updates at reasonable intervals.
 - Keep updates short: one sentence, focused on meaningful progress or next direction.
@@ -38,8 +38,9 @@ Bad prefaces:
 - \`I will read another file.\`
 - \`Now I will run grep.\`
 - \`Next I will inspect this one small thing.\`
+`;
 
-## Repository Instructions
+const REPOSITORY_INSTRUCTIONS = `## Repository Instructions
 
 - Repositories may contain \`AGENTS.md\` files with project-specific instructions.
 - An \`AGENTS.md\` applies to all files under its directory.
@@ -49,8 +50,9 @@ Bad prefaces:
 - Root-level \`AGENTS.md\` and any \`AGENTS.md\` from the current working directory up to the repository root may already be included in context; do not re-read them unless needed.
 - When editing outside the current directory or inside a subdirectory not yet inspected, check for applicable deeper \`AGENTS.md\` files first.
 - If instructions conflict, state the conflict briefly and follow the highest-priority instruction.
+`;
 
-## Execution Policy
+const EXECUTION_POLICY = `## Execution Policy
 
 Use senior engineering judgment: direct, factual, pragmatic, and explicit about material tradeoffs.
 
@@ -67,15 +69,17 @@ Use senior engineering judgment: direct, factual, pragmatic, and explicit about 
 - If a simpler approach exists, say so. Push back when warranted.
 - For non-trivial or ambiguous tasks, state only assumptions that materially affect the solution.
 - Use plain text questions only when \`ask_user\` is unavailable or when no tool call is possible.
+`;
 
-## Evidence Discipline
+const EVIDENCE_DISCIPLINE = `## Evidence Discipline
 
 - Do not guess or fabricate implementation details, command results, file contents, package APIs, errors, or test outcomes.
 - Use tools to verify facts when available.
 - If verification is impossible, state the limit clearly.
 - Distinguish observed facts from assumptions.
+`;
 
-## Change Scope
+const CHANGE_SCOPE = `## Change Scope
 
 Do exactly what the user asks, no more and no less.
 
@@ -104,8 +108,9 @@ Do exactly what the user asks, no more and no less.
 - In greenfield tasks, use more initiative when scope is open, but avoid unnecessary complexity.
 
 The test: every changed line should trace directly to the user's request.
+`;
 
-## Validation
+const VALIDATION = `## Validation
 
 Transform tasks into verifiable goals when practical:
 \`\`\`text
@@ -132,16 +137,18 @@ Continue through the plan until the request is resolved or a real blocker preven
 * Do not fix unrelated failures.
 * If failure appears pre-existing or unrelated, report it clearly.
 * If validation is skipped, state why.
+`;
 
-## Efficiency
+const EFFICIENCY = `## Efficiency
 
 * Prefer targeted reads over large file dumps.
 * Prefer one focused search over repeated broad searches.
 * Stop investigating once enough evidence exists to make a safe change.
 * Do not re-read files after successful \`edit\` or \`write\` unless verification, debugging, or final line references require exact resulting content.
 * Do not paste large files unless the user asks.
+`;
 
-## Final Response
+const FINAL_RESPONSE = `## Final Response
 
 When handing off code work, respond as a concise teammate.
 
@@ -171,7 +178,43 @@ Use this structure:
 * When command output matters to the user, summarize or quote the important lines; do not assume the user saw raw tool output.
 
 Keep responses concise. Remove fluff, pleasantries, and filler. Preserve clarity over terseness.
+
 `;
+
+const GUIDELINE_SECTIONS = [
+  {
+    setting: "behavioralGuidelinesCommunicationAndToolUseEnabled",
+    content: COMMUNICATION_AND_TOOL_USE,
+  },
+  {
+    setting: "behavioralGuidelinesRepositoryInstructionsEnabled",
+    content: REPOSITORY_INSTRUCTIONS,
+  },
+  {
+    setting: "behavioralGuidelinesExecutionPolicyEnabled",
+    content: EXECUTION_POLICY,
+  },
+  {
+    setting: "behavioralGuidelinesEvidenceDisciplineEnabled",
+    content: EVIDENCE_DISCIPLINE,
+  },
+  {
+    setting: "behavioralGuidelinesChangeScopeEnabled",
+    content: CHANGE_SCOPE,
+  },
+  {
+    setting: "behavioralGuidelinesValidationEnabled",
+    content: VALIDATION,
+  },
+  {
+    setting: "behavioralGuidelinesEfficiencyEnabled",
+    content: EFFICIENCY,
+  },
+  {
+    setting: "behavioralGuidelinesFinalResponseEnabled",
+    content: FINAL_RESPONSE,
+  },
+];
 
 const TOOLS_MARKER = "\nAvailable tools:";
 const PRIMARY_MARKER = "\nPi documentation (read only";
@@ -182,115 +225,151 @@ let initialized = false;
 let warnedMissingMarker = false;
 
 function getSettingsPath(): string {
-	const piDir = process.env.PI_CONFIG_DIR || path.join(process.cwd(), ".pi");
-	return path.join(piDir, "settings.json");
+  const piDir = process.env.PI_CONFIG_DIR || path.join(process.cwd(), ".pi");
+  return path.join(piDir, "settings.json");
 }
 
 function readSettings(): any {
-	try {
-		return JSON.parse(fs.readFileSync(getSettingsPath(), "utf8"));
-	} catch {
-		return {};
-	}
+  try {
+    return JSON.parse(fs.readFileSync(getSettingsPath(), "utf8"));
+  } catch {
+    return {};
+  }
 }
 
 function readEnabled(): boolean {
-	const value = readSettings().extensionState?.behavioralGuidelinesEnabled;
-	return typeof value === "boolean" ? value : true;
+  const value = readSettings().extensionState?.behavioralGuidelinesEnabled;
+  return typeof value === "boolean" ? value : true;
+}
+
+function getEnabledGuidelines(settings: any, systemPrompt: string): string {
+  const extensionState = settings.extensionState || {};
+  return GUIDELINE_SECTIONS.filter(({ setting, content }) => {
+    const value = extensionState[setting];
+    return (typeof value === "boolean" ? value : true) && !systemPrompt.includes(content);
+  })
+    .map(({ content }) => content)
+    .join("");
 }
 
 function writeEnabled(value: boolean): void {
-	enabled = value;
-	try {
-		const settingsPath = getSettingsPath();
-		const settings = readSettings();
-		settings.extensionState = { ...(settings.extensionState || {}), behavioralGuidelinesEnabled: value };
-		fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
-	} catch {
-		// best-effort
-	}
+  enabled = value;
+  try {
+    const settingsPath = getSettingsPath();
+    const settings = readSettings();
+    settings.extensionState = {
+      ...(settings.extensionState || {}),
+      behavioralGuidelinesEnabled: value,
+    };
+    fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+  } catch {
+    // best-effort
+  }
 }
 
 function injectOperatingContext(systemPrompt: string): string {
-	if (systemPrompt.includes(OPERATING_CONTEXT)) return systemPrompt;
+  if (systemPrompt.includes(OPERATING_CONTEXT)) return systemPrompt;
 
-	const markerIndex = systemPrompt.indexOf(TOOLS_MARKER);
-	if (markerIndex === -1) {
-		return `${systemPrompt}\n\n${OPERATING_CONTEXT}`;
-	}
+  const markerIndex = systemPrompt.indexOf(TOOLS_MARKER);
+  if (markerIndex === -1) {
+    return `${systemPrompt}\n\n${OPERATING_CONTEXT}`;
+  }
 
-	return `${systemPrompt.slice(0, markerIndex)}\n\n${OPERATING_CONTEXT}${systemPrompt.slice(markerIndex)}`;
+  return `${systemPrompt.slice(0, markerIndex)}\n\n${OPERATING_CONTEXT}${systemPrompt.slice(markerIndex)}`;
 }
 
 function injectGuidelines(systemPrompt: string): string {
-	if (systemPrompt.includes(GUIDELINES)) return systemPrompt;
+  const guidelines = getEnabledGuidelines(readSettings(), systemPrompt);
+  if (!guidelines) return systemPrompt;
 
-	let markerIndex = systemPrompt.indexOf(PRIMARY_MARKER);
-	if (markerIndex === -1) markerIndex = systemPrompt.indexOf(FALLBACK_MARKER);
-	if (markerIndex === -1) {
-		return `${systemPrompt}\n${GUIDELINES}`;
-	}
+  let markerIndex = systemPrompt.indexOf(PRIMARY_MARKER);
+  if (markerIndex === -1) markerIndex = systemPrompt.indexOf(FALLBACK_MARKER);
+  if (markerIndex === -1) {
+    return `${systemPrompt}\n${guidelines}`;
+  }
 
-	return `${systemPrompt.slice(0, markerIndex)}\n\n${GUIDELINES}${systemPrompt.slice(markerIndex)}`;
+  return `${systemPrompt.slice(0, markerIndex)}\n\n${guidelines}${systemPrompt.slice(markerIndex)}`;
 }
 
 function injectPromptSections(systemPrompt: string): string {
-	return injectGuidelines(injectOperatingContext(systemPrompt));
+  return injectGuidelines(injectOperatingContext(systemPrompt));
 }
 
 function updateStatus(ctx: any): void {
-	if (!ctx.hasUI) return;
-	if (!enabled) {
-		ctx.ui.setStatus("behavioral-guidelines", undefined);
-		return;
-	}
-	ctx.ui.setStatus("behavioral-guidelines", ctx.ui.theme.fg("accent", "[GUIDELINES]"));
+  if (!ctx.hasUI) return;
+  if (!enabled) {
+    ctx.ui.setStatus("behavioral-guidelines", undefined);
+    return;
+  }
+  ctx.ui.setStatus(
+    "behavioral-guidelines",
+    ctx.ui.theme.fg("accent", "[GUIDELINES]"),
+  );
 }
 
 export default function behavioralGuidelinesExtension(pi: ExtensionAPI) {
-	pi.on("session_start", async (_event, ctx) => {
-		enabled = readEnabled();
-		initialized = true;
-		updateStatus(ctx);
-	});
+  pi.on("session_start", async (_event, ctx) => {
+    enabled = readEnabled();
+    initialized = true;
+    updateStatus(ctx);
+  });
 
-	pi.on("before_agent_start", async (event, ctx) => {
-		if (!initialized) {
-			enabled = readEnabled();
-			initialized = true;
-		}
-		if (!enabled) return undefined;
+  pi.on("before_agent_start", async (event, ctx) => {
+    if (!initialized) {
+      enabled = readEnabled();
+      initialized = true;
+    }
+    if (!enabled) return undefined;
 
-		if (!event.systemPrompt.includes(PRIMARY_MARKER) && !event.systemPrompt.includes(FALLBACK_MARKER) && !warnedMissingMarker) {
-			warnedMissingMarker = true;
-			if (ctx.hasUI) {
-				ctx.ui.notify("Behavioral guidelines: insertion marker missing; appending at end", "warning");
-			}
-		}
+    if (
+      !event.systemPrompt.includes(PRIMARY_MARKER) &&
+      !event.systemPrompt.includes(FALLBACK_MARKER) &&
+      !warnedMissingMarker
+    ) {
+      warnedMissingMarker = true;
+      if (ctx.hasUI) {
+        ctx.ui.notify(
+          "Behavioral guidelines: insertion marker missing; appending at end",
+          "warning",
+        );
+      }
+    }
 
-		return { systemPrompt: injectPromptSections(event.systemPrompt) };
-	});
+    return { systemPrompt: injectPromptSections(event.systemPrompt) };
+  });
 
-	pi.registerCommand("behavioral-guidelines", {
-		description: "Toggle behavioral guidelines system prompt injection (on/off/status)",
-		handler: async (args, ctx) => {
-			const arg = args.trim().toLowerCase();
-			if (!arg || arg === "toggle") {
-				writeEnabled(!enabled);
-			} else if (arg === "on" || arg === "enable" || arg === "enabled") {
-				writeEnabled(true);
-			} else if (arg === "off" || arg === "disable" || arg === "disabled") {
-				writeEnabled(false);
-			} else if (arg === "status") {
-				ctx.ui.notify(`Behavioral guidelines: ${enabled ? "on" : "off"}`, "info");
-				return;
-			} else {
-				ctx.ui.notify("Usage: /behavioral-guidelines [on|off|toggle|status]", "warning");
-				return;
-			}
+  pi.registerCommand("behavioral-guidelines", {
+    description:
+      "Toggle behavioral guidelines system prompt injection (on/off/status)",
+    handler: async (args, ctx) => {
+      const arg = args.trim().toLowerCase();
+      if (!arg || arg === "toggle") {
+        writeEnabled(!enabled);
+      } else if (arg === "on" || arg === "enable" || arg === "enabled") {
+        writeEnabled(true);
+      } else if (arg === "off" || arg === "disable" || arg === "disabled") {
+        writeEnabled(false);
+      } else if (arg === "status") {
+        const settings = readSettings();
+        const extensionState = settings.extensionState || {};
+        const disabledSections = GUIDELINE_SECTIONS.filter(({ setting }) =>
+          extensionState[setting] === false,
+        ).map(({ setting }) => setting);
+        ctx.ui.notify(
+          `Behavioral guidelines: ${enabled ? "on" : "off"}; disabled sections: ${disabledSections.length ? disabledSections.join(", ") : "none"}`,
+          "info",
+        );
+        return;
+      } else {
+        ctx.ui.notify(
+          "Usage: /behavioral-guidelines [on|off|toggle|status]",
+          "warning",
+        );
+        return;
+      }
 
-			updateStatus(ctx);
-			ctx.ui.notify(`Behavioral guidelines: ${enabled ? "on" : "off"}`, "info");
-		},
-	});
+      updateStatus(ctx);
+      ctx.ui.notify(`Behavioral guidelines: ${enabled ? "on" : "off"}`, "info");
+    },
+  });
 }
