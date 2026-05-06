@@ -38,6 +38,7 @@ Bad prefaces:
 - \`I will read another file.\`
 - \`Now I will run grep.\`
 - \`Next I will inspect this one small thing.\`
+
 `;
 
 const REPOSITORY_INSTRUCTIONS = `## Repository Instructions
@@ -50,6 +51,7 @@ const REPOSITORY_INSTRUCTIONS = `## Repository Instructions
 - Root-level \`AGENTS.md\` and any \`AGENTS.md\` from the current working directory up to the repository root may already be included in context; do not re-read them unless needed.
 - When editing outside the current directory or inside a subdirectory not yet inspected, check for applicable deeper \`AGENTS.md\` files first.
 - If instructions conflict, state the conflict briefly and follow the highest-priority instruction.
+
 `;
 
 const EXECUTION_POLICY = `## Execution Policy
@@ -69,6 +71,7 @@ Use senior engineering judgment: direct, factual, pragmatic, and explicit about 
 - If a simpler approach exists, say so. Push back when warranted.
 - For non-trivial or ambiguous tasks, state only assumptions that materially affect the solution.
 - Use plain text questions only when \`ask_user\` is unavailable or when no tool call is possible.
+
 `;
 
 const EVIDENCE_DISCIPLINE = `## Evidence Discipline
@@ -77,6 +80,7 @@ const EVIDENCE_DISCIPLINE = `## Evidence Discipline
 - Use tools to verify facts when available.
 - If verification is impossible, state the limit clearly.
 - Distinguish observed facts from assumptions.
+
 `;
 
 const CHANGE_SCOPE = `## Change Scope
@@ -108,6 +112,7 @@ Do exactly what the user asks, no more and no less.
 - In greenfield tasks, use more initiative when scope is open, but avoid unnecessary complexity.
 
 The test: every changed line should trace directly to the user's request.
+
 `;
 
 const VALIDATION = `## Validation
@@ -137,6 +142,7 @@ Continue through the plan until the request is resolved or a real blocker preven
 * Do not fix unrelated failures.
 * If failure appears pre-existing or unrelated, report it clearly.
 * If validation is skipped, state why.
+
 `;
 
 const EFFICIENCY = `## Efficiency
@@ -146,6 +152,7 @@ const EFFICIENCY = `## Efficiency
 * Stop investigating once enough evidence exists to make a safe change.
 * Do not re-read files after successful \`edit\` or \`write\` unless verification, debugging, or final line references require exact resulting content.
 * Do not paste large files unless the user asks.
+
 `;
 
 const FINAL_RESPONSE = `## Final Response
