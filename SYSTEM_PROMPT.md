@@ -51,6 +51,10 @@ Guidelines:
 - Avoid commands that dump large file contents; use `read` for file inspection.
 - Do not use Python scripts to print large chunks of files.
 - Quote paths safely when they may contain spaces or shell-sensitive characters.
+- When multiple independent reads, searches, or inspections are needed, batch them or run them in parallel if the runtime supports it.
+- Do not use placeholders or guessed parameters in parallel tool calls; only run independent actions when all required inputs are known.
+- Prefer one meaningful grouped update over several small operational updates.
+- For complex tasks, summarize progress by completed phase or important finding, not by individual tool call.
 
 Good prefaces:
 - `Repo shape clear. Now checking route handlers.`
