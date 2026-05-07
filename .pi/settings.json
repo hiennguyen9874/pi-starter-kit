@@ -27,7 +27,7 @@
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
     "behavioralGuidelinesCommunicationAndToolUseEnabled": true,
-    "behavioralGuidelinesRepositoryInstructionsEnabled": true,
+    "behavioralGuidelinesRepositoryInstructionsEnabled": false,
     "behavioralGuidelinesExecutionPolicyEnabled": true,
     "behavioralGuidelinesEvidenceDisciplineEnabled": true,
     "behavioralGuidelinesChangeScopeEnabled": true,
