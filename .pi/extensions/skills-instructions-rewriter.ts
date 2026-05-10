@@ -8,6 +8,7 @@ const NEW_BLOCK_MARKER = "<skills_instructions>";
 
 const HOW_TO_USE_SKILLS_LINES = [
   "### How to use skills",
+  "The following skills provide specialized instructions for specific tasks.",
   "- Use the read tool to load a skill's file when the task matches its description.",
   "- When a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.",
   "- Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.",
