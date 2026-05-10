@@ -22,7 +22,8 @@
     "./extensions/behavioral-guidelines.ts",
     "./extensions/pi-documentation.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/dump-system-prompt.ts"
+    "./extensions/dump-system-prompt.ts",
+    "./extensions/skills-instructions-rewriter.ts"
   ],
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
@@ -34,7 +35,8 @@
     "behavioralGuidelinesValidationEnabled": true,
     "behavioralGuidelinesEfficiencyEnabled": true,
     "behavioralGuidelinesFinalResponseEnabled": true,
-    "piDocumentationEnabled": false
+    "piDocumentationEnabled": false,
+    "skillsInstructionsRewriterEnabled": false
   },
   "subagents": {
     "agentOverrides": {
