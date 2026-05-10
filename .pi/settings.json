@@ -32,9 +32,9 @@
     "behavioralGuidelinesExecutionPolicyEnabled": true,
     "behavioralGuidelinesEvidenceDisciplineEnabled": true,
     "behavioralGuidelinesChangeScopeEnabled": true,
-    "behavioralGuidelinesValidationEnabled": true,
+    "behavioralGuidelinesValidationEnabled": false,
     "behavioralGuidelinesEfficiencyEnabled": true,
-    "behavioralGuidelinesFinalResponseEnabled": true,
+    "behavioralGuidelinesFinalResponseEnabled": false,
     "piDocumentationEnabled": false,
     "skillsInstructionsRewriterEnabled": true
   },
