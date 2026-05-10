@@ -25,7 +25,7 @@
     "./extensions/prompt-skills.ts",
     "./extensions/dump-system-prompt.ts",
     "./extensions/profile/index.ts",
-    "./extensions/pi-goal/index.ts"
+    "-./extensions/pi-goal/index.ts"
   ],
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
