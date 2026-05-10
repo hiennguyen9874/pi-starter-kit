@@ -29,6 +29,8 @@ Do not use `/goal` for:
 - unsafe or irreversible changes without explicit approval
 - “run longer” as the only objective
 
+For broad, vague, stalled, high-risk, or multi-hour work, prefer preparing a small goal board before starting `/goal`.
+
 ## Command Quick Reference
 
 | Command | Purpose |
@@ -69,15 +71,105 @@ Tell users to include what evidence counts as done in the original goal objectiv
 Before starting a serious `/goal`, grill the user or the plan until these answers are clear. Ask one question at a time when needed.
 
 1. **Objective:** What exact problem should be solved?
-2. **Acceptance criteria:** How will we know it is done?
-3. **Scope boundary:** What should the agent not change?
-4. **Plan document:** Where is the phase/checklist file the agent should follow?
-5. **Progress record:** Where should progress, blockers, and decisions be written?
-6. **Verification:** Which tests, commands, smoke checks, or review steps prove success?
-7. **Budget:** Should the run have a token budget?
-8. **Stop conditions:** When should the agent pause and ask the user instead of continuing?
+2. **Interpreted outcome:** What must become true when the work is done?
+3. **Acceptance criteria:** How will we know it is done?
+4. **Completion proof:** What observable evidence closes the full original request?
+5. **Likely misfire:** How could the agent appear successful while solving the wrong problem?
+6. **Scope boundary:** What should the agent not change?
+7. **Plan document:** Where is the phase/checklist file the agent should follow?
+8. **Progress record:** Where should progress, blockers, and decisions be written?
+9. **Verification:** Which tests, commands, smoke checks, or review steps prove success?
+10. **Budget:** Should the run have a token budget?
+11. **Stop conditions:** When should the agent pause and ask the user instead of continuing?
 
 If these are missing, help the user create a short plan/checklist before starting `/goal`.
+
+## Optional Board Mode for Large Goals
+
+For broad, ambiguous, multi-hour, recovery, audit, or already-planned work, create a small board instead of relying on a single freeform objective.
+
+Recommended control files, based on the templates in `references/`:
+
+```text
+docs/goals/<slug>/
+  goal.md       # human-readable charter; see references/goal.md
+  state.yaml    # board truth; see references/state.yaml
+  notes/        # long findings or decisions; see references/note.md
+```
+
+Starter command template: `references/goal-prompt.txt`.
+
+The charter should preserve:
+
+- original request
+- interpreted outcome
+- input shape: `vague | specific | existing_plan | recovery | audit`
+- authority: `requested | approved | inferred | needs_approval | blocked`
+- proof type: `test | demo | artifact | metric | review | source_backed_answer | decision`
+- completion proof
+- likely misfire
+- blind spots considered
+- non-negotiable constraints
+- stop rule
+
+Use `state.yaml` as board truth when it conflicts with `goal.md` about task status, active task, receipts, verification freshness, or completion.
+
+## Board Task Rules
+
+For board-backed goals:
+
+- Keep exactly one active task.
+- Work only on the active task.
+- Use read-only **Scout** tasks for evidence mapping.
+- Use read-only **Judge** tasks for strategy, ambiguity, scope, and completion skepticism.
+- Use bounded **Worker** tasks for implementation.
+- Use **PM** tasks for board maintenance and final audit.
+- Worker tasks must specify `allowed_files`, `verify`, and `stop_if`.
+- No implementation should happen without an active Worker or PM task that explicitly allows it.
+
+A minimal task card:
+
+```yaml
+id: T001
+type: scout | judge | worker | pm
+assignee: Scout | Judge | Worker | PM
+status: queued | active | blocked | done
+objective: "<one sentence>"
+inputs: []
+constraints: []
+expected_output: []
+receipt: null
+```
+
+Worker task additions:
+
+```yaml
+allowed_files: []
+verify: []
+stop_if: []
+```
+
+## Receipts
+
+Every completed, blocked, or escalated task should leave a compact receipt on the task card.
+
+Worker receipt example:
+
+```yaml
+receipt:
+  result: done
+  changed_files:
+    - src/billing/router.ts
+    - test/billing/router.test.ts
+  commands:
+    - cmd: npm test -- test/billing/router.test.ts
+      status: pass
+  summary: "invoice.paid now routes through eventRouter.dispatch; regression test added."
+```
+
+For long findings, write `notes/<task-id>-<slug>.md` and reference it from the receipt.
+
+Blocked tasks do not automatically stop the whole goal. Block the exact task, record the missing requirement, and continue with safe local Scout/Judge/Worker/PM work when possible.
 
 ## Good Goal Shape
 
@@ -119,12 +211,13 @@ Set the first budget conservatively in a new codebase. If the goal becomes `budg
 ## Recommended Workflow
 
 1. **Plan first.** Create or identify a plan file with phases and acceptance criteria.
-2. **Prepare project guidance.** Update `AGENTS.md`, `CONTEXT.md`, or a task plan if the agent needs domain-specific expectations.
-3. **Add progress tracking.** Use a checklist, `progress.md`, or phase files so each continuation can recover context from disk.
-4. **Start with a clear `/goal`.** Point to the plan and progress file in the objective.
-5. **Inspect early output.** If the first run misunderstands quality expectations, pause or clear the goal and improve the plan with a concrete example.
-6. **Resume after correction.** Use `/goal resume` when the instructions are ready.
-7. **Require evidence.** The model should call `update_goal({ status: "complete" })` only after it has verified the acceptance criteria.
+2. **Use board mode when needed.** For broad or risky goals, create `docs/goals/<slug>/goal.md`, `state.yaml`, and `notes/` before starting.
+3. **Prepare project guidance.** Update `AGENTS.md`, `CONTEXT.md`, or a task plan if the agent needs domain-specific expectations.
+4. **Add progress tracking.** Use a checklist, `progress.md`, phase files, or board receipts so each continuation can recover context from disk.
+5. **Start with a clear `/goal`.** Point to the plan, board, and progress file in the objective.
+6. **Inspect early output.** If the first run misunderstands quality expectations, pause or clear the goal and improve the plan with a concrete example.
+7. **Resume after correction.** Use `/goal resume` when the instructions are ready.
+8. **Require evidence.** The model should call `update_goal({ status: "complete" })` only after it has verified the acceptance criteria.
 
 ## Lifecycle
 
@@ -168,3 +261,11 @@ Verify with [commands/checks].
 If blocked by [decision/input], pause and ask.
 --budget [optional-token-budget]
 ```
+
+## Board-Backed Starter Template
+
+```text
+/goal Follow docs/goals/<slug>/goal.md.
+```
+
+Use this when `goal.md` points to `state.yaml`, defines the stop rule, and instructs the agent to work one active task at a time, write receipts, advance the board, and finish only after a final audit maps evidence back to the original request.
