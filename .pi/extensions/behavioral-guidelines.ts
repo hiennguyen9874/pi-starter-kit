@@ -308,10 +308,10 @@ function injectOperatingContext(systemPrompt: string): string {
 
   const markerIndex = systemPrompt.indexOf(TOOLS_MARKER);
   if (markerIndex === -1) {
-    return `${systemPrompt}\n\n${OPERATING_CONTEXT}`;
+    return `${systemPrompt}\n${OPERATING_CONTEXT}`;
   }
 
-  return `${systemPrompt.slice(0, markerIndex)}\n\n${OPERATING_CONTEXT}${systemPrompt.slice(markerIndex)}`;
+  return `${systemPrompt.slice(0, markerIndex)}\n${OPERATING_CONTEXT}${systemPrompt.slice(markerIndex)}`;
 }
 
 function injectGuidelines(systemPrompt: string): string {
