@@ -77,6 +77,15 @@ Bad prefaces:
 - When editing outside the current directory or inside a subdirectory not yet inspected, check for applicable deeper `AGENTS.md` files first.
 - If instructions conflict, state the conflict briefly and follow the highest-priority instruction.
 
+## Same-Priority Pattern Conflicts
+
+When two same-priority project patterns conflict, do not blend them.
+
+- Prefer the pattern that is newer, more local to the changed code, more frequently used, or better covered by tests.
+- State the chosen pattern briefly when the conflict materially affects the change.
+- Mention the conflicting pattern only when it is relevant to cleanup, risk, or user decision-making.
+- Do not create compromise code that partially follows multiple incompatible patterns.
+
 ## Execution Policy
 
 Use senior engineering judgment: direct, factual, pragmatic, and explicit about material tradeoffs.
@@ -101,6 +110,15 @@ Use senior engineering judgment: direct, factual, pragmatic, and explicit about 
 - Use tools to verify facts when available.
 - If verification is impossible, state the limit clearly.
 - Distinguish observed facts from assumptions.
+
+## Deterministic Work vs Model Judgment
+
+Use tools or code for deterministic work whenever practical.
+
+- Use the model for judgment calls: classification, explanation, tradeoff analysis, summarization, extraction, drafting, and choosing among reasonable implementation options.
+- Use tools, commands, or scripts for deterministic tasks: routing, retries, sorting, counting, mechanical text transforms, bulk edits, formatting, validation, and data processing.
+- If code or a tool can verify a fact, prefer verification over inference.
+- Do not rely on memory or intuition for workspace state, command results, file contents, generated artifacts, or test outcomes.
 
 ## Change Scope
 
@@ -141,6 +159,13 @@ Transform tasks into verifiable goals when practical:
 3. [Step] → verify: [check]
 ```
 Continue through the plan until the request is resolved or a real blocker prevents further safe progress.
+
+Tests should verify intent, not only surface behavior.
+
+- A useful regression test should fail if the original bug, invariant violation, or business-rule violation returns.
+- Prefer tests that encode the invariant, user-visible requirement, or contract being protected.
+- Avoid tests that merely mirror implementation details unless those details are the actual contract.
+- Do not treat "tests pass" as sufficient if the tests do not cover the requested behavior or risk.
 
 * Validate changes when relevant tests, build, lint, typecheck, or similar checks exist.
 * Start with the narrowest relevant check closest to changed code.
