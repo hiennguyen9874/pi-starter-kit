@@ -23,7 +23,9 @@
     "./extensions/pi-documentation.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/dump-system-prompt.ts"
+    "./extensions/dump-system-prompt.ts",
+    "./extensions/profile/index.ts",
+    "./extensions/pi-goal/index.ts"
   ],
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
@@ -32,10 +34,10 @@
     "behavioralGuidelinesExecutionPolicyEnabled": true,
     "behavioralGuidelinesEvidenceDisciplineEnabled": true,
     "behavioralGuidelinesChangeScopeEnabled": true,
-    "behavioralGuidelinesValidationEnabled": false,
+    "behavioralGuidelinesValidationEnabled": true,
     "behavioralGuidelinesEfficiencyEnabled": true,
-    "behavioralGuidelinesFinalResponseEnabled": false,
-    "piDocumentationEnabled": false,
+    "behavioralGuidelinesFinalResponseEnabled": true,
+    "piDocumentationEnabled": true,
     "skillsInstructionsRewriterEnabled": true
   },
   "subagents": {
