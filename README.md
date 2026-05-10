@@ -194,7 +194,7 @@ Agent-authoring and docs skills:
 - `prompt-leverage` — upgrade raw prompts into execution-ready prompts
 - `prd` — create product requirements documents
 - `skill-creator`, `writing-skills` — create, test, and improve skills
-- `using-superpowers`, `test-driven-development` — imported workflow skills used by broader profiles
+- `test-driven-development` — imported workflow skills used by broader profiles
 
 ## Profiles
 
