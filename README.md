@@ -177,7 +177,7 @@ Core workflow skills:
 - `code-reviewer`, `requesting-code-review`, `receiving-code-review` — review workflows
 - `git-commit`, `verification-before-completion`, `finishing-a-development-branch` — completion and commit workflows
 - `brainstorming`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
-- `grill-me`, `grill-with-docs`, `domain-model`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
+- `grill-me`, `grill-with-docs`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
 
 Domain and stack skills:
 

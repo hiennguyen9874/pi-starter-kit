@@ -4,49 +4,34 @@
     "base": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
+        "grill-me",
+        "grill-with-docs",
+        "handoff",
+        "prototype",
         "diagnose",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
         "systematic-debugging"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "superpowers": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
+        "grill-me",
+        "grill-with-docs",
+        "handoff",
+        "prototype",
         "diagnose",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
@@ -62,30 +47,19 @@
         "verification-before-completion",
         "writing-plans"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "backend": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
-        "diagnose",
+        "grill-me",
+        "grill-with-docs",
+        "handoff",
+        "prototype",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
@@ -107,30 +81,20 @@
         "golang-testing",
         "postgres-patterns"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "frontend": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
+        "grill-me",
+        "grill-with-docs",
+        "handoff",
+        "prototype",
         "diagnose",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
@@ -160,27 +124,19 @@
         "slides"
       ],
       "mcpServersEnable": [
-        "chrome-devtools",
-        "context-mode"
+        "chrome-devtools"
       ]
     },
     "devops": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
+        "grill-me",
+        "grill-with-docs",
         "diagnose",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
@@ -197,30 +153,18 @@
         "writing-plans",
         "docker-patterns"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "agentic": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
+        "grill-me",
+        "grill-with-docs",
         "diagnose",
         "code-reviewer",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
-        "grill-me",
         "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
@@ -229,46 +173,24 @@
         "writing-skills",
         "skill-creator"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "domain-model",
         "diagnose",
         "context7-cli",
         "ask-user",
-        "context-mode",
-        "context-mode-ops",
-        "ctx-doctor",
-        "ctx-insight",
-        "ctx-purge",
-        "ctx-stats",
-        "ctx-upgrade",
         "git-commit",
         "grill-me",
         "prompt-leverage",
         "prd"
       ],
-      "mcpServersEnable": [
-        "context-mode"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools"
-      ]
+      "mcpServersEnable": []
     },
     "readiness-report": {
       "skillsEnable": [
         "readiness-report"
-      ],
-      "mcpServersDisable": [
-        "chrome-devtools",
-        "context-mode"
       ]
     }
   }
