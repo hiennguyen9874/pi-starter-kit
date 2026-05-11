@@ -5,6 +5,7 @@
     "npm:pi-command-history",
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
+    "git:github.com/championswimmer/pi-context-usage",
     "-npm:pi-mcp-adapter",
     "-npm:context-mode",
     "-npm:pi-prompt-template-model",
@@ -37,7 +38,7 @@
     "behavioralGuidelinesValidationEnabled": true,
     "behavioralGuidelinesEfficiencyEnabled": true,
     "behavioralGuidelinesFinalResponseEnabled": true,
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "skillsInstructionsRewriterEnabled": true
   },
   "subagents": {
