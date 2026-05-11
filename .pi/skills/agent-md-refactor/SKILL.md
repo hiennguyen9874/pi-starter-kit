@@ -57,8 +57,6 @@ Inspect project files to identify:
 - build, run, lint, format, typecheck, and test commands
 - CI/CD workflows
 - architecture docs
-- domain language in `CONTEXT.md` or `CONTEXT-MAP.md` when present
-- architectural decisions in `docs/adr/` when present
 - current README and developer docs
 - current agent instruction files
 - major directories and module boundaries
@@ -73,8 +71,6 @@ Common files to check:
 - `.github/workflows/`, `.gitlab-ci.yml`
 - Dockerfiles and compose files
 - existing docs under `docs/`
-
-When `CONTEXT.md`, `CONTEXT-MAP.md`, or ADRs exist, use them as source of truth for domain vocabulary, ownership boundaries, and documented architectural decisions. Do not rewrite domain docs as part of this skill unless the user explicitly asks; only reflect settled language and decisions in agent instructions.
 
 Never invent commands. Infer commands from repo files. If a command is unclear, write `Unknown; see <file>` or ask the user.
 
@@ -135,8 +131,6 @@ Move out of root:
 - testing strategy details
 - code style details
 - architecture deep dives
-- domain glossary details from `CONTEXT.md`
-- ADR rationale and decision history
 - deployment process
 - debugging notes
 - git workflow details
@@ -160,8 +154,7 @@ Common topic files:
 | `development-workflow.md` | Local loop, checks, PR expectations, common tasks |
 | `testing.md` | Test commands, frameworks, patterns, fixtures, coverage |
 | `code-style.md` | Project-specific formatting, naming, imports, structure |
-| `architecture.md` | Components, boundaries, dependencies, data flow, ADR constraints worth knowing during code changes |
-| `domain-language.md` | Canonical domain terms, aliases to avoid, context map pointers |
+| `architecture.md` | Components, boundaries, dependencies, data flow |
 | `config-and-env.md` | Configuration files, env vars, local services |
 | `security.md` | Secrets, auth, permissions, validation, network safety |
 | `deployment.md` | CI/CD, packaging, release, environments |
@@ -178,8 +171,6 @@ Grouping rules:
 5. Keep instructions actionable and project-specific.
 6. Avoid duplicating the same rule across files; link instead.
 7. Reuse existing `docs/agent-instructions/` files when present instead of creating duplicates.
-8. If domain language is important, prefer a short `domain-language.md` that points to `CONTEXT.md` instead of copying the whole glossary.
-9. If ADRs constrain agent behavior, summarize only the operational implication and link to the ADR; do not duplicate full rationale.
 
 ### Phase 6: Build the Instruction Index
 
@@ -195,8 +186,7 @@ Read these only when task matches scope:
 | File | Read when | Contains |
 |---|---|---|
 | `docs/agent-instructions/testing.md` | You add/change tests or debug failures | Test commands, frameworks, patterns, fixtures |
-| `docs/agent-instructions/architecture.md` | You change boundaries, data flow, APIs, storage, or module responsibilities | Components, dependencies, ownership, ADR constraints |
-| `docs/agent-instructions/domain-language.md` | You name domain concepts, change user-facing behavior, or touch context boundaries | Canonical vocabulary, aliases to avoid, links to `CONTEXT.md` or `CONTEXT-MAP.md` |
+| `docs/agent-instructions/architecture.md` | You change boundaries, data flow, APIs, storage, or module responsibilities | Components, dependencies, ownership |
 ```
 
 The index must point only to files under `docs/agent-instructions/`.
@@ -293,7 +283,6 @@ After creating or refactoring:
 - [ ] No nested `AGENTS.md` files were created by default.
 - [ ] Commands are exact and current, or marked unknown.
 - [ ] Links from root to detailed docs work.
-- [ ] Domain terms and architecture constraints match `CONTEXT.md`, `CONTEXT-MAP.md`, and ADRs when present.
 - [ ] Contradictions are resolved or surfaced to the user.
 - [ ] Every retained instruction is actionable, project-specific, and changes agent behavior.
 - [ ] Low-value generic instructions are pruned or rewritten.
