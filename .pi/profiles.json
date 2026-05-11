@@ -6,6 +6,7 @@
         "bootstrap-project-context",
         "grill-me",
         "grill-with-docs",
+        "improve-codebase-architecture",
         "handoff",
         "prototype",
         "diagnose",
@@ -13,9 +14,7 @@
         "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
-        "prompt-leverage",
         "systematic-debugging"
       ],
       "mcpServersEnable": []
@@ -25,6 +24,7 @@
         "bootstrap-project-context",
         "grill-me",
         "grill-with-docs",
+        "improve-codebase-architecture",
         "handoff",
         "prototype",
         "diagnose",
@@ -32,9 +32,7 @@
         "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
-        "prompt-leverage",
         "systematic-debugging",
         "brainstorming",
         "dispatching-parallel-agents",
@@ -53,6 +51,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "grill-me",
+        "improve-codebase-architecture",
         "grill-with-docs",
         "handoff",
         "prototype",
@@ -60,9 +59,7 @@
         "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
-        "prompt-leverage",
         "systematic-debugging",
         "brainstorming",
         "dispatching-parallel-agents",
@@ -88,6 +85,7 @@
         "bootstrap-project-context",
         "grill-me",
         "grill-with-docs",
+        "improve-codebase-architecture",
         "handoff",
         "prototype",
         "diagnose",
@@ -95,9 +93,7 @@
         "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
-        "prompt-leverage",
         "systematic-debugging",
         "brainstorming",
         "dispatching-parallel-agents",
@@ -130,6 +126,7 @@
     "devops": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "improve-codebase-architecture",
         "grill-me",
         "grill-with-docs",
         "diagnose",
@@ -137,9 +134,7 @@
         "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
-        "prompt-leverage",
         "systematic-debugging",
         "brainstorming",
         "dispatching-parallel-agents",
@@ -158,17 +153,13 @@
     "agentic": {
       "skillsEnable": [
         "bootstrap-project-context",
+        "improve-codebase-architecture",
         "grill-me",
         "grill-with-docs",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
         "ask-user",
         "git-commit",
-        "improve-codebase-architecture",
         "pragmatic-principles",
         "prompt-leverage",
-        "systematic-debugging",
         "agent-md-refactor",
         "writing-skills",
         "skill-creator"
@@ -178,12 +169,6 @@
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "diagnose",
-        "context7-cli",
-        "ask-user",
-        "git-commit",
-        "grill-me",
-        "prompt-leverage",
         "prd"
       ],
       "mcpServersEnable": []
