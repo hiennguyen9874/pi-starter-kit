@@ -17,7 +17,11 @@
         "pragmatic-principles",
         "systematic-debugging"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "superpowers": {
       "skillsEnable": [
@@ -45,7 +49,11 @@
         "verification-before-completion",
         "writing-plans"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "backend": {
       "skillsEnable": [
@@ -78,7 +86,11 @@
         "golang-testing",
         "postgres-patterns"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "frontend": {
       "skillsEnable": [
@@ -121,6 +133,9 @@
       ],
       "mcpServersEnable": [
         "chrome-devtools"
+      ],
+      "mcpServersDisable": [
+        "context-model"
       ]
     },
     "devops": {
@@ -148,7 +163,11 @@
         "writing-plans",
         "docker-patterns"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "agentic": {
       "skillsEnable": [
@@ -164,18 +183,31 @@
         "writing-skills",
         "skill-creator"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
         "prd"
       ],
-      "mcpServersEnable": []
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
+      ]
     },
     "readiness-report": {
       "skillsEnable": [
         "readiness-report"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-model"
       ]
     }
   }
