@@ -11,6 +11,7 @@ import {
   reconstructGoal,
   transitionGoal,
   applyGoalUsage,
+  type GoalEntry,
   type GoalState,
 } from "./state.ts";
 import { registerGoalTools } from "./tools.ts";
@@ -19,6 +20,9 @@ export interface GoalExtensionOptions {
   clock?: () => number;
   scheduler?: (fn: () => void) => unknown;
 }
+
+type GoalEventKind = "created" | "paused" | "resumed" | "cleared" | "completed";
+const GOAL_EVENT_MESSAGE_TYPE = "pi-goal-event";
 
 interface UsageCarrier {
   usage?: Record<string, unknown>;
@@ -60,6 +64,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   const clock = options.clock ?? (() => Date.now());
   const scheduler = options.scheduler ?? ((fn: () => void) => setTimeout(fn, 0));
   let currentGoal: GoalState | null = null;
+  let statusBarEnabled = true;
   let awaitingContinuationGoalId: string | null = null;
   let continuationGeneration = 0;
   let activeTurnStartedAt: number | null = null;
@@ -70,7 +75,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   let toolsRestricted = false;
 
   function refreshStatus(ctx: Pick<ExtensionContext, "ui">): void {
-    ctx.ui.setStatus("pi-goal", formatFooterStatus(currentGoal));
+    ctx.ui.setStatus("pi-goal", statusBarEnabled ? formatFooterStatus(currentGoal) : undefined);
   }
 
   function syncGoalTools(pi: Pick<ExtensionAPI, "getActiveTools" | "setActiveTools">): void {
@@ -87,18 +92,24 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
 
   function persist(pi: Pick<ExtensionAPI, "appendEntry">, goal: GoalState): void {
     currentGoal = goal;
-    pi.appendEntry(ENTRY_TYPE, goalEntry(goal, clock()));
+    pi.appendEntry(ENTRY_TYPE, goalEntry(goal, clock(), statusBarEnabled));
   }
 
   function clear(pi: Pick<ExtensionAPI, "appendEntry">): void {
     const clearedGoalId = currentGoal?.goalId ?? null;
     currentGoal = null;
     pendingCompletionGoalId = null;
-    pi.appendEntry(ENTRY_TYPE, clearGoalEntry(clearedGoalId, clock()));
+    pi.appendEntry(ENTRY_TYPE, clearGoalEntry(clearedGoalId, clock(), statusBarEnabled));
   }
 
   function restore(pi: Pick<ExtensionAPI, "getActiveTools" | "setActiveTools">, ctx: ExtensionContext): void {
-    currentGoal = reconstructGoal(ctx.sessionManager.getBranch());
+    const branch = ctx.sessionManager.getBranch();
+    currentGoal = reconstructGoal(branch);
+    for (const entry of branch) {
+      if (entry?.type !== "custom" || entry.customType !== ENTRY_TYPE) continue;
+      const data = entry.data as GoalEntry | undefined;
+      if (typeof data?.statusBarEnabled === "boolean") statusBarEnabled = data.statusBarEnabled;
+    }
     awaitingContinuationGoalId = null;
     pendingCompletionGoalId = null;
     continuationGeneration++;
@@ -159,7 +170,27 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     return true;
   }
 
+  function emitGoalEvent(pi: Pick<ExtensionAPI, "sendMessage">, kind: GoalEventKind, goal: GoalState | null): void {
+    pi.sendMessage({
+      customType: GOAL_EVENT_MESSAGE_TYPE,
+      content: kind,
+      display: true,
+      details: {
+        kind,
+        objective: goal?.objective ?? null,
+        status: goal?.status ?? null,
+      },
+    }, undefined);
+  }
+
   function register(pi: ExtensionAPI): void {
+    (pi as unknown as { registerMessageRenderer?: Function }).registerMessageRenderer?.(
+      GOAL_EVENT_MESSAGE_TYPE,
+      (message: { details?: { kind?: string; objective?: string | null; status?: string | null } }) => ({
+        text: `Goal ${message.details?.kind ?? "updated"}${message.details?.objective ? `: ${message.details.objective}` : ""}`,
+      }),
+    );
+
     registerGoalTools(pi, {
       getGoal: () => currentGoal,
       setGoal(goal, _source, ctx) {
@@ -180,13 +211,17 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     registerGoalCommand(pi, {
       getGoal: () => currentGoal,
       setGoal(goal, _source, ctx) {
-        const previousStatus = currentGoal?.status ?? null;
-        const isNewGoal = currentGoal?.goalId !== goal.goalId;
+        const previousGoal = currentGoal;
+        const previousStatus = previousGoal?.status ?? null;
+        const isNewGoal = previousGoal?.goalId !== goal.goalId;
         invalidateContinuation();
         persist(pi, goal);
 
         syncGoalTools(pi);
         refreshStatus(ctx as ExtensionContext);
+        if (isNewGoal) emitGoalEvent(pi, "created", goal);
+        if (!isNewGoal && previousStatus === "active" && goal.status === "paused") emitGoalEvent(pi, "paused", goal);
+        if (!isNewGoal && previousStatus !== "active" && goal.status === "active") emitGoalEvent(pi, "resumed", goal);
         if (isNewGoal && goal.status === "active" && ctx.isIdle() && !ctx.hasPendingMessages()) {
           pi.sendUserMessage(goal.objective);
         } else if (!isNewGoal && previousStatus !== "active" && goal.status === "active") {
@@ -194,14 +229,30 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
         }
       },
       clearGoal(_source, ctx) {
+        const clearedGoal = currentGoal;
         invalidateContinuation();
         clear(pi);
         syncGoalTools(pi);
         refreshStatus(ctx as ExtensionContext);
+        emitGoalEvent(pi, "cleared", clearedGoal);
+      },
+      setStatusBar(value, _source, ctx) {
+        statusBarEnabled = value === "on" ? true : value === "off" ? false : !statusBarEnabled;
+        if (currentGoal) persist(pi, currentGoal);
+        refreshStatus(ctx as ExtensionContext);
+        return statusBarEnabled;
       },
     });
 
-    pi.on("session_start", (_event, ctx) => restore(pi, ctx));
+    pi.on("session_start", (event, ctx) => {
+      restore(pi, ctx);
+      if (event.reason === "reload" && currentGoal?.status === "active") {
+        currentGoal = transitionGoal(currentGoal, "paused", clock());
+        persist(pi, currentGoal);
+        refreshStatus(ctx);
+        ctx.ui.notify(`Goal paused after reload: ${currentGoal.objective}. Use /goal resume to continue.`);
+      }
+    });
     pi.on("session_tree", (_event, ctx) => restore(pi, ctx));
     pi.on("session_compact", (_event, ctx) => restore(pi, ctx));
     pi.on("before_agent_start", (event) => {
@@ -249,12 +300,16 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
         wasContinuation: currentTurnIsContinuation,
         now: clock(),
       });
-      const nextGoal = pendingCompletionGoalId === result.goal.goalId
+      const isCompleting = pendingCompletionGoalId === result.goal.goalId;
+      const nextGoal = isCompleting
         ? transitionGoal(result.goal, "complete", clock())
         : result.goal;
-      if (pendingCompletionGoalId === result.goal.goalId) pendingCompletionGoalId = null;
+      if (isCompleting) pendingCompletionGoalId = null;
       persist(pi, nextGoal);
       syncGoalTools(pi);
+      if (isCompleting) {
+        emitGoalEvent(pi, "completed", nextGoal);
+      }
       if (result.crossedBudget && nextGoal.status !== "complete") {
         pi.sendMessage(
           {

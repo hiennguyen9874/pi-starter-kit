@@ -5,6 +5,7 @@ import { createGoal, parseTokenBudget, transitionGoal, type CreateGoalOptions, t
 
 export type GoalCommand =
   | { action: "status" | "pause" | "resume" | "clear" }
+  | { action: "statusbar"; value: "on" | "off" | "toggle" }
   | { action: "create"; objective: string; tokenBudget: number | null };
 
 export type GoalCommandContext = Pick<ExtensionCommandContext, "hasUI" | "ui" | "isIdle" | "hasPendingMessages">;
@@ -13,17 +14,21 @@ export interface GoalCommandHost {
   getGoal(): GoalState | null;
   setGoal(goal: GoalState, source: "command", ctx: GoalCommandContext): void;
   clearGoal(source: "command", ctx: GoalCommandContext): void;
+  setStatusBar(value: "on" | "off" | "toggle", source: "command", ctx: GoalCommandContext): boolean;
 }
 
 export function parseGoalCommand(args: string): GoalCommand {
   const trimmed = args.trim();
   if (trimmed === "" || trimmed === "status") return { action: "status" };
   if (trimmed === "pause" || trimmed === "resume" || trimmed === "clear") return { action: trimmed };
+  if (trimmed === "statusbar") return { action: "statusbar", value: "toggle" };
+  if (trimmed === "statusbar on") return { action: "statusbar", value: "on" };
+  if (trimmed === "statusbar off") return { action: "statusbar", value: "off" };
 
   let objective = trimmed;
   let budgetText: string | undefined;
-  const equals = objective.match(/\s--budget=([^\s]+)\s*$/);
-  const spaced = objective.match(/\s--budget\s+([^\s]+)\s*$/);
+  const equals = objective.match(/\s--(?:budget|tokens)=([^\s]+)\s*$/);
+  const spaced = objective.match(/\s--(?:budget|tokens)\s+([^\s]+)\s*$/);
   if (equals) {
     budgetText = equals[1];
     objective = objective.slice(0, equals.index).trim();
@@ -47,6 +52,12 @@ export async function handleGoalCommand(
 
     if (parsed.action === "status") {
       ctx.ui.notify(current ? `${formatFooterStatus(current) ?? "Goal"}\n${goalToolText(current)}` : "No goal set. Usage: /goal <objective>", "info");
+      return;
+    }
+
+    if (parsed.action === "statusbar") {
+      const enabled = host.setStatusBar(parsed.value, "command", ctx);
+      ctx.ui.notify(`Goal status bar ${enabled ? "enabled" : "disabled"}.`, "info");
       return;
     }
 
@@ -95,7 +106,7 @@ export function registerGoalCommand(pi: { registerCommand: Function }, host: Goa
   pi.registerCommand("goal", {
     description: "Set, inspect, pause, resume, or clear a long-running pi-goal objective.",
     getArgumentCompletions(prefix: string) {
-      const values = ["status", "pause", "resume", "clear"];
+      const values = ["status", "pause", "resume", "clear", "statusbar", "statusbar on", "statusbar off"];
       const matches = values.filter((value) => value.startsWith(prefix.trim()));
       return matches.length > 0 ? matches.map((value) => ({ value, label: value })) : null;
     },

@@ -28,6 +28,7 @@ export interface GoalEntry {
   action: "set" | "clear";
   goal: GoalState | null;
   clearedGoalId?: string | null;
+  statusBarEnabled?: boolean;
   at: number;
 }
 
@@ -136,12 +137,12 @@ export function applyGoalUsage(goal: GoalState, delta: UsageDelta): { goal: Goal
   };
 }
 
-export function goalEntry(goal: GoalState, at = nowMs()): GoalEntry {
-  return { version: 1, action: "set", goal: cloneGoal(goal), at };
+export function goalEntry(goal: GoalState, at = nowMs(), statusBarEnabled?: boolean): GoalEntry {
+  return { version: 1, action: "set", goal: cloneGoal(goal), statusBarEnabled, at };
 }
 
-export function clearGoalEntry(clearedGoalId: string | null, at = nowMs()): GoalEntry {
-  return { version: 1, action: "clear", goal: null, clearedGoalId, at };
+export function clearGoalEntry(clearedGoalId: string | null, at = nowMs(), statusBarEnabled?: boolean): GoalEntry {
+  return { version: 1, action: "clear", goal: null, clearedGoalId, statusBarEnabled, at };
 }
 
 export function isGoalState(value: unknown): value is GoalState {

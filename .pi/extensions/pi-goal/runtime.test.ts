@@ -50,6 +50,7 @@ function fakePi() {
   const commands: Record<string, any> = {};
   const tools: Record<string, any> = {};
   const handlers: Record<string, Function[]> = {};
+  const renderers: Record<string, Function> = {};
   const entries: Array<{ customType: string; data: unknown }> = [];
   const messages: Array<{ message: any; options: any }> = [];
   const activeTools = new Set(["read", "bash", "edit", "write"]);
@@ -57,10 +58,12 @@ function fakePi() {
     commands,
     tools,
     handlers,
+    renderers,
     entries,
     messages,
     registerCommand(name: string, command: any) { commands[name] = command; },
     registerTool(tool: any) { tools[tool.name] = tool; },
+    registerMessageRenderer(name: string, renderer: Function) { renderers[name] = renderer; },
     on(name: string, handler: Function) { (handlers[name] ??= []).push(handler); },
     appendEntry(customType: string, data: unknown) { entries.push({ customType, data }); },
     sendMessage(message: any, options: any) { messages.push({ message, options }); },
@@ -83,6 +86,7 @@ test("default export registers command, tools, and lifecycle handlers", () => {
   assert.ok(pi.handlers.session_tree?.length);
   assert.ok(pi.handlers.session_compact?.length);
   assert.ok(pi.handlers.agent_end?.length);
+  assert.ok(pi.renderers["pi-goal-event"]);
 });
 
 test("/goal command persists state, updates status, and starts first visible turn", async () => {
@@ -368,6 +372,7 @@ test("goal resume schedules a hidden continuation when idle", async () => {
   await pi.commands.goal.handler("resume", ctx);
 
   assert.equal(scheduled.length, 1);
+  assert.equal(pi.messages.at(-1)?.message.customType, "pi-goal-event");
   scheduled[0]();
   assert.equal(pi.messages.at(-1)?.message.customType, "pi-goal-continuation");
 });
@@ -385,4 +390,31 @@ test("update_goal rejects non-active goals at execution boundary", async () => {
     /active goal/i,
   );
   assert.equal((pi.entries.at(-1)?.data as any)?.goal?.status, undefined);
+});
+
+test("statusbar setting toggles and persists across restore", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const ctx = fakeCtx();
+
+  await pi.commands.goal.handler("statusbar off", ctx);
+  assert.equal(ctx.statuses["pi-goal"], undefined);
+
+  const persisted = pi.entries.at(-1)?.data as any;
+  const restoreCtx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: persisted }]);
+  await pi.handlers.session_start[0]({}, restoreCtx);
+  assert.equal(restoreCtx.statuses["pi-goal"], undefined);
+});
+
+test("session reload auto-pauses active goal and notifies", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const goal = activeGoal({ status: "active" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({ reason: "reload" }, ctx);
+
+  const latestGoal = (pi.entries.at(-1)?.data as any).goal;
+  assert.equal(latestGoal.status, "paused");
+  assert.match(ctx.notifications.at(-1) ?? "", /paused after reload/i);
 });

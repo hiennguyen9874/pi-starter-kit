@@ -22,10 +22,15 @@ function makeCtx(hasUI = true) {
 
 function makeHost(initial: GoalState | null = null) {
   let goal = initial;
+  let statusBarEnabled = true;
   return {
     getGoal: () => goal,
     setGoal(next: GoalState) { goal = next; },
     clearGoal() { goal = null; },
+    setStatusBar(value: "on" | "off" | "toggle") {
+      statusBarEnabled = value === "on" ? true : value === "off" ? false : !statusBarEnabled;
+      return statusBarEnabled;
+    },
   };
 }
 
@@ -35,8 +40,13 @@ test("parses goal command actions and budget forms", () => {
   assert.deepEqual(parseGoalCommand("pause"), { action: "pause" });
   assert.deepEqual(parseGoalCommand("resume"), { action: "resume" });
   assert.deepEqual(parseGoalCommand("clear"), { action: "clear" });
+  assert.deepEqual(parseGoalCommand("statusbar"), { action: "statusbar", value: "toggle" });
+  assert.deepEqual(parseGoalCommand("statusbar on"), { action: "statusbar", value: "on" });
+  assert.deepEqual(parseGoalCommand("statusbar off"), { action: "statusbar", value: "off" });
   assert.deepEqual(parseGoalCommand("Ship it --budget 12k"), { action: "create", objective: "Ship it", tokenBudget: 12000 });
   assert.deepEqual(parseGoalCommand("Ship it --budget=2M"), { action: "create", objective: "Ship it", tokenBudget: 2000000 });
+  assert.deepEqual(parseGoalCommand("Ship it --tokens 10k"), { action: "create", objective: "Ship it", tokenBudget: 10000 });
+  assert.deepEqual(parseGoalCommand("Ship it --tokens=3M"), { action: "create", objective: "Ship it", tokenBudget: 3000000 });
 });
 
 test("/goal creates an active goal", async () => {
