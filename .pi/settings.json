@@ -45,7 +45,7 @@
     "behavioralGuidelinesValidationEnabled": true,
     "behavioralGuidelinesEfficiencyEnabled": true,
     "behavioralGuidelinesFinalResponseEnabled": true,
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "skillsInstructionsRewriterEnabled": true
   },
   "subagents": {
