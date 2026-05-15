@@ -5,14 +5,21 @@
     "npm:pi-command-history",
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
-    "git:github.com/championswimmer/pi-context-usage",
+    "npm:pi-cache-graph",
+    "npm:@ff-labs/pi-fff",
+    "-git:github.com/championswimmer/pi-context-usage",
+    "-npm:pi-tool-display",
     "-npm:pi-mcp-adapter",
     "-npm:context-mode",
     "-npm:pi-prompt-template-model",
     "-npm:pi-subagents",
     "-npm:pi-intercom",
     "-npm:pi-web-access",
-    "-git:github.com/davebcn87/pi-autoresearch"
+    "-npm:pi-btw",
+    "-git:github.com/davebcn87/pi-autoresearch",
+    "-git:github.com/jonjonrankin/pi-caveman",
+    "-npm:pi-context-prune",
+    "-npm:pi-hashline-readmap"
   ],
   "extensions": [
     "./extensions/permission-gate.ts",
@@ -38,7 +45,7 @@
     "behavioralGuidelinesValidationEnabled": true,
     "behavioralGuidelinesEfficiencyEnabled": true,
     "behavioralGuidelinesFinalResponseEnabled": true,
-    "piDocumentationEnabled": false,
+    "piDocumentationEnabled": true,
     "skillsInstructionsRewriterEnabled": true
   },
   "subagents": {
