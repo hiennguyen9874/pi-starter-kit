@@ -6,7 +6,7 @@
     "npm:pi-ask-user",
     "npm:pi-rtk-optimizer",
     "npm:pi-cache-graph",
-    "npm:@ff-labs/pi-fff",
+    "-npm:@ff-labs/pi-fff",
     "-git:github.com/championswimmer/pi-context-usage",
     "-npm:pi-tool-display",
     "-npm:pi-mcp-adapter",

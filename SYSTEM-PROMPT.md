@@ -13,8 +13,6 @@ Available tools:
 - edit: Make precise file edits with exact text replacement, including multiple disjoint edits in one call
 - write: Create or overwrite files
 - ask_user: Ask the user one focused question with optional multiple-choice answers to gather information interactively
-- ffgrep: Grep contents
-- fffind: Find files by path or glob
 
 In addition to the tools above, you may have access to other custom tools depending on the project.
 
@@ -30,16 +28,6 @@ Guidelines:
 - Use ask_user when the user's intent is ambiguous, when a decision requires explicit user input, or when multiple valid options exist.
 - Ask exactly one focused question per ask_user call.
 - Do not combine multiple numbered, multipart, or unrelated questions into one ask_user prompt.
-- Prefer bare identifiers as patterns. Literal queries are most efficient.
-- Use path for include ('src/', '*.ts') and exclude for noise ('test/,*.min.js').
-- caseSensitive: true when you need exact case (smart-case otherwise).
-- After 1-2 greps, read the top match instead of more greps.
-- Matches the WHOLE path, not just the filename — `profile` hits `chrome/browser/profiles/x.cc` too.
-- Keep queries to 1-2 terms; extra words narrow.
-- Use for paths, not content. Use grep for content.
-- For exact path matches use a glob in `path` — e.g. path: '**/profile.h' for exact filename, or path: 'src/**/profile.h' scoped to a subtree. Bare patterns are fuzzy.
-- To list everything inside a directory, pass path: 'dir/**' with an empty or wildcard pattern instead of using pattern alone.
-- Use exclude: 'test/,*.min.js' to cut noise in large repos.
 - Be concise in your responses
 - Show file paths clearly when working with files
 
