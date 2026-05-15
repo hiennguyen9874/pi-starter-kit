@@ -38,9 +38,10 @@ This structure informs the task decomposition. Each task should produce self-con
 ## Bite-Sized Phase and Task Granularity
 
 **Phase count maximum by feature size:**
-- Small feature: maximum 3 phases
-- Medium feature: maximum 5 phases
-- Large feature: maximum 7 phases
+- Small feature: 2-3 phases
+- Medium feature: 3-5 phases
+- Large feature: 5-7 phases
+- Breaking feature: 7-10 phases
 
 If the work appears to need more phases than the size allows, simplify scope or ask before writing the plan.
 
