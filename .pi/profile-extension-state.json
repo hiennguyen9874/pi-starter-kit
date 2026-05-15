@@ -9,8 +9,11 @@
     "-skills/brand",
     "-skills/coding-standards",
     "-skills/composition-patterns",
+    "-skills/creating-custom-tensorrt-plugins",
     "-skills/database-migrations",
+    "-skills/defuddle",
     "-skills/design-system",
+    "-skills/developing-with-streamlit",
     "-skills/dispatching-parallel-agents",
     "-skills/docker-patterns",
     "-skills/executing-plans",
@@ -28,6 +31,7 @@
     "-skills/readiness-report",
     "-skills/receiving-code-review",
     "-skills/requesting-code-review",
+    "-skills/sei-uuidv7-injection",
     "-skills/shadcn-best-practices",
     "-skills/skill-creator",
     "-skills/slides",
@@ -51,6 +55,12 @@
       "context-mode": {
         "command": "context-mode",
         "lifecycle": "keep-alive"
+      },
+      "deepwiki": {
+        "url": "https://mcp.deepwiki.com/mcp"
+      },
+      "exa": {
+        "url": "https://mcp.exa.ai/mcp"
       }
     }
   }

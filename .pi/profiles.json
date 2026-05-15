@@ -20,7 +20,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "superpowers": {
@@ -52,7 +54,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "backend": {
@@ -89,7 +93,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "frontend": {
@@ -135,7 +141,9 @@
         "chrome-devtools"
       ],
       "mcpServersDisable": [
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "devops": {
@@ -166,7 +174,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "agentic": {
@@ -186,7 +196,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "documenter": {
@@ -197,7 +209,9 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     },
     "readiness-report": {
@@ -207,7 +221,36 @@
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
-        "context-model"
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "ml-dev": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "grill-me",
+        "grill-with-docs",
+        "improve-codebase-architecture",
+        "handoff",
+        "prototype",
+        "diagnose",
+        "code-reviewer",
+        "context7-cli",
+        "ask-user",
+        "git-commit",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "sei-uuidv7-injection",
+        "developing-with-streamlit",
+        "creating-custom-tensorrt-plugins"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
       ]
     }
   }
