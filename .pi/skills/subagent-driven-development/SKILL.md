@@ -123,7 +123,8 @@ Give implementer:
 
 **Required workflow skills:**
 - **writing-plans** — creates plan folders this skill executes
-- **code-reviewer** — review standard for spec and quality reviewers
+- **spec-review** — review standard for plan/spec alignment
+- **code-quality-review** — review standard for correctness, maintainability, tests, and pragmatic quality
 - **finishing-a-development-branch** — only after all phases are done, tests pass, and user explicitly asks
 
 **Subagents should use:**

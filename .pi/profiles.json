@@ -4,18 +4,90 @@
     "base": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "grill-me",
+        "interview-me",
+        "ask-user",
+        "handoff",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "git-commit"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "planning": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "ask-user",
+        "brainstorming",
+        "spec-driven-development",
+        "prd",
+        "writing-plans",
+        "prototype",
         "grill-with-docs",
         "improve-codebase-architecture",
-        "handoff",
-        "prototype",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
+        "documentation-and-adrs",
+        "pragmatic-principles"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "execution": {
+      "skillsEnable": [
+        "bootstrap-project-context",
         "ask-user",
-        "git-commit",
+        "executing-plans",
+        "subagent-driven-development",
+        "dispatching-parallel-agents",
+        "test-driven-development",
+        "systematic-debugging",
+        "verification-before-completion",
         "pragmatic-principles",
-        "systematic-debugging"
+        "handoff"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "review": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "spec-review",
+        "code-quality-review",
+        "requesting-code-review",
+        "receiving-code-review",
+        "verification-before-completion",
+        "pragmatic-principles"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "finish": {
+      "skillsEnable": [
+        "git-commit",
+        "git-workflow-and-versioning",
+        "finishing-a-development-branch",
+        "verification-before-completion",
+        "handoff"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -28,28 +100,25 @@
     "superpowers": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "grill-me",
-        "grill-with-docs",
-        "improve-codebase-architecture",
-        "handoff",
-        "prototype",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
+        "interview-me",
         "ask-user",
-        "git-commit",
+        "handoff",
         "pragmatic-principles",
         "systematic-debugging",
         "brainstorming",
-        "dispatching-parallel-agents",
+        "spec-driven-development",
+        "writing-plans",
         "executing-plans",
-        "finishing-a-development-branch",
-        "receiving-code-review",
-        "requesting-code-review",
         "subagent-driven-development",
+        "dispatching-parallel-agents",
         "test-driven-development",
+        "spec-review",
+        "code-quality-review",
+        "requesting-code-review",
+        "receiving-code-review",
         "verification-before-completion",
-        "writing-plans"
+        "finishing-a-development-branch",
+        "git-commit"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -62,33 +131,19 @@
     "backend": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "grill-me",
-        "improve-codebase-architecture",
-        "grill-with-docs",
-        "handoff",
-        "prototype",
-        "code-reviewer",
-        "context7-cli",
+        "interview-me",
         "ask-user",
-        "git-commit",
-        "pragmatic-principles",
+        "context7-cli",
         "systematic-debugging",
-        "brainstorming",
-        "dispatching-parallel-agents",
-        "executing-plans",
-        "finishing-a-development-branch",
-        "receiving-code-review",
-        "requesting-code-review",
-        "subagent-driven-development",
-        "test-driven-development",
-        "verification-before-completion",
-        "writing-plans",
+        "pragmatic-principles",
         "api-design",
         "backend-patterns",
         "database-migrations",
+        "postgres-patterns",
         "golang-patterns",
         "golang-testing",
-        "postgres-patterns"
+        "source-driven-development",
+        "test-driven-development"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -101,41 +156,43 @@
     "frontend": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "grill-me",
-        "grill-with-docs",
-        "improve-codebase-architecture",
-        "handoff",
-        "prototype",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
+        "interview-me",
         "ask-user",
-        "git-commit",
-        "pragmatic-principles",
+        "context7-cli",
         "systematic-debugging",
-        "brainstorming",
-        "dispatching-parallel-agents",
-        "executing-plans",
-        "finishing-a-development-branch",
-        "receiving-code-review",
-        "requesting-code-review",
-        "subagent-driven-development",
-        "test-driven-development",
-        "verification-before-completion",
-        "writing-plans",
-        "coding-standards",
-        "composition-patterns",
+        "pragmatic-principles",
         "frontend-skill",
+        "composition-patterns",
         "react-best-practices",
-        "banner-design",
-        "design-system",
         "react-view-transitions",
-        "ui-ux-pro-max",
-        "brand",
         "shadcn-best-practices",
+        "ui-ux-pro-max",
         "web-design-guidelines",
+        "performance-optimization",
+        "source-driven-development",
+        "test-driven-development"
+      ],
+      "mcpServersEnable": [
+        "chrome-devtools"
+      ],
+      "mcpServersDisable": [
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "design": {
+      "skillsEnable": [
+        "interview-me",
+        "ask-user",
+        "frontend-skill",
         "interface-design",
-        "slides"
+        "ui-ux-pro-max",
+        "design-system",
+        "brand",
+        "banner-design",
+        "slides",
+        "web-design-guidelines"
       ],
       "mcpServersEnable": [
         "chrome-devtools"
@@ -149,27 +206,14 @@
     "devops": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "improve-codebase-architecture",
-        "grill-me",
-        "grill-with-docs",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
+        "interview-me",
         "ask-user",
-        "git-commit",
-        "pragmatic-principles",
         "systematic-debugging",
-        "brainstorming",
-        "dispatching-parallel-agents",
-        "executing-plans",
-        "finishing-a-development-branch",
-        "receiving-code-review",
-        "requesting-code-review",
-        "subagent-driven-development",
-        "test-driven-development",
-        "verification-before-completion",
-        "writing-plans",
-        "docker-patterns"
+        "pragmatic-principles",
+        "docker-patterns",
+        "ci-cd-and-automation",
+        "git-workflow-and-versioning",
+        "verification-before-completion"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -182,16 +226,30 @@
     "agentic": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "improve-codebase-architecture",
-        "grill-me",
-        "grill-with-docs",
+        "interview-me",
         "ask-user",
-        "git-commit",
-        "pragmatic-principles",
         "prompt-leverage",
         "agent-md-refactor",
+        "context7-cli",
+        "pragmatic-principles"
+      ],
+      "mcpServersEnable": [],
+      "mcpServersDisable": [
+        "chrome-devtools",
+        "context-mode",
+        "deepwiki",
+        "exa"
+      ]
+    },
+    "skill-authoring": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "ask-user",
         "writing-skills",
-        "skill-creator"
+        "skill-creator",
+        "prompt-leverage",
+        "pragmatic-principles"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -204,7 +262,14 @@
     "documenter": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "prd"
+        "interview-me",
+        "ask-user",
+        "prd",
+        "documentation-and-adrs",
+        "spec-driven-development",
+        "writing-plans",
+        "handoff",
+        "readiness-report"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [
@@ -229,21 +294,16 @@
     "ml-dev": {
       "skillsEnable": [
         "bootstrap-project-context",
-        "grill-me",
-        "grill-with-docs",
-        "improve-codebase-architecture",
-        "handoff",
-        "prototype",
-        "diagnose",
-        "code-reviewer",
-        "context7-cli",
+        "interview-me",
         "ask-user",
-        "git-commit",
-        "pragmatic-principles",
+        "context7-cli",
         "systematic-debugging",
-        "sei-uuidv7-injection",
+        "pragmatic-principles",
+        "source-driven-development",
+        "test-driven-development",
         "developing-with-streamlit",
-        "creating-custom-tensorrt-plugins"
+        "creating-custom-tensorrt-plugins",
+        "sei-uuidv7-injection"
       ],
       "mcpServersEnable": [],
       "mcpServersDisable": [

@@ -1,7 +1,6 @@
 ---
 description: "Run two-phase code review: spec alignment first, code quality second"
 skills:
-  - code-reviewer
   - pragmatic-principles
   - receiving-code-review
   - dispatching-parallel-agents

@@ -95,7 +95,7 @@ Use this decision tree:
 - If workflow is only project convention: put guidance in repo docs, not skill.
 - If workflow is reusable and uncovered: create new skill.
 
-For high-impact merge/split/create decisions, use `ask-user` before editing.
+Note: Always use `interview-me` to ask for detailed information from user about what should be improved until we reach a shared understanding.
 
 ### 4. Apply Skill-Writing Rules
 
@@ -114,6 +114,7 @@ Follow `writing-skills` and `skill-creator` guidance:
   - scripts only for deterministic repeated tasks
 - Avoid one-off project notes unless skill is intentionally project-local.
 - Do not add broad abstractions or speculative sections.
+- Using `**` to highlight important keywords and sentences.
 
 ### 5. Test Skill Behavior
 

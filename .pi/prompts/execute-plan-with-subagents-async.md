@@ -3,7 +3,6 @@ description: Execute a full plan folder using phase-level subagents with backgro
 skills:
   - subagent-driven-development
   - pi-subagents
-  - code-reviewer
 ---
 
 You are executing a full written implementation plan folder using subagent-driven development.
@@ -17,7 +16,8 @@ Use this prompt when:
 Required skills:
 - `subagent-driven-development` — phase-level implementation workflow and quality gates
 - `pi-subagents` — `subagent(...)`, async/background runs, `status`, and `resume`
-- `code-reviewer` — review standards for spec and quality review
+- `spec-review` — phase 1 plan/spec alignment review
+- `code-quality-review` — phase 2 correctness, maintainability, tests, and pragmatic quality review
 
 Required agents:
 - `implementer` — implements all tasks in exactly one phase

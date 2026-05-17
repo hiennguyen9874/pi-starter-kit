@@ -24,6 +24,17 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+## Planning Inputs
+
+Before defining phases, operate in **read-only planning mode**:
+
+- Read the spec, design context, and relevant codebase sections
+- Identify existing patterns and conventions
+- Map dependencies between components
+- Note risks, unknowns, and human decisions needed before implementation
+
+**Do not write implementation code while planning.** The output is the plan folder.
+
 ## File Structure
 
 Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
@@ -34,6 +45,12 @@ Before defining tasks, map out which files will be created or modified and what 
 - In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
+
+## Dependency and Slice Strategy
+
+Order phases by the dependency graph: foundations first, then features that depend on them. Define shared contracts before parallel work that relies on those contracts.
+
+Prefer **vertical slices** over horizontal layers. A good phase delivers working, testable functionality across the needed files instead of building all schema, then all APIs, then all UI. Horizontal foundation work is allowed only when later slices truly depend on it.
 
 ## Bite-Sized Phase and Task Granularity
 
@@ -46,6 +63,8 @@ This structure informs the task decomposition. Each task should produce self-con
 If the work appears to need more phases than the size allows, simplify scope or ask before writing the plan.
 
 **Each phase contains 1-3 related tasks.** Group tasks that belong together, such as backend API + backend tests, or frontend UI + frontend tests. Do not mix unrelated backend, frontend, infra, and docs work in one phase.
+
+**Target task size:** each task should be small enough for one focused session, usually touching about 1-5 files. If a task touches multiple independent subsystems, has more than three acceptance conditions, or needs "and" in the title, split it.
 
 **Each step is one action (2-5 minutes):**
 - "Write the failing test" - step
@@ -147,6 +166,20 @@ Run: `pytest tests/path -v`
 Expected: PASS
 ````
 
+## Checkpoints
+
+Add explicit verification checkpoints inside each phase when it has multiple tasks or meaningful integration risk:
+
+```markdown
+## Phase Verification
+- [ ] Focused tests pass: `pytest tests/path -v`
+- [ ] Build/typecheck passes: `npm run build`
+- [ ] Core acceptance criteria for this phase are satisfied
+- [ ] Stop for human review before the next phase if risk or scope changed
+```
+
+Use project-appropriate commands. Keep checkpoints concrete; never write generic "verify everything" instructions.
+
 ## Remember
 - Plan output is a folder, not one `plan.md` containing many tasks
 - Exact file paths always
@@ -154,6 +187,7 @@ Expected: PASS
 - Exact commands with expected output
 - Phase count stays within size cap: small ≤3, medium ≤5, large ≤7
 - Each phase has 1-3 related tasks
+- Tasks are dependency-ordered, vertically sliced when possible, and small enough for one focused session
 - `plan.md` links to `phase-x.md`; task detail lives in phase files
 - DRY, YAGNI, TDD, frequent commits
 
@@ -163,9 +197,11 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+**2. Dependency and slice check:** Are foundations before dependents? Are phases vertically sliced where possible? Are tasks too large or mixing unrelated subsystems? Fix ordering and splits before handoff.
 
-**3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+**3. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+
+**4. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 

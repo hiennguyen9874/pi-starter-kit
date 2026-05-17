@@ -2,7 +2,7 @@
 description: Create a reusable workflow prompt for a specific coding-agent task
 skills:
   - prompt-leverage
-  - grill-me
+  - interview-me
   - ask-user
 ---
 

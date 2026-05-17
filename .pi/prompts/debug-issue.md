@@ -1,7 +1,6 @@
 ---
 description: Diagnose and fix a bug, failing test, broken behavior, or performance regression
 skills:
-  - diagnose
   - systematic-debugging
   - test-driven-development
 ---

@@ -182,9 +182,3 @@ git branch -d <feature-branch>
 - Present exactly 4 options
 - Get typed confirmation for Option 4
 - Clean up only the branch state implied by the chosen option
-
-## Integration
-
-**Called by:**
-- **subagent-driven-development** (Step 7) - After all tasks complete
-- **executing-plans** (Step 5) - After all batches complete

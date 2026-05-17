@@ -7,6 +7,8 @@ description: Use when building or improving visually strong landing pages, websi
 
 Use this skill when the quality of the work depends on art direction, hierarchy, restraint, imagery, and motion rather than component count.
 
+Use `interface-design` instead for dashboards, admin panels, SaaS tools, settings pages, and data-heavy product interfaces.
+
 Goal: ship interfaces that feel deliberate, premium, and current. Default toward award-level composition: one big idea, strong imagery, sparse copy, rigorous spacing, and a small number of memorable motions.
 
 
@@ -189,6 +191,21 @@ Motion rules:
 - Carousel with no narrative purpose
 - App UI made of stacked cards instead of layout
 
+## Engineering Quality Gate
+
+Polished UI is not finished until it works like production software.
+
+Before handing off, check:
+
+- **Responsive behavior:** works at mobile, tablet, desktop, and wide desktop sizes; no overflow, cramped tap targets, or broken hero viewport math.
+- **Accessibility:** semantic elements first, visible focus states, keyboard navigation for every interactive element, labelled inputs/buttons, and text contrast that meets WCAG AA.
+- **States:** loading, empty, error, disabled, hover, focus, and active states exist where the user can encounter them.
+- **Design system fit:** use project tokens, spacing scale, typography, and existing components before raw colors, arbitrary pixel values, or custom one-off UI.
+- **Content realism:** use realistic copy and data lengths so wrapping, truncation, hierarchy, and empty states are actually tested.
+- **Runtime hygiene:** no console errors, hydration warnings, layout shift, or interaction jank in the affected UI.
+
+If the task is React/Next.js performance-heavy, also use `react-best-practices`. If the task is shadcn/ui-specific, also use `shadcn-best-practices`. If it is mainly tokens or component specs, use `design-system`.
+
 ## Litmus Checks
 
 - Is the brand or product unmistakable in the first screen?
@@ -198,3 +215,5 @@ Motion rules:
 - Are cards actually necessary?
 - Does motion improve hierarchy or atmosphere?
 - Would the design still feel premium if all decorative shadows were removed?
+- Can the interface be operated with keyboard only?
+- Do responsive, loading, empty, and error states look intentional rather than bolted on?

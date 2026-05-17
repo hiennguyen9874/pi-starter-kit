@@ -29,8 +29,9 @@ Load plan, review critically, execute one phase, report for review before contin
 For each task in the selected phase:
 1. Mark as in_progress
 2. Follow each step exactly (plan has bite-sized steps)
-3. Run verifications as specified
-4. Mark as completed
+3. Keep the task as a **small, working increment**: change one logical thing, avoid unrelated cleanup, and keep the project buildable
+4. Run verifications as specified before moving on
+5. Mark as completed
 
 Do not start another phase without explicit user instruction.
 
@@ -76,7 +77,9 @@ After all phases complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
+- Execute **one small, verified increment at a time** inside the selected phase
 - Don't skip verifications
+- Don't expand scope or clean up adjacent code while implementing a phase
 - Reference skills when plan says to
 - Between phases: just report and wait
 - Stop when blocked, don't guess

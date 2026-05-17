@@ -1,13 +1,13 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: "Use when creative work needs shaping before implementation: refining vague ideas, creating features, building components, adding functionality, or modifying behavior. Explores intent, alternatives, assumptions, requirements, and design before implementation."
 ---
 
 # Brainstorming Ideas Into Designs
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
+Start by understanding the current project context, then ask questions one at a time to refine the idea. If the idea is still vague, first widen it into a few viable directions, stress-test assumptions, and converge before presenting an implementation design. Once you understand what you're building, present the design and get user approval.
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
@@ -24,12 +24,13 @@ You MUST create a task for each of these items and complete them in order:
 1. **Explore project context** — check files, docs, recent commits
 2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a clarifying question. See the Visual Companion section below.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — include feature size (small/medium/large) and get user approval after each section
-6. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>/design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
+4. **Refine vague ideas when needed** — reframe the problem, generate variations, surface assumptions, and converge on a direction
+5. **Propose 2-3 approaches** — with trade-offs and your recommendation
+6. **Present design** — include feature size (small/medium/large) and get user approval after each section
+7. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>/design.md` and commit
+8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+9. **User reviews written spec** — ask user to review the spec file before proceeding
+10. **Transition to implementation** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
 
 ## Process Flow
 
@@ -39,6 +40,8 @@ digraph brainstorming {
     "Visual questions ahead?" [shape=diamond];
     "Offer Visual Companion\n(own message, no other content)" [shape=box];
     "Ask clarifying questions" [shape=box];
+    "Refine vague idea?" [shape=diamond];
+    "Generate variations and converge" [shape=box];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
@@ -51,7 +54,10 @@ digraph brainstorming {
     "Visual questions ahead?" -> "Offer Visual Companion\n(own message, no other content)" [label="yes"];
     "Visual questions ahead?" -> "Ask clarifying questions" [label="no"];
     "Offer Visual Companion\n(own message, no other content)" -> "Ask clarifying questions";
-    "Ask clarifying questions" -> "Propose 2-3 approaches";
+    "Ask clarifying questions" -> "Refine vague idea?";
+    "Refine vague idea?" -> "Generate variations and converge" [label="yes"];
+    "Refine vague idea?" -> "Propose 2-3 approaches" [label="no"];
+    "Generate variations and converge" -> "Propose 2-3 approaches";
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
@@ -76,6 +82,18 @@ digraph brainstorming {
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria
+
+**Refining vague ideas:**
+
+Use this lightweight ideation pass only when the user has a raw concept rather than a buildable direction.
+
+- Reframe the idea as a crisp **How Might We** problem statement.
+- Ask enough sharpening questions to identify the target user, success criteria, and binding constraints.
+- Generate **5-8 distinct variations** using lenses like simplification, inversion, audience shift, constraint removal, or combination with adjacent ideas.
+- Cluster the strongest variations into **2-3 directions**.
+- Stress-test each direction for **user value, feasibility, differentiation, hidden assumptions, and what could kill it**.
+- Converge on one recommended direction with the user before moving into implementation design.
+- Keep a visible **Not Doing** list so focus and trade-offs are explicit.
 
 **Exploring approaches:**
 

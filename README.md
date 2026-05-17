@@ -173,28 +173,29 @@ Local skills live in `.pi/skills/`. Profiles expose only task-relevant subsets.
 Core workflow skills:
 
 - `bootstrap-project-context` — repo onboarding from docs and source
-- `diagnose` / `systematic-debugging` — bug and failure diagnosis
-- `code-reviewer`, `requesting-code-review`, `receiving-code-review` — review workflows
-- `git-commit`, `verification-before-completion`, `finishing-a-development-branch` — completion and commit workflows
-- `brainstorming`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
-- `grill-me`, `grill-with-docs`, `improve-codebase-architecture`, `pragmatic-principles` — design pressure-testing and architecture improvement
+- `systematic-debugging` — bug, failure, regression, and unexpected-behavior diagnosis
+- `spec-review`, `code-quality-review`, `requesting-code-review`, `receiving-code-review` — review workflows
+- `git-commit`, `git-workflow-and-versioning`, `verification-before-completion`, `finishing-a-development-branch` — completion, branch, and commit workflows
+- `brainstorming`, `spec-driven-development`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
+- `interview-me`, `grill-with-docs`, `improve-codebase-architecture`, `prototype`, `pragmatic-principles` — design pressure-testing, architecture improvement, and simplicity checks
 
 Domain and stack skills:
 
 - backend/API/data: `api-design`, `backend-patterns`, `database-migrations`, `postgres-patterns`
 - Go: `golang-patterns`, `golang-testing`
-- frontend/design: `frontend-skill`, `interface-design`, `coding-standards`, `react-best-practices`, `react-view-transitions`, `shadcn-best-practices`, `composition-patterns`, `ui-ux-pro-max`, `web-design-guidelines`
-- brand/design-system: `brand`, `design-system`, `banner-design`, `slides`
-- DevOps: `docker-patterns`
+- frontend implementation: `frontend-skill`, `composition-patterns`, `react-best-practices`, `react-view-transitions`, `shadcn-best-practices`, `ui-ux-pro-max`, `web-design-guidelines`, `performance-optimization`
+- design/brand/presentation: `interface-design`, `design-system`, `brand`, `banner-design`, `slides`
+- DevOps: `docker-patterns`, `ci-cd-and-automation`
+- ML/video/app specializations: `developing-with-streamlit`, `creating-custom-tensorrt-plugins`, `sei-uuidv7-injection`
 
 Agent-authoring and docs skills:
 
 - `agent-md-refactor` — restructure agent instruction files with docs-only progressive disclosure
 - `context7-cli` — fetch library docs and manage Context7/ctx7 skill workflows
 - `prompt-leverage` — upgrade raw prompts into execution-ready prompts
-- `prd` — create product requirements documents
+- `prd`, `documentation-and-adrs`, `readiness-report` — product, architecture, and readiness documentation
 - `skill-creator`, `writing-skills` — create, test, and improve skills
-- `test-driven-development` — imported workflow skills used by broader profiles
+- `source-driven-development`, `test-driven-development` — source-grounded and test-first development workflows
 
 ## Profiles
 
@@ -202,15 +203,23 @@ Profiles control which skills and MCP servers are visible or blocked.
 
 Current profiles:
 
-- `base` — small general-purpose default
-- `superpowers` — broader workflow/tooling profile
-- `backend` — server, API, database, Go, and backend work
-- `frontend` — UI, React, design, browser work
-- `devops` — infra and release work
-- `agentic` — agent, skill, prompt, and compression work
-- `documenter` — docs and product-writing work
+- `base` — small general-purpose default for safe repo work, debugging, handoff, and commits
+- `planning` — discovery, requirements, specs, PRDs, prototypes, plans, and architecture shaping
+- `execution` — execute written plans with direct or subagent-driven workflows and verification gates
+- `review` — spec alignment and code-quality review of completed work
+- `finish` — final verification, branch completion, git workflow, and conventional commits
+- `superpowers` — broad workflow profile combining planning, execution, review, verification, and finishing skills
+- `backend` — server, API, database, PostgreSQL, Go, source-grounded backend work, and TDD
+- `frontend` — React, shadcn/ui, frontend implementation, browser-assisted UI work, animation, performance, and audit skills
+- `design` — visual direction, product interface design, design systems, brand, banners, slides, and UI audit
+- `devops` — Docker, CI/CD, git workflow, verification, and infrastructure-adjacent debugging
+- `agentic` — agent instruction, prompt, Context7, and agent-system work
+- `skill-authoring` — skill creation, improvement, pressure-testing, and prompt refinement
+- `documenter` — PRDs, ADRs, specs, plans, handoffs, and readiness reports
+- `readiness-report` — focused readiness-report generation
+- `ml-dev` — Streamlit, TensorRT plugins, SEI UUIDv7 injection, and source-grounded ML/video development
 
-Profile config lives in `.pi/profiles.json`.
+Profile config lives in `.pi/profiles.json`. Prefer switching to the narrowest profile that matches the current domain or phase.
 
 ### Runtime Behavior
 
@@ -331,14 +340,14 @@ Expected result: all tests pass.
 
 ### Create a New Profile
 
-Add a profile under `.pi/profiles.json`:
+Add a profile under `.pi/profiles.json`. Keep profiles task-shaped: include only the skills and MCP servers needed for that domain or phase.
 
 ```json
 {
   "profiles": {
-    "review": {
-      "skillsEnable": ["bootstrap-project-context", "code-reviewer", "systematic-debugging"],
-      "mcpServersEnable": ["context-mode"]
+    "api-review": {
+      "skillsEnable": ["bootstrap-project-context", "spec-review", "code-quality-review", "api-design"],
+      "mcpServersDisable": ["chrome-devtools", "context-mode", "deepwiki", "exa"]
     }
   }
 }

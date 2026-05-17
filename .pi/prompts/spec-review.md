@@ -1,7 +1,7 @@
 ---
 description: Run phase 1 spec alignment review against requirements, plan, phase file, or design
 skills:
-  - code-reviewer
+  - spec-review
 ---
 
 ## Objective

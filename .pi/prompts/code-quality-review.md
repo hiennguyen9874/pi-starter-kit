@@ -1,7 +1,7 @@
 ---
 description: Run phase 2 code quality review for correctness, maintainability, and pragmatics
 skills:
-  - code-reviewer
+  - code-quality-review
   - pragmatic-principles
   - receiving-code-review
 ---
