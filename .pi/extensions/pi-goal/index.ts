@@ -35,6 +35,16 @@ function numberFrom(value: unknown): number {
   return Number.isFinite(number) ? Math.max(0, Math.trunc(number)) : 0;
 }
 
+function textComponent(text: string) {
+  return {
+    render(width: number): string[] {
+      const safeWidth = Math.max(1, Math.trunc(width));
+      return [text.length > safeWidth ? text.slice(0, safeWidth) : text];
+    },
+    invalidate() {},
+  };
+}
+
 export function extractTokenUsage(message: UsageCarrier | undefined): number {
   const usage = message?.usage ?? message?.metadata?.usage ?? message?.tokens;
   if (!usage) return 0;
@@ -186,9 +196,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   function register(pi: ExtensionAPI): void {
     (pi as unknown as { registerMessageRenderer?: Function }).registerMessageRenderer?.(
       GOAL_EVENT_MESSAGE_TYPE,
-      (message: { details?: { kind?: string; objective?: string | null; status?: string | null } }) => ({
-        text: `Goal ${message.details?.kind ?? "updated"}${message.details?.objective ? `: ${message.details.objective}` : ""}`,
-      }),
+      (message: { details?: { kind?: string; objective?: string | null; status?: string | null } }) => textComponent(
+        `Goal ${message.details?.kind ?? "updated"}${message.details?.objective ? `: ${message.details.objective}` : ""}`,
+      ),
     );
 
     registerGoalTools(pi, {

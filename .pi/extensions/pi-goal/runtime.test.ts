@@ -87,6 +87,10 @@ test("default export registers command, tools, and lifecycle handlers", () => {
   assert.ok(pi.handlers.session_compact?.length);
   assert.ok(pi.handlers.agent_end?.length);
   assert.ok(pi.renderers["pi-goal-event"]);
+
+  const rendered = pi.renderers["pi-goal-event"]({ details: { kind: "created", objective: "Build feature" } });
+  assert.equal(typeof rendered?.render, "function");
+  assert.equal(typeof rendered?.invalidate, "function");
 });
 
 test("/goal command persists state, updates status, and starts first visible turn", async () => {
