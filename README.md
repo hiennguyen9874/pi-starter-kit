@@ -353,29 +353,6 @@ Add a profile under `.pi/profiles.json`. Keep profiles task-shaped: include only
 }
 ```
 
-## Troubleshooting
-
-### Skill Not Available
-
-Check:
-
-1. Skill exists locally or is installed by a Pi package.
-2. Active profile includes it in `skillsEnable` when that list is non-empty.
-3. Active profile does not include it in `skillsDisable`.
-4. `.pi/settings.json` does not contain a managed exclusion for it after profile sync.
-
-### MCP Server Blocked
-
-Check:
-
-1. Server exists in `.pi/mcp.json` or is provided by an extension/package.
-2. Active profile includes it in `mcpServersEnable` when that list is non-empty.
-3. Active profile does not include it in `mcpServersDisable`.
-
-### Profile References Missing Skills
-
-Some profile entries may refer to skills provided by external Pi packages or user-level skill directories. If a skill is missing, either install it, remove it from the profile, or keep it only in profiles where that external dependency exists.
-
 ## Frontend Workflow
 
 Frontend prompts distinguish **marketing surfaces** (landing pages, portfolios, hero sections) from **product surfaces** (dashboards, admin panels, SaaS apps). Use `frontend-*` prompts for marketing, `interface-*` prompts for product.
