@@ -1,6 +1,6 @@
 ---
 name: interview-me
-description: Use when the user asks to be interviewed, grilled, challenged, or stress-tested before planning or implementation; when an ask is underspecified; or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.
+description: Use when the user asks to be interviewed, grilled, challenged, or stress-tested on an idea, plan, design, or requirements; when an ask is underspecified; or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.
 ---
 
 # Interview Me
@@ -22,6 +22,7 @@ Apply this skill when:
 - You're tempted to start with assumptions you haven't surfaced
 - The user hasn't said which value they're optimizing for when two reasonable ones are in tension (simplicity vs. flexibility, cost vs. speed)
 - The user explicitly invokes: **"interview me"**, **"grill me"**, **"challenge this plan"**, **"before we start, are we sure?"**, **"stress-test my thinking"**, or **"ask me one question at a time"**
+- The user has an existing **plan** or **design** and wants you to walk the decision tree before they commit to it
 
 **When NOT to use:**
 
@@ -73,6 +74,15 @@ Wait for the user to react before asking the next question.
 - It surfaces *your* assumptions, which is what the interview is meant to expose
 
 The risk here is a polite user agreeing with your guess to be agreeable. Mitigate by being visibly willing to be wrong, and occasionally guess in a direction you expect the user to push back on.
+
+### Plan grilling mode
+
+When the user asks to be **grilled** on an existing **plan** or **design**, interview the plan relentlessly instead of treating it like a blank-slate idea:
+
+- Walk down the **design tree** one branch at a time: goals, constraints, dependencies, alternatives, failure modes, reversibility, and rollout.
+- Resolve upstream decisions before downstream ones; don't ask about implementation details before the load-bearing product or architecture choice is settled.
+- For each question, include your **recommended answer** or best guess, with the reasoning that produced it.
+- If the answer can be found by exploring the **codebase**, docs, tests, or existing decisions, inspect those sources instead of asking the user to restate what the repo already knows.
 
 ### Step 3: Listen for "want vs. should want"
 
