@@ -1,4 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { DynamicBorder } from "@mariozechner/pi-coding-agent";
+import { Container, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
 
 import { loadProfilesConfig } from "./profile-config.ts";
 import { getKnownSkillNames, summarizeProfile } from "./profile-discovery.ts";
@@ -339,7 +341,73 @@ export default function profileExtension(pi: ExtensionAPI): void {
         return;
       }
 
-      const selected = await ctx.ui.select("Select profile", profileNames);
+      const activeName = state.activeProfileName;
+      const items: SelectItem[] = profileNames.map((name) => {
+        const isActive = name === activeName;
+        const label = isActive ? `${name} (active)` : name;
+        return {
+          value: name,
+          label,
+          description: summarizeProfile(name, state.profiles[name]),
+        };
+      });
+
+      const selected = await ctx.ui.custom<string | null>((tui, theme, _kb, done) => {
+        const container = new Container();
+        container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+
+        container.addChild(new Text(theme.fg("accent", theme.bold("Select Profile")), 1, 0));
+
+        const selectList = new SelectList(items, Math.min(items.length, 10), {
+          selectedPrefix: (t) => theme.fg("accent", t),
+          selectedText: (t) => theme.fg("accent", t),
+          description: (t) => theme.fg("muted", t),
+          scrollInfo: (t) => theme.fg("dim", t),
+          noMatch: (t) => theme.fg("warning", t),
+        });
+
+        let filter = "";
+
+        selectList.onSelect = (item) => done(item.value);
+        selectList.onCancel = () => done(null);
+
+        container.addChild(selectList);
+
+        container.addChild(new Text(theme.fg("dim", "type to filter · ↑↓ navigate · enter select · esc cancel"), 1, 0));
+
+        container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+
+        return {
+          render: (w) => container.render(w),
+          invalidate: () => container.invalidate(),
+          handleInput: (data) => {
+            // Printable characters: accumulate filter
+            if (data.length === 1 && data.match(/[a-zA-Z0-9_-]/)) {
+              filter += data;
+              selectList.setFilter(filter);
+              tui.requestRender();
+              return;
+            }
+            // Backspace: remove last char from filter
+            if (data === "\x7f" || data === "\b") {
+              filter = filter.slice(0, -1);
+              selectList.setFilter(filter);
+              tui.requestRender();
+              return;
+            }
+            // Escape filter on Escape if filter is active
+            if (data === "\u001b" && filter) {
+              filter = "";
+              selectList.setFilter("");
+              tui.requestRender();
+              return;
+            }
+            selectList.handleInput(data);
+            tui.requestRender();
+          },
+        };
+      });
+
       if (!selected || !state.profiles[selected]) {
         return;
       }

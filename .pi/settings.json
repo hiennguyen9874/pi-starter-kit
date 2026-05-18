@@ -27,13 +27,13 @@
     "-./extensions/confirm-destructive.ts",
     "-./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
-    "./extensions/behavioral-guidelines.ts",
+    "-./extensions/pi-goal/index.ts",
+    "./extensions/profile/index.ts",
     "./extensions/pi-documentation.ts",
+    "./extensions/behavioral-guidelines.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/dump-system-prompt.ts",
-    "./extensions/profile/index.ts",
-    "./extensions/pi-goal/index.ts"
+    "./extensions/dump-system-prompt.ts"
   ],
   "extensionState": {
     "behavioralGuidelinesEnabled": true,
