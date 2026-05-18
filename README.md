@@ -170,32 +170,135 @@ Use these prompt groups when:
 
 Local skills live in `.pi/skills/`. Profiles expose only task-relevant subsets.
 
-Core workflow skills:
+#### Core Workflow
 
-- `bootstrap-project-context` — repo onboarding from docs and source
-- `systematic-debugging` — bug, failure, regression, and unexpected-behavior diagnosis
-- `spec-review`, `code-quality-review`, `requesting-code-review`, `receiving-code-review` — review workflows
-- `git-commit`, `git-workflow-and-versioning`, `verification-before-completion`, `finishing-a-development-branch` — completion, branch, and commit workflows
-- `brainstorming`, `spec-driven-development`, `writing-plans`, `executing-plans`, `dispatching-parallel-agents`, `subagent-driven-development` — planning and execution workflows
-- `interview-me`, `grill-with-docs`, `improve-codebase-architecture`, `prototype`, `pragmatic-principles` — design pressure-testing, architecture improvement, and simplicity checks
+| Skill | Description |
+|---|---|
+| `bootstrap-project-context` | Repo onboarding — absorb docs and source before acting |
+| `systematic-debugging` | Diagnose bugs, failures, regressions via reproducible feedback loops |
+| `handoff` | Summarize conversation for a fresh agent to continue the work |
+| `interview-me` | Elicit real needs before any plan, spec, or code exists |
+| `git-commit` | Create conventional commits by analyzing the actual diff |
+| `git-workflow-and-versioning` | Disciplined branching, committing, and history management |
+| `verification-before-completion` | Evidence-based verification before claiming work is done |
+| `finishing-a-development-branch` | Guided branch completion: verify tests, present options, clean up |
+| `pi-goal` | Long-running objective with visible progress and completion test |
 
-Domain and stack skills:
+#### Planning & Execution
 
-- backend/API/data: `api-design`, `backend-patterns`, `database-migrations`, `postgres-patterns`
-- Go: `golang-patterns`, `golang-testing`
-- frontend implementation: `frontend-skill`, `composition-patterns`, `react-best-practices`, `react-view-transitions`, `shadcn-best-practices`, `ui-ux-pro-max`, `web-design-guidelines`, `performance-optimization`
-- design/brand/presentation: `interface-design`, `design-system`, `brand`, `banner-design`, `slides`
-- DevOps: `docker-patterns`, `ci-cd-and-automation`
-- ML/video/app specializations: `developing-with-streamlit`, `creating-custom-tensorrt-plugins`, `sei-uuidv7-injection`
+| Skill | Description |
+|---|---|
+| `brainstorming` | Turn vague ideas into refined designs through iterative dialogue |
+| `spec-driven-development` | Write structured specs before code; shared source of truth |
+| `writing-plans` | Comprehensive implementation plan folders for zero-context engineers |
+| `executing-plans` | Execute plans one phase at a time with architect review checkpoints |
+| `subagent-driven-development` | Dispatch isolated implementer subagents per plan phase |
+| `dispatching-parallel-agents` | Delegate independent tasks to parallel agents with isolated context |
+| `prototype` | Throwaway code that answers a specific design question |
+| `grill-with-docs` | Relentless plan interrogation against project docs and evidence |
 
-Agent-authoring and docs skills:
+#### Review
 
-- `agent-md-refactor` — restructure agent instruction files with docs-only progressive disclosure
-- `context7-cli` — fetch library docs and manage Context7/ctx7 skill workflows
-- `prompt-leverage` — upgrade raw prompts into execution-ready prompts
-- `prd`, `documentation-and-adrs`, `readiness-report` — product, architecture, and readiness documentation
-- `skill-creator`, `writing-skills` — create, test, and improve skills
-- `source-driven-development`, `test-driven-development` — source-grounded and test-first development workflows
+| Skill | Description |
+|---|---|
+| `spec-review` | Verify the implementation built the *right* thing (before quality review) |
+| `code-quality-review` | Determine whether the implementation built the thing *well* |
+| `requesting-code-review` | Dispatch review subagents with precisely crafted context |
+| `receiving-code-review` | Technical evaluation of review feedback — verify before implementing |
+
+#### Coding Standards & Quality
+
+| Skill | Description |
+|---|---|
+| `coding-standards` | Baseline coding conventions applicable across projects |
+| `pragmatic-principles` | YAGNI, KISS, DRY — prevent over-engineering and duplication |
+| `code-simplification` | Reduce complexity while preserving exact behavior |
+| `test-driven-development` | Test-first: write test, watch it fail, write minimal code to pass |
+| `source-driven-development` | Every framework decision backed by official documentation |
+
+#### Backend / API / Data
+
+| Skill | Description |
+|---|---|
+| `api-design` | Conventions for consistent, developer-friendly REST APIs |
+| `backend-patterns` | Scalable server-side architecture patterns |
+| `database-migrations` | Safe, reversible database schema changes for production |
+| `postgres-patterns` | PostgreSQL best practices and query patterns |
+
+#### Go
+
+| Skill | Description |
+|---|---|
+| `golang-patterns` | Go implementation, review, refactoring, and architecture |
+| `golang-testing` | Go testing patterns following TDD methodology |
+
+#### Frontend Implementation
+
+| Skill | Description |
+|---|---|
+| `frontend-skill` | Marketing surfaces — art direction, hierarchy, restraint, imagery, motion |
+| `interface-design` | Product surfaces — dashboards, admin panels, SaaS, data interfaces |
+| `composition-patterns` | Compound components, state lifting, avoiding boolean prop proliferation |
+| `react-best-practices` | Vercel-maintained React/Next.js performance rules (70 rules, 8 categories) |
+| `react-view-transitions` | Native View Transition API for page and shared-element animations |
+| `shadcn-best-practices` | shadcn/ui components, CLI usage, and design system patterns |
+| `ui-ux-pro-max` | Broad UI/UX reference — color, fonts, interaction patterns, quality control |
+| `web-design-guidelines` | Review code against Vercel Web Interface Guidelines |
+| `performance-optimization` | Measure-first performance work: profile, bottleneck, fix, re-measure |
+
+#### Design / Brand / Presentation
+
+| Skill | Description |
+|---|---|
+| `design-system` | Token architecture, component specifications, systematic design |
+| `brand` | Brand identity, voice, messaging, asset management, consistency |
+| `banner-design` | Social, ads, web, and print banner design with AI visual elements |
+| `slides` | Strategic HTML presentations with data visualization |
+| `architecture-diagram` | Self-contained HTML architecture diagrams with inline SVG |
+
+#### DevOps
+
+| Skill | Description |
+|---|---|
+| `docker-patterns` | Docker and Docker Compose best practices for containerized development |
+| `ci-cd-and-automation` | Automated quality gates: tests, lint, typecheck, build enforcement |
+
+#### ML / Video / App Specializations
+
+| Skill | Description |
+|---|---|
+| `developing-with-streamlit` | Routing skill for Streamlit app development sub-skills |
+| `creating-custom-tensorrt-plugins` | Build, register, and validate custom TensorRT plugins |
+| `sei-uuidv7-injection` | Inject UUIDv7 into H.264/H.265 streams via GStreamer |
+
+#### Agent Authoring & Docs
+
+| Skill | Description |
+|---|---|
+| `agent-md-refactor` | Restructure agent instruction files with docs-only progressive disclosure |
+| `context7-cli` | Fetch library docs, manage skills, set up Context7 MCP |
+| `prompt-leverage` | Upgrade raw prompts into execution-ready prompts |
+| `prd` | Production-grade Product Requirements Documents |
+| `documentation-and-adrs` | Architectural decision records and "why" documentation |
+| `readiness-report` | Static repo audit for autonomous agent readiness |
+| `skill-creator` | Create and iteratively improve new skills |
+| `writing-skills` | Skill authoring standard — structure, progressive disclosure, TDD-style testing |
+
+#### Utility
+
+| Skill | Description |
+|---|---|
+| `defuddle` | Extract clean readable content from web pages (removes ads, nav, clutter) |
+| `improve-codebase-architecture` | Surface architectural friction and propose deepening opportunities |
+
+#### Global & Installed Skills
+
+Skills outside `.pi/skills/`, available across projects:
+
+| Skill | Source | Description |
+|---|---|
+| `find-skills` | `~/.agents/skills/` | Discover and install skills from the open agent skills ecosystem |
+| `ask-user` | `pi-ask-user` (npm) | Force explicit user alignment before consequential decisions |
 
 ## Profiles
 
