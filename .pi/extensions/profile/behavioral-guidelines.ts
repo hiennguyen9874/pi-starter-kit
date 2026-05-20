@@ -112,6 +112,18 @@ Use tools or code for deterministic work whenever practical.
 
 `;
 
+const PLANNING_DISCIPLINE = `## Planning Discipline
+
+When the active task is planning, design, or requirements work:
+
+- Do not edit files unless the user explicitly asks for implementation.
+- Separate facts, assumptions, risks, and recommendations.
+- Present tradeoffs before choosing a direction.
+- Define success criteria before proposing execution steps.
+- Prefer asking one focused clarification question when requirements materially affect the plan.
+
+`;
+
 const CHANGE_SCOPE = `## Change Scope
 
 **Minimum necessary change. No speculative features. Every changed line must trace to the request.**
@@ -237,6 +249,7 @@ export const BEHAVIORAL_GUIDELINE_SECTION_NAMES = [
   "repositoryInstructions",
   "executionPolicy",
   "evidenceDiscipline",
+  "planningDiscipline",
   "changeScope",
   "validation",
   "efficiency",
@@ -253,6 +266,7 @@ export interface BehavioralGuidelinesConfig {
 const GUIDELINE_SECTIONS: Array<{
   name: BehavioralGuidelineSectionName;
   content: string;
+  defaultEnabled?: boolean;
 }> = [
   {
     name: "communicationAndToolUse",
@@ -269,6 +283,11 @@ const GUIDELINE_SECTIONS: Array<{
   {
     name: "evidenceDiscipline",
     content: EVIDENCE_DISCIPLINE,
+  },
+  {
+    name: "planningDiscipline",
+    content: PLANNING_DISCIPLINE,
+    defaultEnabled: false,
   },
   {
     name: "changeScope",
@@ -294,9 +313,9 @@ const FALLBACK_MARKER = "\n# Project Context\n";
 
 function getEnabledGuidelines(config: BehavioralGuidelinesConfig | undefined, systemPrompt: string): string {
   const sections = config?.sections ?? {};
-  return GUIDELINE_SECTIONS.filter(({ name, content }) => {
+  return GUIDELINE_SECTIONS.filter(({ name, content, defaultEnabled }) => {
     const value = sections[name];
-    return (typeof value === "boolean" ? value : true) && !systemPrompt.includes(content);
+    return (typeof value === "boolean" ? value : defaultEnabled ?? true) && !systemPrompt.includes(content);
   })
     .map(({ content }) => content)
     .join("");

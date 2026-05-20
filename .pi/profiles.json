@@ -29,7 +29,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -67,7 +68,8 @@
             "changeScope": false,
             "validation": false,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": true
           }
         }
       }
@@ -103,7 +105,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -136,7 +139,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -167,7 +171,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -213,7 +218,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -253,7 +259,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -296,7 +303,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -331,9 +339,10 @@
             "executionPolicy": true,
             "evidenceDiscipline": true,
             "changeScope": false,
-            "validation": true,
+            "validation": false,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": true
           }
         }
       }
@@ -368,7 +377,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -401,7 +411,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": true
           }
         }
       }
@@ -434,7 +445,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -467,9 +479,10 @@
             "executionPolicy": true,
             "evidenceDiscipline": true,
             "changeScope": false,
-            "validation": true,
+            "validation": false,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": true
           }
         }
       }
@@ -496,7 +509,8 @@
             "changeScope": false,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }
@@ -533,7 +547,8 @@
             "changeScope": true,
             "validation": true,
             "efficiency": true,
-            "finalResponse": true
+            "finalResponse": true,
+            "planningDiscipline": false
           }
         }
       }

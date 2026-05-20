@@ -30,3 +30,16 @@ test("injectBehavioralGuidelines skips injection when disabled", () => {
 
   assert.equal(result, SYSTEM_PROMPT);
 });
+
+test("injectBehavioralGuidelines only injects planning discipline when enabled", () => {
+  const defaultResult = injectBehavioralGuidelines(SYSTEM_PROMPT, { enabled: true });
+  const planningResult = injectBehavioralGuidelines(SYSTEM_PROMPT, {
+    enabled: true,
+    sections: {
+      planningDiscipline: true,
+    },
+  });
+
+  assert.doesNotMatch(defaultResult, /## Planning Discipline/);
+  assert.match(planningResult, /## Planning Discipline/);
+});
