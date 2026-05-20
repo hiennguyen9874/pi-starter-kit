@@ -119,7 +119,7 @@ Expected: FAIL because `.pi/extensions/pi-goal/commands.ts` does not exist yet.
 Implement `.pi/extensions/pi-goal/commands.ts` with these exported APIs:
 
 ```ts
-import type { ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 
 import { formatFooterStatus, goalToolText } from "./format.ts";
 import { createGoal, parseTokenBudget, transitionGoal, type CreateGoalOptions, type GoalState } from "./state.ts";
@@ -306,7 +306,7 @@ Implement `.pi/extensions/pi-goal/tools.ts` with these exported APIs:
 
 ```ts
 import { StringEnum } from "@mariozechner/pi-ai";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 
 import { goalToolText } from "./format.ts";

@@ -177,7 +177,7 @@ Borrowed ideas:
 
 Differences:
 
-- This local extension uses `@mariozechner/pi-coding-agent` imports and `.ts` extension imports, matching this workspace.
+- This local extension uses `@earendil-works/pi-coding-agent` imports and `.ts` extension imports, matching this workspace.
 - The public names are canonical `/goal`, `get_goal`, `create_goal`, `update_goal`; the reference uses Codex/thread-goal naming in places.
 - The continuation prompt keeps Pi-specific hidden-message markers and formatting while adopting Codex-style strict completion-audit language.
 - First goal creation from `/goal` starts with visible `pi.sendUserMessage(objective)`; hidden messages are reserved for follow-up continuations.

@@ -9,7 +9,6 @@ interface JsonObject {
 
 interface ManagedProfileState {
   managedSkillEntries?: string[];
-  mcpBaseline?: JsonObject;
 }
 
 export interface SyncProfileResourcesResult {
@@ -31,16 +30,28 @@ function getPiDir(cwd: string): string {
   return join(cwd, ".pi");
 }
 
+function getLocalStateDir(cwd: string): string {
+  return join(getPiDir(cwd), ".local");
+}
+
 function getProfileStatePath(cwd: string): string {
-  return join(getPiDir(cwd), "profile-state.json");
+  return join(getLocalStateDir(cwd), "profile-state.json");
 }
 
 function getManagedStatePath(cwd: string): string {
-  return join(getPiDir(cwd), "profile-extension-state.json");
+  return join(getLocalStateDir(cwd), "profile-extension-state.json");
+}
+
+function getSettingsBasePath(cwd: string): string {
+  return join(getPiDir(cwd), "settings.base.json");
 }
 
 function getSettingsPath(cwd: string): string {
   return join(getPiDir(cwd), "settings.json");
+}
+
+function getMcpBasePath(cwd: string): string {
+  return join(getPiDir(cwd), "mcp.base.json");
 }
 
 function getMcpPath(cwd: string): string {
@@ -83,7 +94,6 @@ function readManagedState(cwd: string): ManagedProfileState {
     managedSkillEntries: Array.isArray(parsed.managedSkillEntries)
       ? parsed.managedSkillEntries.filter((entry): entry is string => typeof entry === "string")
       : [],
-    mcpBaseline: isObject(parsed.mcpBaseline) ? parsed.mcpBaseline : undefined,
   };
 }
 
@@ -218,7 +228,7 @@ export function writePersistedProfileName(cwd: string, name: string | undefined)
     return false;
   }
 
-  mkdirSync(getPiDir(cwd), { recursive: true });
+  mkdirSync(getLocalStateDir(cwd), { recursive: true });
   return writeJsonObject(getProfileStatePath(cwd), { name });
 }
 
@@ -227,8 +237,7 @@ export function loadProfileKnownSkillNames(cwd: string): string[] {
 }
 
 export function loadProfileKnownMcpServerNames(cwd: string): string[] {
-  const managedState = readManagedState(cwd);
-  const source = managedState.mcpBaseline ?? readJsonObject(getMcpPath(cwd));
+  const source = readJsonObject(getMcpBasePath(cwd)) ?? readJsonObject(getMcpPath(cwd));
   const servers = isObject(source?.mcpServers) ? source.mcpServers : {};
   return Object.keys(servers).sort((a, b) => a.localeCompare(b));
 }
@@ -239,7 +248,7 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const managedState = readManagedState(cwd);
   const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
   const settingsPath = getSettingsPath(cwd);
-  const currentSettings = readJsonObject(settingsPath) ?? {};
+  const currentSettings = readJsonObject(getSettingsBasePath(cwd)) ?? readJsonObject(settingsPath) ?? {};
   const nextSettings = mergeManagedSkillEntries(
     currentSettings,
     managedState.managedSkillEntries ?? [],
@@ -247,8 +256,7 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   );
   const settingsChanged = writeJsonObject(settingsPath, nextSettings);
 
-  const currentMcp = readJsonObject(getMcpPath(cwd));
-  const mcpBaseline = managedState.mcpBaseline ?? currentMcp;
+  const mcpBaseline = readJsonObject(getMcpBasePath(cwd)) ?? readJsonObject(getMcpPath(cwd));
   let mcpChanged = false;
 
   if (mcpBaseline) {
@@ -258,7 +266,6 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const persistedChanged = writePersistedProfileName(cwd, profileName);
   const managedStateChanged = writeJsonObject(getManagedStatePath(cwd), {
     managedSkillEntries: nextManagedSkillEntries,
-    ...(mcpBaseline ? { mcpBaseline } : {}),
   });
 
   return {

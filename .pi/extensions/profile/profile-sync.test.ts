@@ -39,7 +39,7 @@ test("syncProfileResources writes skill exclusions for project skills outside th
   writeSkill(root, "backend-patterns");
   writeSkill(root, "frontend-design");
   writeSkill(root, "ui-styling");
-  writeFileSync(join(root, ".pi", "settings.json"), JSON.stringify({ theme: "dark", skills: ["+skills/custom"] }, null, 2));
+  writeFileSync(join(root, ".pi", "settings.base.json"), JSON.stringify({ theme: "dark", skills: ["+skills/custom"] }, null, 2));
 
   const result = syncProfileResources(root, "backend", {
     skillsEnable: ["backend-patterns"],
@@ -55,10 +55,10 @@ test("syncProfileResources writes skill exclusions for project skills outside th
   assert.deepEqual(loadProfileKnownSkillNames(root), ["backend-patterns", "frontend-design", "ui-styling"]);
 });
 
-test("syncProfileResources filters mcp.json from stored baseline when switching profiles", () => {
+test("syncProfileResources filters mcp.json from baseline when switching profiles", () => {
   const root = createRoot();
   writeFileSync(
-    join(root, ".pi", "mcp.json"),
+    join(root, ".pi", "mcp.base.json"),
     JSON.stringify(
       {
         mcpServers: {
@@ -90,7 +90,7 @@ test("wildcard profile entries apply to skill and MCP resource syncing", () => {
   writeSkill(root, "backend-patterns");
   writeSkill(root, "frontend-design");
   writeFileSync(
-    join(root, ".pi", "mcp.json"),
+    join(root, ".pi", "mcp.base.json"),
     JSON.stringify(
       {
         mcpServers: {

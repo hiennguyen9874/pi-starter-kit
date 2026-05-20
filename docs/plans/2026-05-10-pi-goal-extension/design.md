@@ -19,7 +19,7 @@ Relevant project/Pi constraints:
 - `pi.sendMessage(..., { triggerTurn: true })` can trigger a model turn from a custom message.
 - Hidden custom messages with `display: false` are not rendered in the TUI but remain model-visible.
 - `agent_end` is not a perfect idle boundary, so continuation should be deferred and re-checked.
-- Existing local extension style uses `@mariozechner/pi-coding-agent` and `typebox`; no new dependency is needed.
+- Existing local extension style uses `@earendil-works/pi-coding-agent` and `typebox`; no new dependency is needed.
 
 Referenced examples showed four useful patterns:
 

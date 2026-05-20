@@ -1,4 +1,4 @@
-import type { ExtensionAPI, Skill } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, Skill } from "@earendil-works/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 

@@ -6,7 +6,7 @@
 
 **Architecture:** Implement a modular `.pi/extensions/pi-goal/` extension. Pure modules own state, formatting, prompts, commands, and tools; `index.ts` wires Pi lifecycle hooks, continuation scheduling, accounting, status updates, and context pruning.
 
-**Tech Stack:** TypeScript Pi extension APIs from `@mariozechner/pi-coding-agent`, `typebox`, `StringEnum` from `@mariozechner/pi-ai`, Node built-in `node:test` and `node:assert/strict`.
+**Tech Stack:** TypeScript Pi extension APIs from `@earendil-works/pi-coding-agent`, `typebox`, `StringEnum` from `@mariozechner/pi-ai`, Node built-in `node:test` and `node:assert/strict`.
 
 ---
 

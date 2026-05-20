@@ -119,7 +119,7 @@ test("session_start loads profiles using getCommands API and /profile can activa
     true,
   );
   assert.equal(reloadCalls, 1);
-  assert.equal(JSON.parse(readFileSync(join(root, ".pi", "profile-state.json"), "utf8")).name, "backend");
+  assert.equal(JSON.parse(readFileSync(join(root, ".pi", ".local", "profile-state.json"), "utf8")).name, "backend");
 });
 
 test("session_start does not warn when skill commands are not discovered yet", async () => {
@@ -299,7 +299,8 @@ test("session_start prefers persisted profile state from disk", async () => {
       },
     }),
   );
-  writeFileSync(join(root, ".pi", "profile-state.json"), JSON.stringify({ name: "backend" }));
+  mkdirSync(join(root, ".pi", ".local"), { recursive: true });
+  writeFileSync(join(root, ".pi", ".local", "profile-state.json"), JSON.stringify({ name: "backend" }));
   writeFileSync(join(root, ".pi", "mcp.json"), JSON.stringify({ mcpServers: {} }));
 
   const handlers: Record<string, Function> = {};

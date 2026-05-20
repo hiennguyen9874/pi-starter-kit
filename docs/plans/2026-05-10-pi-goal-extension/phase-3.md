@@ -141,7 +141,7 @@ Expected: FAIL because `.pi/extensions/pi-goal/index.ts` does not exist yet.
 Implement `.pi/extensions/pi-goal/index.ts` with a testable factory and default export:
 
 ```ts
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 import { registerGoalCommand } from "./commands.ts";
 import { formatFooterStatus } from "./format.ts";
