@@ -46,7 +46,16 @@
     "behavioralGuidelinesEfficiencyEnabled": true,
     "behavioralGuidelinesFinalResponseEnabled": true,
     "piDocumentationEnabled": true,
-    "skillsInstructionsRewriterEnabled": true
+    "skillsInstructionsRewriterEnabled": true,
+    "skillsInstructionsRewriterDisabledSkillFilters": [
+      "context-mode",
+      "ctx-doctor",
+      "ctx-insight",
+      "ctx-purge",
+      "ctx-stats",
+      "ctx-upgrade",
+      "find-skills"
+    ]
   },
   "subagents": {
     "agentOverrides": {

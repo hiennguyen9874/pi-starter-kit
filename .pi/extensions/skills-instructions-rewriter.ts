@@ -14,6 +14,43 @@ const HOW_TO_USE_SKILLS_LINES = [
   "- Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.",
 ];
 
+function normalizeFilter(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const filter = value.trim();
+  return filter.length > 0 ? filter : undefined;
+}
+
+function readDisabledSkillFilters(settings: any): string[] {
+  const raw = settings?.extensionState?.skillsInstructionsRewriterDisabledSkillFilters;
+  if (!Array.isArray(raw)) return [];
+  return raw.map(normalizeFilter).filter((value): value is string => Boolean(value));
+}
+
+function wildcardToRegExp(pattern: string): RegExp {
+  const escaped = pattern
+    .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+    .replaceAll("*", ".*");
+  return new RegExp(`^${escaped}$`, "i");
+}
+
+function skillMatchesFilter(skill: Skill, filter: string): boolean {
+  const normalizedName = skill.name.toLowerCase();
+  const normalizedPath = skill.filePath.toLowerCase();
+  const normalizedFilter = filter.toLowerCase();
+
+  if (filter.includes("*")) {
+    const matcher = wildcardToRegExp(filter);
+    return matcher.test(skill.name) || matcher.test(skill.filePath);
+  }
+
+  return normalizedName.includes(normalizedFilter) || normalizedPath.includes(normalizedFilter);
+}
+
+function filterSkills(skills: Skill[], disabledFilters: string[]): Skill[] {
+  if (disabledFilters.length === 0) return skills;
+  return skills.filter((skill) => !disabledFilters.some((filter) => skillMatchesFilter(skill, filter)));
+}
+
 function getSettingsPath(): string {
   const piDir = process.env.PI_CONFIG_DIR || path.join(process.cwd(), ".pi");
   return path.join(piDir, "settings.json");
@@ -51,7 +88,18 @@ function buildSkillsBlock(skills: Skill[]): string {
 }
 
 function rewriteSkillsSection(systemPrompt: string, skills: Skill[]): string {
-  if (systemPrompt.includes(NEW_BLOCK_MARKER)) return systemPrompt;
+  const skillsBlock = buildSkillsBlock(skills);
+
+  const blockStart = systemPrompt.indexOf(NEW_BLOCK_MARKER);
+  if (blockStart !== -1) {
+    const blockEndMarker = "</skills_instructions>";
+    const blockEndIndex = systemPrompt.indexOf(blockEndMarker, blockStart);
+    if (blockEndIndex === -1) return systemPrompt;
+
+    const before = systemPrompt.slice(0, blockStart).trimEnd();
+    const after = systemPrompt.slice(blockEndIndex + blockEndMarker.length);
+    return `${before}\n\n${skillsBlock}${after}`;
+  }
 
   const startIndex = systemPrompt.indexOf(LEGACY_START_MARKER);
   if (startIndex === -1) return systemPrompt;
@@ -61,16 +109,23 @@ function rewriteSkillsSection(systemPrompt: string, skills: Skill[]): string {
 
   const before = systemPrompt.slice(0, startIndex).trimEnd();
   const after = systemPrompt.slice(endIndex);
-  const skillsBlock = buildSkillsBlock(skills);
 
   return `${before}\n\n${skillsBlock}\n${after}`;
+}
+
+function rewriteSkillsBlock(systemPrompt: string, skills: Skill[]): string {
+  const settings = readSettings();
+  const disabledFilters = readDisabledSkillFilters(settings);
+  const filteredSkills = filterSkills(skills, disabledFilters);
+
+  return rewriteSkillsSection(systemPrompt, filteredSkills);
 }
 
 export default function skillsInstructionsRewriterExtension(pi: ExtensionAPI) {
   pi.on("before_agent_start", async (event) => {
     if (!isEnabled()) return undefined;
 
-    const updatedSystemPrompt = rewriteSkillsSection(
+    const updatedSystemPrompt = rewriteSkillsBlock(
       event.systemPrompt,
       event.systemPromptOptions.skills ?? [],
     );
