@@ -43,6 +43,14 @@ test("loads valid profiles config", () => {
         backend: {
           skillsEnable: ["backend-patterns"],
           mcpServersDisable: ["chrome-devtools"],
+          extensionState: {
+            behavioralGuidelines: {
+              enabled: true,
+              sections: {
+                validation: false,
+              },
+            },
+          },
         },
       },
     }),
@@ -55,7 +63,41 @@ test("loads valid profiles config", () => {
   assert.deepEqual(result.config?.profiles.backend, {
     skillsEnable: ["backend-patterns"],
     mcpServersDisable: ["chrome-devtools"],
+    extensionState: {
+      behavioralGuidelines: {
+        enabled: true,
+        sections: {
+          validation: false,
+        },
+      },
+    },
   });
+});
+
+
+test("rejects invalid behavioral guideline profile config", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "profiles.json"),
+    JSON.stringify({
+      profiles: {
+        planning: {
+          extensionState: {
+            behavioralGuidelines: {
+              sections: {
+                unknownSection: false,
+              },
+            },
+          },
+        },
+      },
+    }),
+  );
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.config, undefined);
+  assert.match(result.error ?? "", /unknown behavioral guideline section/i);
 });
 
 test("repository base profile allows bundled extension skills used by prompts", () => {

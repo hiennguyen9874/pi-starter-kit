@@ -17,7 +17,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "planning": {
       "skillsEnable": [
@@ -40,7 +55,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": false,
+            "validation": false,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "execution": {
       "skillsEnable": [
@@ -61,7 +91,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "review": {
       "skillsEnable": [
@@ -79,7 +124,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "finish": {
       "skillsEnable": [
@@ -95,7 +155,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "superpowers": {
       "skillsEnable": [
@@ -126,7 +201,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "backend": {
       "skillsEnable": [
@@ -151,7 +241,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "frontend": {
       "skillsEnable": [
@@ -179,7 +284,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "design": {
       "skillsEnable": [
@@ -201,7 +321,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": false,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "devops": {
       "skillsEnable": [
@@ -221,7 +356,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "agentic": {
       "skillsEnable": [
@@ -239,7 +389,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "skill-authoring": {
       "skillsEnable": [
@@ -257,7 +422,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "documenter": {
       "skillsEnable": [
@@ -277,7 +457,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": false,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "readiness-report": {
       "skillsEnable": [
@@ -289,7 +484,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": false,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     },
     "ml-dev": {
       "skillsEnable": [
@@ -311,7 +521,22 @@
         "context-mode",
         "deepwiki",
         "exa"
-      ]
+      ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true
+          }
+        }
+      }
     }
   }
 }

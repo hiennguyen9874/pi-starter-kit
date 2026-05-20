@@ -55,6 +55,16 @@ export function summarizeProfile(name: string, profile: ProfileDefinition): stri
   if (profile.mcpServersDisable?.length) {
     parts.push(`mcp -${profile.mcpServersDisable.join(", ")}`);
   }
+  if (profile.extensionState?.behavioralGuidelines?.enabled === false) {
+    parts.push("guidelines off");
+  } else if (profile.extensionState?.behavioralGuidelines?.sections) {
+    const disabledSections = Object.entries(profile.extensionState.behavioralGuidelines.sections)
+      .filter(([, enabled]) => enabled === false)
+      .map(([section]) => section);
+    if (disabledSections.length > 0) {
+      parts.push(`guidelines -${disabledSections.join(", ")}`);
+    }
+  }
 
   if (parts.length === 1) {
     parts.push("no profile restrictions");

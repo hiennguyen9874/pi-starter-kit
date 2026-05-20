@@ -1,10 +1,17 @@
+import type { BehavioralGuidelinesConfig } from "./behavioral-guidelines.ts";
+
 export const PROFILE_WILDCARD = "*";
+
+export interface ProfileExtensionState {
+  behavioralGuidelines?: BehavioralGuidelinesConfig;
+}
 
 export interface ProfileDefinition {
   skillsEnable?: string[];
   skillsDisable?: string[];
   mcpServersEnable?: string[];
   mcpServersDisable?: string[];
+  extensionState?: ProfileExtensionState;
 }
 
 export interface ProfilePolicy {

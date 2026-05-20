@@ -2,6 +2,10 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
 
+import {
+  hasBehavioralGuidelinesInsertionMarker,
+  injectBehavioralGuidelines,
+} from "./behavioral-guidelines.ts";
 import { loadProfilesConfig } from "./profile-config.ts";
 import { getKnownSkillNames, summarizeProfile } from "./profile-discovery.ts";
 import { createProfilePolicy, PROFILE_WILDCARD, type ProfileDefinition, type ProfilePolicy } from "./profile-policy.ts";
@@ -182,6 +186,7 @@ export function buildProfileExplanation(input: {
     `Skills disabled: ${formatList(input.activeProfile.skillsDisable)}`,
     `MCP servers enabled: ${formatList(input.activeProfile.mcpServersEnable, "all unless disabled")}`,
     `MCP servers disabled: ${formatList(input.activeProfile.mcpServersDisable)}`,
+    `Behavioral guidelines: ${input.activeProfile.extensionState?.behavioralGuidelines?.enabled === false ? "off" : "on"}`,
     "Rule: disable wins; non-empty enable list allow-lists; * means all.",
   ];
 
@@ -250,12 +255,14 @@ export default function profileExtension(pi: ExtensionAPI): void {
     activeProfile?: ProfileDefinition;
     activePolicy?: ProfilePolicy;
     warnedAboutDirectMcpTools: boolean;
+    warnedAboutMissingGuidelinesMarker: boolean;
     resourcesRequireReload: boolean;
   } = {
     profiles: {},
     knownSkills: [],
     knownMcpServers: [],
     warnedAboutDirectMcpTools: false,
+    warnedAboutMissingGuidelinesMarker: false,
     resourcesRequireReload: false,
   };
 
@@ -433,6 +440,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     );
     state.knownMcpServers = loadProfileKnownMcpServerNames(ctx.cwd);
     state.warnedAboutDirectMcpTools = false;
+    state.warnedAboutMissingGuidelinesMarker = false;
     state.resourcesRequireReload = false;
 
     if (loaded.error) {
@@ -535,17 +543,25 @@ export default function profileExtension(pi: ExtensionAPI): void {
     };
   });
 
-  // pi.on("before_agent_start", async (event) => {
-  //   if (!state.activeProfileName || !state.activeProfile) {
-  //     return;
-  //   }
+  pi.on("before_agent_start", async (event, ctx) => {
+    if (!state.activeProfile) {
+      return;
+    }
 
-  //   return {
-  //     systemPrompt: `${event.systemPrompt}\n\n${buildProfilePrompt(
-  //       state.activeProfileName,
-  //       state.activeProfile,
-  //       state.resourcesRequireReload ? "detailed" : "compact",
-  //     )}`,
-  //   };
-  // });
+    const behavioralGuidelines = state.activeProfile.extensionState?.behavioralGuidelines;
+    if (behavioralGuidelines?.enabled === false) {
+      return;
+    }
+
+    if (!hasBehavioralGuidelinesInsertionMarker(event.systemPrompt) && !state.warnedAboutMissingGuidelinesMarker) {
+      state.warnedAboutMissingGuidelinesMarker = true;
+      if (ctx.hasUI) {
+        ctx.ui.notify("Behavioral guidelines: insertion marker missing; appending at end", "warning");
+      }
+    }
+
+    return {
+      systemPrompt: injectBehavioralGuidelines(event.systemPrompt, behavioralGuidelines),
+    };
+  });
 }

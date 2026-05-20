@@ -1,7 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { ProfileDefinition } from "./profile-policy.ts";
+import { BEHAVIORAL_GUIDELINE_SECTION_NAMES } from "./behavioral-guidelines.ts";
+import type { BehavioralGuidelinesConfig, BehavioralGuidelineSectionName } from "./behavioral-guidelines.ts";
+import type { ProfileDefinition, ProfileExtensionState } from "./profile-policy.ts";
 
 export interface ProfilesConfig {
   defaultProfile?: string;
@@ -15,9 +17,64 @@ export interface LoadProfilesConfigResult {
 }
 
 const LIST_FIELDS = ["skillsEnable", "skillsDisable", "mcpServersEnable", "mcpServersDisable"] as const;
+const BEHAVIORAL_GUIDELINE_SECTION_NAME_SET = new Set<string>(BEHAVIORAL_GUIDELINE_SECTION_NAMES);
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function validateBehavioralGuidelinesConfig(profileName: string, value: unknown): BehavioralGuidelinesConfig {
+  if (!isObject(value)) {
+    throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines" must be an object`);
+  }
+
+  const result: BehavioralGuidelinesConfig = {};
+
+  if (value.enabled !== undefined) {
+    if (typeof value.enabled !== "boolean") {
+      throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines.enabled" must be a boolean`);
+    }
+    result.enabled = value.enabled;
+  }
+
+  if (value.sections !== undefined) {
+    if (!isObject(value.sections)) {
+      throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines.sections" must be an object`);
+    }
+
+    const sections: Partial<Record<BehavioralGuidelineSectionName, boolean>> = {};
+    for (const [sectionName, sectionValue] of Object.entries(value.sections)) {
+      if (!BEHAVIORAL_GUIDELINE_SECTION_NAME_SET.has(sectionName)) {
+        throw new Error(`Profile "${profileName}" has unknown behavioral guideline section "${sectionName}"`);
+      }
+      if (typeof sectionValue !== "boolean") {
+        throw new Error(`Profile "${profileName}" behavioral guideline section "${sectionName}" must be a boolean`);
+      }
+
+      sections[sectionName as BehavioralGuidelineSectionName] = sectionValue;
+    }
+
+    result.sections = sections;
+  }
+
+  return result;
+}
+
+function validateProfileExtensionState(name: string, value: unknown): ProfileExtensionState {
+  if (!isObject(value)) {
+    throw new Error(`Profile "${name}" field "extensionState" must be an object`);
+  }
+
+  const result: ProfileExtensionState = {};
+  if (value.behavioralGuidelines !== undefined) {
+    result.behavioralGuidelines = validateBehavioralGuidelinesConfig(name, value.behavioralGuidelines);
+  }
+
+  return result;
 }
 
 function validateProfileDefinition(name: string, value: unknown): ProfileDefinition {
@@ -39,6 +96,10 @@ function validateProfileDefinition(name: string, value: unknown): ProfileDefinit
     }
 
     result[field] = fieldValue;
+  }
+
+  if (profile.extensionState !== undefined) {
+    result.extensionState = validateProfileExtensionState(name, profile.extensionState);
   }
 
   return result;

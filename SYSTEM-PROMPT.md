@@ -266,7 +266,7 @@ The following skills provide specialized instructions for specific tasks.
 - Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.
 </skills_instructions>
 
-Current date: 2026-05-18
+Current date: 2026-05-20
 Current working directory: /home/hiennx/Documents/pi-starter-kit
 
 RTK note: If file edits repeatedly fail because old text does not match, ask the user to manually run '/rtk' in the Pi TUI, disable 'Read compaction enabled', re-read the file, apply the edit, then ask the user to manually re-enable it in the Pi TUI.
