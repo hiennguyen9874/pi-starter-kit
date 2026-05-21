@@ -237,17 +237,26 @@ test("user input clears continuation suppression", async () => {
   assert.equal(scheduled.length, 1);
 });
 
-test("pending messages block continuation scheduling", async () => {
+test("pending messages block continuation delivery until a later settled retry", async () => {
   const scheduled: Function[] = [];
   const pi = fakePi();
   createGoalExtension({ scheduler: (fn) => scheduled.push(fn) }).register(pi as never);
   const goal = activeGoal();
-  const ctx = { ...fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]), hasPendingMessages: () => true };
+  let pending = true;
+  const ctx = { ...fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]), hasPendingMessages: () => pending };
 
   await pi.handlers.session_start[0]({}, ctx);
   await pi.handlers.agent_end[0]({ messages: [] }, ctx);
 
-  assert.equal(scheduled.length, 0);
+  assert.equal(scheduled.length, 1);
+  scheduled[0]();
+  assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 0);
+
+  pending = false;
+  await pi.handlers.agent_end[0]({ messages: [] }, ctx);
+  assert.equal(scheduled.length, 2);
+  scheduled[1]();
+  assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 1);
 });
 
 test("read-only active tool restrictions block continuation scheduling", async () => {
@@ -421,4 +430,46 @@ test("session reload auto-pauses active goal and notifies", async () => {
   const latestGoal = (pi.entries.at(-1)?.data as any).goal;
   assert.equal(latestGoal.status, "paused");
   assert.match(ctx.notifications.at(-1) ?? "", /paused after reload/i);
+});
+
+test("agent_end schedules continuation retry when agent is not settled yet", async () => {
+  const scheduled: Function[] = [];
+  const pi = fakePi();
+  createGoalExtension({ scheduler: (fn) => scheduled.push(fn) }).register(pi as never);
+  const ctx = fakeCtx();
+  let idle = false;
+  let pending = true;
+  ctx.isIdle = () => idle;
+  ctx.hasPendingMessages = () => pending;
+
+  await pi.commands.goal.handler("Build feature", ctx);
+
+  await pi.handlers.agent_end[0]({ messages: [] }, ctx);
+  assert.equal(scheduled.length, 1);
+
+  scheduled[0]();
+  assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 0);
+
+  idle = true;
+  pending = false;
+  await pi.handlers.agent_end[0]({ messages: [] }, ctx);
+  assert.equal(scheduled.length, 2);
+
+  scheduled[1]();
+  assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 1);
+});
+
+test("session_compact retries continuation delivery from restored active goal state", async () => {
+  const scheduled: Function[] = [];
+  const pi = fakePi();
+  createGoalExtension({ scheduler: (fn) => scheduled.push(fn) }).register(pi as never);
+  const goal = activeGoal({ continuationScheduled: true });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.session_compact[0]({}, ctx);
+  assert.equal(scheduled.length, 1);
+
+  scheduled[0]();
+  assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 1);
 });

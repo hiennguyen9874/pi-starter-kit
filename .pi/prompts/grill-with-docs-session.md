@@ -2,7 +2,6 @@
 description: Grill a plan against project docs, domain language, code evidence, and ADRs
 skills:
   - grill-with-docs
-  - ask-user
 ---
 
 You are running a docs-backed grilling session.

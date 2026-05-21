@@ -28,11 +28,12 @@
     "-./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
     "./extensions/profile/index.ts",
-    "./extensions/pi-goal/index.ts",
+    "-./extensions/pi-goal/index.ts",
     "./extensions/pi-documentation.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/dump-system-prompt.ts"
+    "./extensions/dump-system-prompt.ts",
+    "./extensions/save-last-response.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,

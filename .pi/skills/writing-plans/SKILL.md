@@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plan folders assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized phases and tasks. DRY. YAGNI. TDD. Frequent commits.
+Write decision-complete implementation plan folders assuming the engineer has zero context for our codebase and questionable taste. Document what they need to know: which files to touch for each task, interfaces/contracts, important code or test snippets, docs they might need to check, and how to test it. Give them the whole plan as bite-sized phases and tasks. DRY. YAGNI. TDD. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
@@ -32,6 +32,13 @@ Before defining phases, operate in **read-only planning mode**:
 - Identify existing patterns and conventions
 - Map dependencies between components
 - Note risks, unknowns, and human decisions needed before implementation
+
+Resolve discoverable facts locally before asking the user. Do not ask where code lives, how current APIs behave, or what conventions exist if those answers can be found through non-mutating repo inspection.
+
+Treat unknowns differently:
+- **Discoverable facts:** inspect files, configs, tests, docs, schemas, and existing patterns first.
+- **Preferences/trade-offs:** ask the user with concrete options and a recommended default.
+- **Unanswered but low-risk defaults:** proceed only when safe, and record the default in the plan's assumptions.
 
 **Do not write implementation code while planning.** The output is the plan folder.
 
@@ -91,9 +98,13 @@ If the work appears to need more phases than the size allows, simplify scope or 
 ---
 ```
 
-After the header, list phases only:
+After the header, list phases only. Add a short `Assumptions` section before `Phases` only when the plan relies on explicit defaults or unresolved low-risk choices.
 
 ```markdown
+## Assumptions
+
+- [Only include when needed: explicit default or decision the implementer must preserve]
+
 ## Phases
 
 1. [Phase 1: Backend API and tests](phase-1.md)
@@ -133,6 +144,8 @@ Expected: FAIL with "function not defined"
 
 - [ ] **Step 3: Write minimal implementation**
 
+Follow the existing implementation pattern in `src/path/nearby_file.py`. The new function must accept `input`, return `expected`, and raise `ValueError("specific message")` for invalid input.
+
 ```python
 def function(input):
     return expected
@@ -152,13 +165,15 @@ git commit -m "feat: add specific feature"
 
 ## No Placeholders
 
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
+Every step must contain the actual content an engineer needs. Be concrete without bloating the plan: include exact interfaces, schemas, test cases, acceptance checks, and representative snippets where they prevent ambiguity. Full implementation code is required only when the specific code shape matters; otherwise, describe the required behavior precisely and point to the existing pattern to follow.
+
+These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
+- "Add appropriate error handling" / "add validation" / "handle edge cases" without naming the exact cases and expected behavior
+- "Write tests for the above" (without actual test names, scenarios, or assertions)
+- "Similar to Task N" (repeat the necessary details — the engineer may be reading tasks out of order)
+- Steps that describe what to do without enough detail to verify completion
+- References to types, functions, or methods not defined in any task or existing code path
 
 ## Phase Verification
 
@@ -183,7 +198,8 @@ Use project-appropriate commands. Keep checkpoints concrete; never write generic
 ## Remember
 - Plan output is a folder, not one `plan.md` containing many tasks
 - Exact file paths always
-- Complete code in every step — if a step changes code, show the code
+- Plans must be decision-complete: interfaces, behavior, edge cases, tests, and assumptions are explicit
+- Include code snippets where they remove ambiguity; do not paste large implementations when a precise behavior spec and existing pattern are safer
 - Exact commands with expected output
 - Phase count stays within size cap: small ≤3, medium ≤5, large ≤7
 - Each phase has 1-3 related tasks
@@ -207,7 +223,7 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Execution Handoff
 
-After saving the plan folder, offer execution choice:
+After saving the plan folder, stop planning and offer execution choice. Do not begin implementation unless the user explicitly chooses an execution path.
 
 **"Plan complete and saved to `docs/plans/<folder>/`. Two execution options:**
 

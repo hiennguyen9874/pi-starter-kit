@@ -5,6 +5,10 @@ const OPERATING_CONTEXT = `## Operating Context
 - Treat workspace files, tool outputs, user messages, and repository instructions as authoritative context.
 - Do not invent file contents, command results, APIs, project behavior, or test outcomes.
 - If evidence is missing, inspect the workspace with available tools or state the uncertainty clearly.
+
+## Personality
+
+Default to a concise, direct, and friendly teammate tone. Prioritize actionable guidance, clear assumptions, and practical next steps over long explanations.
 `;
 
 const COMMUNICATION_AND_TOOL_USE = `## Communication and Tool Use
@@ -309,7 +313,7 @@ const GUIDELINE_SECTIONS: Array<{
 
 const TOOLS_MARKER = "\nAvailable tools:";
 const PRIMARY_MARKER = "\nPi documentation (read only";
-const FALLBACK_MARKER = "\n# Project Context\n";
+const FALLBACK_MARKER = "\n<project_context>\n";
 
 function getEnabledGuidelines(config: BehavioralGuidelinesConfig | undefined, systemPrompt: string): string {
   const sections = config?.sections ?? {};

@@ -1,12 +1,12 @@
 # PI-GOAL
 
-`pi-goal` is a project-local Pi extension that adds a Codex-style long-running goal workflow to this starter kit.
+`pi-goal` is a project-local Pi extension that adds a Codex-style, long-running goal workflow to this starter kit.
 
 The implementation lives in `.pi/extensions/pi-goal/` and is auto-discovered by Pi as a local extension. It does not require a Pi core fork, npm publishing, or edits to `.pi/settings.json`.
 
 ## What it does
 
-`pi-goal` lets a session keep one active objective and continue working on it until it is paused, cleared, budget-limited, or explicitly completed.
+`pi-goal` lets a session keep one active objective and continue working on it until it is paused, cleared, budget-limited, or explicitly marked complete.
 
 Public API:
 
@@ -20,7 +20,7 @@ Public API:
 - `create_goal` — model tool for creating a goal from an explicit user request.
 - `update_goal` — model tool for marking an active goal complete after evidence proves completion.
 
-The extension stores one goal at a time. It intentionally does not implement queues, DAG dependencies, package publishing, command prefixes, or a status overlay.
+The extension stores one goal at a time. It intentionally does not implement goal queues, DAG dependencies, package publishing, command prefixes, or a status overlay.
 
 ## How it works at runtime
 
@@ -30,9 +30,9 @@ The extension stores one goal at a time. It intentionally does not implement que
 4. After an agent turn ends, if the goal is still active, Pi is idle, tools are available, and continuation is not suppressed, the extension schedules a hidden continuation.
 5. The hidden continuation is sent as a custom message with custom type `pi-goal-continuation`, `display: false`, and `{ triggerTurn: true }`.
 6. Each turn updates elapsed time, token usage, turn count, continuation count, and footer status.
-7. If the token budget is crossed, the goal becomes `budget_limited` and a hidden budget-limit steering message asks the model to wrap up instead of doing new work.
+7. If the token budget is exceeded, the goal becomes `budget_limited`, and a hidden budget-limit steering message asks the model to wrap up instead of starting new work.
 8. If the model calls `update_goal({ status: "complete" })`, completion is deferred until `turn_end` so the final completion turn is included in usage accounting.
-9. Context pruning keeps only the latest hidden continuation message for the current active goal and removes stale continuation prompts from future provider context.
+9. Context pruning keeps only the latest hidden continuation message for the current active goal and removes stale continuation prompts from future provider context windows.
 
 Continuation is blocked when:
 

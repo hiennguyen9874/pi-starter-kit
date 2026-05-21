@@ -19,18 +19,18 @@ Every project goes through this process. A todo list, a single-function utility,
 
 ## Checklist
 
-You MUST create a task for each of these items and complete them in order:
+Complete these checkpoints in order:
 
-1. **Explore project context** — check files, docs, recent commits
+1. **Explore project context** — check files, docs, recent commits before asking questions
 2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a clarifying question. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Ask clarifying questions** — one at a time, only for intent, preferences, trade-offs, or facts that cannot be discovered from the repo
 4. **Refine vague ideas when needed** — reframe the problem, generate variations, surface assumptions, and converge on a direction
 5. **Propose 2-3 approaches** — with trade-offs and your recommendation
-6. **Present design** — include feature size (small/medium/large) and get user approval after each section
+6. **Present decision-complete design** — include feature size (small/medium/large), success criteria, assumptions, and get user approval after each section
 7. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>/design.md` and commit
 8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 9. **User reviews written spec** — ask user to review the spec file before proceeding
-10. **Transition to implementation** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
+10. **Transition to implementation planning** — invoke writing-plans skill to create `plan.md` and phase files in the same folder
 
 ## Process Flow
 
@@ -45,7 +45,7 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Write design.md in plan folder" [shape=box];
+    "Write design.md in plan folder\nand commit" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
     "User reviews spec?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
@@ -61,10 +61,10 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design.md in plan folder" [label="yes"];
-    "Write design.md in plan folder" -> "Spec self-review\n(fix inline)";
+    "User approves design?" -> "Write design.md in plan folder\nand commit" [label="yes"];
+    "Write design.md in plan folder\nand commit" -> "Spec self-review\n(fix inline)";
     "Spec self-review\n(fix inline)" -> "User reviews spec?";
-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
+    "User reviews spec?" -> "Write design.md in plan folder\nand commit" [label="changes requested"];
     "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
 }
 ```
@@ -76,6 +76,8 @@ digraph brainstorming {
 **Understanding the idea:**
 
 - Check out the current project state first (files, docs, recent commits)
+- Resolve discoverable facts through repo inspection before asking the user. Do not ask where things are, how current code works, or what patterns exist if those answers can be found locally.
+- Ask only for intent, preferences, trade-offs, success criteria, or genuinely missing context that cannot be discovered through non-mutating exploration.
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
@@ -104,9 +106,10 @@ Use this lightweight ideation pass only when the user has a raw concept rather t
 **Presenting the design:**
 
 - Once you believe you understand what you're building, present the design
+- Make the design decision-complete: the next planner should not need to choose scope, interfaces, data flow, error handling, testing strategy, or acceptance criteria on their own.
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
-- Cover: feature size, architecture, components, data flow, error handling, testing
+- Cover: feature size, architecture, components, data flow, error handling, testing, success criteria, assumptions, and explicit non-goals
 - Use size to constrain later planning: small ≤3 phases, medium ≤5, large ≤7
 - Be ready to go back and clarify if something doesn't make sense
 
@@ -158,6 +161,8 @@ Wait for the user's response. If they request changes, make them and re-run the 
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling
+- **Explore before asking** - Inspect repo facts first; ask only for user intent and meaningful trade-offs
+- **Decision-complete output** - Designs should leave no major implementation decision unresolved
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
 

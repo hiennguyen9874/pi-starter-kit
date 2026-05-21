@@ -47,8 +47,12 @@ function skillMatchesFilter(skill: Skill, filter: string): boolean {
 }
 
 function filterSkills(skills: Skill[], disabledFilters: string[]): Skill[] {
-  if (disabledFilters.length === 0) return skills;
-  return skills.filter((skill) => !disabledFilters.some((filter) => skillMatchesFilter(skill, filter)));
+  const visibleSkills = skills.filter((skill) => !skill.disableModelInvocation);
+  if (disabledFilters.length === 0) return visibleSkills;
+
+  return visibleSkills.filter(
+    (skill) => !disabledFilters.some((filter) => skillMatchesFilter(skill, filter)),
+  );
 }
 
 function getSettingsPath(): string {

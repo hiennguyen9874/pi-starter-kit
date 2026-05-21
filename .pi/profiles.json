@@ -5,10 +5,13 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "handoff",
+        "prompt-leverage",
         "pragmatic-principles",
         "systematic-debugging",
+        "test-driven-development",
         "git-commit"
       ],
       "mcpServersEnable": [],
@@ -39,6 +42,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "brainstorming",
         "spec-driven-development",
@@ -181,6 +185,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "handoff",
         "pragmatic-principles",
@@ -228,6 +233,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -269,6 +275,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -284,14 +291,8 @@
         "source-driven-development",
         "test-driven-development"
       ],
-      "mcpServersEnable": [
-        "chrome-devtools"
-      ],
-      "mcpServersDisable": [
-        "context-mode",
-        "deepwiki",
-        "exa"
-      ],
+      "mcpServersEnable": ["chrome-devtools"],
+      "mcpServersDisable": ["context-mode", "deepwiki", "exa"],
       "extensionState": {
         "behavioralGuidelines": {
           "enabled": true,
@@ -312,6 +313,7 @@
     "design": {
       "skillsEnable": [
         "interview-me",
+        "grill-me",
         "ask-user",
         "frontend-skill",
         "interface-design",
@@ -322,14 +324,8 @@
         "slides",
         "web-design-guidelines"
       ],
-      "mcpServersEnable": [
-        "chrome-devtools"
-      ],
-      "mcpServersDisable": [
-        "context-mode",
-        "deepwiki",
-        "exa"
-      ],
+      "mcpServersEnable": ["chrome-devtools"],
+      "mcpServersDisable": ["context-mode", "deepwiki", "exa"],
       "extensionState": {
         "behavioralGuidelines": {
           "enabled": true,
@@ -351,6 +347,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "systematic-debugging",
         "pragmatic-principles",
@@ -387,6 +384,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "prompt-leverage",
         "agent-md-refactor",
@@ -421,6 +419,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "writing-skills",
         "skill-creator",
@@ -455,6 +454,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "prd",
         "documentation-and-adrs",
@@ -488,9 +488,7 @@
       }
     },
     "readiness-report": {
-      "skillsEnable": [
-        "readiness-report"
-      ],
+      "skillsEnable": ["readiness-report"],
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
@@ -519,6 +517,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -548,6 +547,66 @@
             "validation": true,
             "efficiency": true,
             "finalResponse": true,
+            "planningDiscipline": false
+          }
+        }
+      }
+    },
+    "goal": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "grill-me",
+        "ask-user",
+        "handoff",
+        "prompt-leverage",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "git-commit"
+      ],
+      "mcpServersEnable": ["exa"],
+      "mcpServersDisable": ["chrome-devtools", "context-mode", "deepwiki"],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true,
+            "planningDiscipline": false
+          }
+        }
+      }
+    },
+    "autoresearch": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "grill-me",
+        "ask-user",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "git-commit"
+      ],
+      "mcpServersEnable": ["exa"],
+      "mcpServersDisable": ["chrome-devtools", "context-mode", "deepwiki"],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": false,
+            "efficiency": true,
+            "finalResponse": false,
             "planningDiscipline": false
           }
         }

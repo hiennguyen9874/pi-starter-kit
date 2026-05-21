@@ -1,7 +1,7 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 import { registerGoalCommand } from "./commands.ts";
-import { formatFooterStatus } from "./format.ts";
+import { formatDuration, formatFooterStatus, formatTokenValue } from "./format.ts";
 import { budgetLimitPrompt, continuationPrompt } from "./prompts.ts";
 import {
   CONTINUATION_MESSAGE_TYPE,
@@ -76,6 +76,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   let statusBarEnabled = true;
   let awaitingContinuationGoalId: string | null = null;
   let continuationGeneration = 0;
+  let pendingContinuationGoalId: string | null = null;
+  let pendingContinuationMessage: string | null = null;
+  let pendingContinuationGeneration = 0;
   let activeTurnStartedAt: number | null = null;
   let currentTurnHadToolCall = false;
   let currentTurnIsContinuation = false;
@@ -120,6 +123,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     }
     awaitingContinuationGoalId = null;
     pendingCompletionGoalId = null;
+    if (currentGoal?.continuationScheduled) {
+      currentGoal = { ...currentGoal, continuationScheduled: false };
+    }
     continuationGeneration++;
     syncGoalTools(pi);
     refreshStatus(ctx);
@@ -127,33 +133,36 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
 
   function invalidateContinuation(): void {
     continuationGeneration++;
+    pendingContinuationGeneration++;
+    pendingContinuationGoalId = null;
+    pendingContinuationMessage = null;
     if (currentGoal?.continuationScheduled) {
       currentGoal = { ...currentGoal, continuationScheduled: false, updatedAt: clock() };
     }
   }
 
-  function scheduleContinuation(
+  function hasPendingContinuation(): boolean {
+    return pendingContinuationGoalId !== null && pendingContinuationMessage !== null;
+  }
+
+  function schedulePendingContinuation(
     pi: Pick<ExtensionAPI, "sendMessage" | "appendEntry">,
     ctx?: Pick<ExtensionContext, "isIdle" | "hasPendingMessages">,
   ): boolean {
-    if (!shouldScheduleContinuation(currentGoal, { toolsRestricted })) return false;
-    if (ctx && (!ctx.isIdle() || ctx.hasPendingMessages())) return false;
-
-    currentGoal = { ...currentGoal, continuationScheduled: true, updatedAt: clock() };
-    persist(pi, currentGoal);
-
-    const goalId = currentGoal.goalId;
-    const generation = ++continuationGeneration;
+    if (!hasPendingContinuation()) return false;
+    const generation = ++pendingContinuationGeneration;
 
     scheduler(() => {
-      if (!currentGoal || currentGoal.goalId !== goalId || currentGoal.status !== "active") return;
+      if (generation !== pendingContinuationGeneration) return;
+      if (!currentGoal || currentGoal.goalId !== pendingContinuationGoalId || currentGoal.status !== "active") return;
       if (toolsRestricted || currentGoal.continuationSuppressed) return;
-      if (!currentGoal.continuationScheduled || generation !== continuationGeneration) return;
-      if (ctx && (!ctx.isIdle() || ctx.hasPendingMessages())) {
-        currentGoal = { ...currentGoal, continuationScheduled: false, updatedAt: clock() };
-        persist(pi, currentGoal);
-        return;
-      }
+      if (!currentGoal.continuationScheduled) return;
+      if (ctx && (!ctx.isIdle() || ctx.hasPendingMessages())) return;
+
+      const goalId = currentGoal.goalId;
+      const message = pendingContinuationMessage;
+      pendingContinuationGoalId = null;
+      pendingContinuationMessage = null;
 
       currentGoal = {
         ...currentGoal,
@@ -167,7 +176,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       pi.sendMessage(
         {
           customType: CONTINUATION_MESSAGE_TYPE,
-          content: continuationPrompt(currentGoal),
+          content: message,
           display: false,
           details: { goalId },
         },
@@ -176,6 +185,32 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     });
 
     return true;
+  }
+
+  function scheduleContinuation(
+    pi: Pick<ExtensionAPI, "sendMessage" | "appendEntry">,
+    ctx?: Pick<ExtensionContext, "isIdle" | "hasPendingMessages">,
+  ): boolean {
+    if (!shouldScheduleContinuation(currentGoal, { toolsRestricted })) return false;
+
+    currentGoal = { ...currentGoal, continuationScheduled: true, updatedAt: clock() };
+    persist(pi, currentGoal);
+
+    pendingContinuationGoalId = currentGoal.goalId;
+    pendingContinuationMessage = continuationPrompt(currentGoal);
+    continuationGeneration++;
+
+    return schedulePendingContinuation(pi, ctx);
+  }
+
+  function ensurePendingContinuation(
+    pi: Pick<ExtensionAPI, "sendMessage" | "appendEntry">,
+    ctx?: Pick<ExtensionContext, "isIdle" | "hasPendingMessages">,
+  ): boolean {
+    if (hasPendingContinuation()) {
+      return schedulePendingContinuation(pi, ctx);
+    }
+    return scheduleContinuation(pi, ctx);
   }
 
   function emitGoalEvent(pi: Pick<ExtensionAPI, "sendMessage">, kind: GoalEventKind, goal: GoalState | null): void {
@@ -262,7 +297,10 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       }
     });
     pi.on("session_tree", (_event, ctx) => restore(pi, ctx));
-    pi.on("session_compact", (_event, ctx) => restore(pi, ctx));
+    pi.on("session_compact", (_event, ctx) => {
+      restore(pi, ctx);
+      ensurePendingContinuation(pi, ctx);
+    });
     pi.on("before_agent_start", (event) => {
       const activeTools = new Set(pi.getActiveTools());
       const hasMutatingTool = activeTools.has("edit") || activeTools.has("write") || activeTools.has("bash");
@@ -315,8 +353,14 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       syncGoalTools(pi);
       if (isCompleting) {
         emitGoalEvent(pi, "completed", nextGoal);
+        const parts: string[] = [`Goal achieved: ${nextGoal.objective}`];
+        parts.push(`Time: ${formatDuration(nextGoal.timeUsedSeconds)}`);
+        parts.push(`Tokens: ${formatTokenValue(nextGoal.tokensUsed)}${nextGoal.tokenBudget !== null ? ` / ${formatTokenValue(nextGoal.tokenBudget)}` : ""}`);
+        parts.push(`Turns: ${nextGoal.turnCount} (${nextGoal.continuationCount} continuations)`);
+        ctx.ui.notify(parts.join(" | "), "info");
       }
       if (result.crossedBudget && nextGoal.status !== "complete") {
+        ctx.ui.notify(`Goal budget exhausted: ${formatTokenValue(result.goal.tokensUsed)} / ${formatTokenValue(result.goal.tokenBudget!)} tokens used. Wrapping up.`, "warning");
         pi.sendMessage(
           {
             customType: CONTINUATION_MESSAGE_TYPE,
@@ -327,10 +371,13 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
           { triggerTurn: true, deliverAs: "steer" },
         );
       }
+      if (result.goal.continuationSuppressed && !isCompleting && !result.crossedBudget) {
+        ctx.ui.notify("Goal continuation paused: no progress detected. Send a message or /goal resume to continue.", "warning");
+      }
       refreshStatus(ctx);
     });
     pi.on("agent_end", (_event, ctx) => {
-      scheduleContinuation(pi, ctx);
+      ensurePendingContinuation(pi, ctx);
       syncGoalTools(pi);
       refreshStatus(ctx);
     });
@@ -344,6 +391,8 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       currentTurnHadToolCall = false;
       currentTurnIsContinuation = false;
       pendingCompletionGoalId = null;
+      pendingContinuationGoalId = null;
+      pendingContinuationMessage = null;
     });
     pi.on("context", (event) => {
       const latestActiveContinuationIndex = currentGoal?.status === "active"

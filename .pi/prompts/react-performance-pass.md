@@ -3,7 +3,6 @@ description: Improve React or Next.js frontend performance
 skills:
   - react-best-practices
   - react-view-transitions
-  - ask-user
 phase: refactor
 domain: react
 ---

@@ -1,6 +1,7 @@
 ---
 name: interview-me
 description: Use when the user asks to be interviewed, grilled, challenged, or stress-tested on an idea, plan, design, or requirements; when an ask is underspecified; or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.
+disable-model-invocation: true
 ---
 
 # Interview Me

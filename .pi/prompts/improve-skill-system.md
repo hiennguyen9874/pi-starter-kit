@@ -4,7 +4,6 @@ skills:
   - prompt-leverage
   - skill-creator
   - writing-skills
-  - ask-user
 ---
 
 You are improving one or more skills in this coding-agent system.
@@ -95,7 +94,7 @@ Use this decision tree:
 - If workflow is only project convention: put guidance in repo docs, not skill.
 - If workflow is reusable and uncovered: create new skill.
 
-Note: Always use `interview-me` to ask for detailed information from user about what should be improved until we reach a shared understanding.
+Note: Always use `grill-me` to ask for detailed information from user about what should be improved until we reach a shared understanding.
 
 ### 4. Apply Skill-Writing Rules
 
