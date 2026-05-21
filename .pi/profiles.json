@@ -570,6 +570,34 @@
           }
         }
       }
+    },
+    "autoresearch": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "ask-user",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "git-commit"
+      ],
+      "mcpServersEnable": ["exa"],
+      "mcpServersDisable": ["chrome-devtools", "context-mode", "deepwiki"],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": false,
+            "efficiency": true,
+            "finalResponse": false,
+            "planningDiscipline": false
+          }
+        }
+      }
     }
   }
 }
