@@ -31,10 +31,14 @@ test("renders continuation prompt with audit and untrusted-objective guardrails"
   assert.match(prompt, /internal hidden pi-goal continuation message/);
   assert.match(prompt, /<pi_goal_continuation goal_id="goal-abc">/);
   assert.match(prompt, /<untrusted_objective>\nImplement &lt;feature&gt; &amp; verify\n<\/untrusted_objective>/);
-  assert.match(prompt, /completion audit/i);
-  assert.match(prompt, /prompt-to-artifact checklist/);
-  assert.match(prompt, /proxy signals as completion/);
-  assert.match(prompt, /verifier, test suite, or green status/);
+  assert.match(prompt, /Continuation behavior/);
+  assert.match(prompt, /full objective intact/);
+  assert.match(prompt, /Work from evidence/);
+  assert.match(prompt, /Fidelity/);
+  assert.match(prompt, /Completion audit/i);
+  assert.match(prompt, /actual current state/);
+  assert.match(prompt, /requirement-by-requirement scrutiny/);
+  assert.match(prompt, /Treat uncertain or indirect evidence as not achieved/);
   assert.match(prompt, /Report the final elapsed time/);
   assert.match(prompt, /Do not call update_goal unless the goal is complete/);
   assert.equal(continuationGoalIdFromMessage(prompt), "goal-abc");
@@ -46,6 +50,7 @@ test("renders budget limit prompt as wrap-up only", () => {
   assert.match(prompt, /has reached its token budget/);
   assert.match(prompt, /system has marked the goal as budget_limited/i);
   assert.match(prompt, /do not start new substantive work/i);
+  assert.match(prompt, /Do not redefine success/i);
   assert.match(prompt, /summarize useful progress/i);
   assert.match(prompt, /Do not call update_goal unless the goal is actually complete/);
 });
