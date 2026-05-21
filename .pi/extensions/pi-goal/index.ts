@@ -59,13 +59,12 @@ export function extractTokenUsage(message: UsageCarrier | undefined): number {
 
 export function shouldScheduleContinuation(
   goal: GoalState | null,
-  options: { planModeActive: boolean; toolsRestricted?: boolean },
+  options: { toolsRestricted?: boolean },
 ): boolean {
   if (!goal) return false;
   if (goal.status !== "active") return false;
   if (goal.continuationScheduled) return false;
   if (goal.continuationSuppressed) return false;
-  if (options.planModeActive) return false;
   if (options.toolsRestricted) return false;
   return true;
 }
@@ -81,7 +80,6 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   let currentTurnHadToolCall = false;
   let currentTurnIsContinuation = false;
   let pendingCompletionGoalId: string | null = null;
-  let planModeActive = false;
   let toolsRestricted = false;
 
   function refreshStatus(ctx: Pick<ExtensionContext, "ui">): void {
@@ -138,7 +136,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     pi: Pick<ExtensionAPI, "sendMessage" | "appendEntry">,
     ctx?: Pick<ExtensionContext, "isIdle" | "hasPendingMessages">,
   ): boolean {
-    if (!shouldScheduleContinuation(currentGoal, { planModeActive, toolsRestricted })) return false;
+    if (!shouldScheduleContinuation(currentGoal, { toolsRestricted })) return false;
     if (ctx && (!ctx.isIdle() || ctx.hasPendingMessages())) return false;
 
     currentGoal = { ...currentGoal, continuationScheduled: true, updatedAt: clock() };
@@ -149,7 +147,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
 
     scheduler(() => {
       if (!currentGoal || currentGoal.goalId !== goalId || currentGoal.status !== "active") return;
-      if (planModeActive || toolsRestricted || currentGoal.continuationSuppressed) return;
+      if (toolsRestricted || currentGoal.continuationSuppressed) return;
       if (!currentGoal.continuationScheduled || generation !== continuationGeneration) return;
       if (ctx && (!ctx.isIdle() || ctx.hasPendingMessages())) {
         currentGoal = { ...currentGoal, continuationScheduled: false, updatedAt: clock() };
@@ -266,8 +264,6 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     pi.on("session_tree", (_event, ctx) => restore(pi, ctx));
     pi.on("session_compact", (_event, ctx) => restore(pi, ctx));
     pi.on("before_agent_start", (event) => {
-      const prompt = String(event.prompt ?? "").toLowerCase();
-      planModeActive = prompt.includes("plan mode") || prompt.includes("read-only") || prompt.includes("do not implement code");
       const activeTools = new Set(pi.getActiveTools());
       const hasMutatingTool = activeTools.has("edit") || activeTools.has("write") || activeTools.has("bash");
       toolsRestricted = !hasMutatingTool;
