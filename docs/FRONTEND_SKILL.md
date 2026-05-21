@@ -1,12 +1,12 @@
 # Skill Analysis & Workflow Guide (v2 — Post-Merge)
 
-## Your 12 Skills Analyzed
+## Your 12 Skills, Analyzed
 
 | # | Skill | Type | Purpose |
 |---|-------|------|---------|
 | 1 | `composition-patterns` | React Architecture | Component composition, compound components, avoiding boolean prop hell |
 | 2 | `frontend-skill` | Art Direction | Landing pages, marketing sites, hero sections, visual hierarchy, motion |
-| 3 | `react-best-practices` | Performance | React/Next.js perf: async waterfalls, bundle size, re-renders, caching |
+| 3 | `react-best-practices` | Performance | React/Next.js performance: async waterfalls, bundle size, re-renders, caching |
 | 4 | `banner-design` | Graphic Design | Social media banners, ads, website heroes, print banners |
 | 5 | `design-system` | Token System | Design tokens (primitive→semantic→component), CSS vars, component specs |
 | 6 | `react-view-transitions` | Animation | React View Transition API, page transitions, shared element animations |
@@ -70,7 +70,7 @@ Previously `shadcn-best-practices` covered only shadcn/ui deep rules. Now includ
 | `frontend-skill` | Marketing surfaces | Landing page, hero section, portfolio |
 | `interface-design` | Product surfaces | Dashboard, admin panel, SaaS app, settings |
 
-**Verdict:** No overlap. They are mutually exclusive territories. Use `frontend-skill` for marketing, `interface-design` for product UI.
+**Verdict:** No overlap. These are mutually exclusive territories. Use `frontend-skill` for marketing and `interface-design` for product UI.
 
 ---
 
@@ -79,10 +79,10 @@ Previously `shadcn-best-practices` covered only shadcn/ui deep rules. Now includ
 
 | Skill | Mode | Action |
 |-------|------|--------|
-| `web-design-guidelines` | Audit / Review | "Check my UI code against Vercel guidelines" |
+| `web-design-guidelines` | Audit / review | "Check my UI code against Vercel guidelines" |
 | `ui-ux-pro-max` | Design / Build | "Design a new dashboard" |
 
-**Verdict:** No real overlap. Use `web-design-guidelines` AFTER building to audit. Use `ui-ux-pro-max` DURING building to decide.
+**Verdict:** No real overlap. Use `web-design-guidelines` after building to audit, and use `ui-ux-pro-max` during building to make design decisions.
 
 ---
 
@@ -296,7 +296,7 @@ brand skill  brand skill
 - **Deleted** `ui-styling` (merged into `shadcn-best-practices`)
 - **Merged** `shadcn-best-practices` now includes: shadcn/ui rules + Tailwind customization + responsive design + canvas visual design + scripts + canvas-fonts
 - **Cleaned** `design-system`: removed slide generation (now owned by `slides`)
-- **Count**: 14 skills → 12 skills
+- **Count**: 14 skills reduced to 12 skills
 
 ### v1 — Pre-Merge (Original)
 - 14 skills including `design` and `ui-styling` as separate entries

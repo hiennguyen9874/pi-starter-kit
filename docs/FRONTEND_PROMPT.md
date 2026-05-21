@@ -1,10 +1,10 @@
 # Prompt Guide — Frontend, Design, UI, UX
 
-This guide covers **9 workflow prompts** for frontend, design, UI, and UX work.
+This guide presents **9 workflow prompts** for frontend, design, UI, and UX work.
 
 ## How Prompts Work
 
-Type what you want. The system matches your intent to a prompt, which then activates relevant **skills** and follows a structured workflow.
+Describe what you want. The system matches your intent to a prompt, then activates the relevant **skills** and follows a structured workflow.
 
 ---
 
@@ -12,15 +12,15 @@ Type what you want. The system matches your intent to a prompt, which then activ
 
 | # | Prompt | Phase | When to Use | Skills |
 |---|--------|-------|-------------|--------|
-| 1 | `frontend-design-direction` | direction | Landing page, portfolio, marketing site needs visual direction | `frontend-skill`, `ui-ux-pro-max` |
-| 2 | `interface-design-direction` | direction | Dashboard, app, admin panel needs design direction | `interface-design`, `ui-ux-pro-max`, `brand`, `design-system` |
+| 1 | `frontend-design-direction` | direction | A landing page, portfolio, or marketing site needs visual direction | `frontend-skill`, `ui-ux-pro-max` |
+| 2 | `interface-design-direction` | direction | A dashboard, app, or admin panel needs design direction | `interface-design`, `ui-ux-pro-max`, `brand`, `design-system` |
 | 3 | `shadcn-ui-build` | build | Build or fix shadcn/ui components, pages, forms, dialogs | `shadcn-best-practices`, `react-best-practices`, `composition-patterns` |
 | 4 | `react-view-transitions-build` | build | Add page transitions, shared element animations | `react-view-transitions`, `react-best-practices` |
 | 5 | `frontend-polish-pass` | polish | Marketing UI feels generic, cluttered, or weak | `frontend-skill`, `ui-ux-pro-max` |
 | 6 | `interface-polish-pass` | polish | Product UI needs density, navigation, data presentation fixes | `interface-design`, `ui-ux-pro-max` |
 | 7 | `frontend-ui-audit` | audit | Review UI code for quality, accessibility, shadcn usage | `web-design-guidelines`, `shadcn-best-practices`, `react-best-practices`, `ui-ux-pro-max` |
 | 8 | `react-component-api-refactor` | refactor | Component has too many boolean props, needs composition | `composition-patterns`, `react-best-practices` |
-| 9 | `react-performance-pass` | refactor | Slow page, rerenders, bundle size, hydration issues | `react-best-practices`, `react-view-transitions` |
+| 9 | `react-performance-pass` | refactor | Slow pages, re-renders, bundle size, hydration issues | `react-best-practices`, `react-view-transitions` |
 
 ---
 
@@ -36,7 +36,7 @@ Before selecting a prompt, determine your surface type:
 | Marketing site | Settings page |
 | Brand page | Data interface |
 
-Use `frontend-*` prompts for marketing. Use `interface-*` prompts for product.
+Use `frontend-*` prompts for marketing surfaces. Use `interface-*` prompts for product surfaces.
 
 ---
 
