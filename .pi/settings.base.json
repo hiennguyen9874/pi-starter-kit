@@ -50,7 +50,7 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "disabled": true
+        "disabled": false
       },
       "planner": {
         "disabled": true
@@ -71,10 +71,7 @@
         "disabled": true
       },
       "oracle": {
-        "disabled": true
-      },
-      "oracle-executor": {
-        "disabled": true
+        "disabled": false
       }
     }
   }
