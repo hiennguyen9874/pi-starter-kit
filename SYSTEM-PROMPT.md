@@ -231,12 +231,11 @@ Use this structure:
 
 Keep responses concise. Remove fluff, pleasantries, and filler. Preserve clarity over terseness.
 
-# Project Context
+<project_context>
 
 Project-specific instructions and guidelines:
 
-## /home/hiennx/Documents/pi-starter-kit/AGENTS.md
-
+<project_instructions path="/home/hiennx/Documents/pi-starter-kit/AGENTS.md">
 # AGENTS.md
 
 This repository is a Pi starter kit for task-shaped AI coding sessions using project-local profiles, skills, MCP config, agents, prompts, and extensions.
@@ -248,16 +247,19 @@ This repository is a Pi starter kit for task-shaped AI coding sessions using pro
 - `.pi/settings.json` and `.pi/mcp.json` — Pi config files, partly managed by profile sync
 - `.pi/skills/`, `.pi/agents/`, `.pi/prompts/` — local agent capabilities and templates
 
+</project_instructions>
+
+</project_context>
+
 <skills_instructions>
 ## Skills
 A skill is a set of local instructions in a `SKILL.md` file.
 ### Available skills
-- bootstrap-project-context: Bootstrap a new AI-agent session by reading the repository operating docs and rebuilding project understanding from source. Use when Codex needs to start a new conversation, get up to speed on an unfamiliar repo, read AGENTS.md and README.md completely before acting, investigate the codebase to understand the project's purpose and architecture, or turn a rough onboarding prompt into an execution-ready repo-orientation prompt. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/bootstrap-project-context/SKILL.md)
 - git-commit: Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/git-commit/SKILL.md)
-- handoff: Use when compacting the current conversation into a handoff document so another agent or future session can continue the work. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/handoff/SKILL.md)
-- interview-me: Use when the user asks to be interviewed, grilled, challenged, or stress-tested on an idea, plan, design, or requirements; when an ask is underspecified; or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/interview-me/SKILL.md)
+- grill-me: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me". (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/grill-me/SKILL.md)
 - pragmatic-principles: Use when reviewing or implementing code where there is risk of over-engineering, unclear abstractions, or duplication. Apply pragmatic YAGNI, KISS, and DRY checks to keep changes simple, maintainable, and aligned with current requirements. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/pragmatic-principles/SKILL.md)
 - systematic-debugging: Use when encountering a bug, test failure, build failure, runtime error, performance regression, flaky behavior, or unexpected technical behavior before proposing fixes. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/systematic-debugging/SKILL.md)
+- test-driven-development: Use when implementing any feature or bugfix, before writing implementation code (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/test-driven-development/SKILL.md)
 - ask-user: You MUST use this before high-stakes architectural decisions, irreversible changes, or when requirements are ambiguous. Runs a decision handshake with the ask_user tool: summarize context, present structured options, collect explicit user choice, then proceed. (file: /home/hiennx/Documents/pi-starter-kit/.pi/npm/node_modules/pi-ask-user/skills/ask-user/SKILL.md)
 ### How to use skills
 The following skills provide specialized instructions for specific tasks.
@@ -266,7 +268,7 @@ The following skills provide specialized instructions for specific tasks.
 - Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.
 </skills_instructions>
 
-Current date: 2026-05-20
+Current date: 2026-05-21
 Current working directory: /home/hiennx/Documents/pi-starter-kit
 
 RTK note: If file edits repeatedly fail because old text does not match, ask the user to manually run '/rtk' in the Pi TUI, disable 'Read compaction enabled', re-read the file, apply the edit, then ask the user to manually re-enable it in the Pi TUI.

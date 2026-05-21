@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const PI_DOCS_MARKER = "\nPi documentation (read only";
-const SECTION_BOUNDARIES = ["\n\n# Project Context", "\n\nThe following skills", "\nCurrent date:", "\nCurrent working directory:"];
+const SECTION_BOUNDARIES = ["\n\n<project_context>", "\n\nThe following skills", "\nCurrent date:", "\nCurrent working directory:"];
 
 let enabled = false;
 let initialized = false;

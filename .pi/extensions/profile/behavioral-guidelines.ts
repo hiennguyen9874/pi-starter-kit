@@ -309,7 +309,7 @@ const GUIDELINE_SECTIONS: Array<{
 
 const TOOLS_MARKER = "\nAvailable tools:";
 const PRIMARY_MARKER = "\nPi documentation (read only";
-const FALLBACK_MARKER = "\n# Project Context\n";
+const FALLBACK_MARKER = "\n<project_context>\n";
 
 function getEnabledGuidelines(config: BehavioralGuidelinesConfig | undefined, systemPrompt: string): string {
   const sections = config?.sections ?? {};
