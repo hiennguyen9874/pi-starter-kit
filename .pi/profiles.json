@@ -7,8 +7,10 @@
         "interview-me",
         "ask-user",
         "handoff",
+        "prompt-leverage",
         "pragmatic-principles",
         "systematic-debugging",
+        "test-driven-development",
         "git-commit"
       ],
       "mcpServersEnable": [],
@@ -284,14 +286,8 @@
         "source-driven-development",
         "test-driven-development"
       ],
-      "mcpServersEnable": [
-        "chrome-devtools"
-      ],
-      "mcpServersDisable": [
-        "context-mode",
-        "deepwiki",
-        "exa"
-      ],
+      "mcpServersEnable": ["chrome-devtools"],
+      "mcpServersDisable": ["context-mode", "deepwiki", "exa"],
       "extensionState": {
         "behavioralGuidelines": {
           "enabled": true,
@@ -322,14 +318,8 @@
         "slides",
         "web-design-guidelines"
       ],
-      "mcpServersEnable": [
-        "chrome-devtools"
-      ],
-      "mcpServersDisable": [
-        "context-mode",
-        "deepwiki",
-        "exa"
-      ],
+      "mcpServersEnable": ["chrome-devtools"],
+      "mcpServersDisable": ["context-mode", "deepwiki", "exa"],
       "extensionState": {
         "behavioralGuidelines": {
           "enabled": true,
@@ -488,9 +478,7 @@
       }
     },
     "readiness-report": {
-      "skillsEnable": [
-        "readiness-report"
-      ],
+      "skillsEnable": ["readiness-report"],
       "mcpServersEnable": [],
       "mcpServersDisable": [
         "chrome-devtools",
@@ -536,6 +524,36 @@
         "deepwiki",
         "exa"
       ],
+      "extensionState": {
+        "behavioralGuidelines": {
+          "enabled": true,
+          "sections": {
+            "communicationAndToolUse": true,
+            "repositoryInstructions": false,
+            "executionPolicy": true,
+            "evidenceDiscipline": true,
+            "changeScope": true,
+            "validation": true,
+            "efficiency": true,
+            "finalResponse": true,
+            "planningDiscipline": false
+          }
+        }
+      }
+    },
+    "goal": {
+      "skillsEnable": [
+        "bootstrap-project-context",
+        "interview-me",
+        "ask-user",
+        "handoff",
+        "prompt-leverage",
+        "pragmatic-principles",
+        "systematic-debugging",
+        "git-commit"
+      ],
+      "mcpServersEnable": ["exa"],
+      "mcpServersDisable": ["chrome-devtools", "context-mode", "deepwiki"],
       "extensionState": {
         "behavioralGuidelines": {
           "enabled": true,
