@@ -38,7 +38,7 @@ Missing context limits what can be verified. State explicitly when a requirement
 
 ## Output Contract
 
-Produce a structured report with these sections:
+Produce a structured report in file `docs/plans/YYYY-MM-DD-<topic>/spec-review-<postfix>.md` with these sections:
 
 ```
 # Spec Review

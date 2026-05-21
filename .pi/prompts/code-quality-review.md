@@ -36,7 +36,7 @@ If spec alignment is unknown or was not reviewed, state that quality approval do
 
 ## Output Contract
 
-Produce a structured report with these sections:
+Produce a structured report in file `docs/plans/YYYY-MM-DD-<topic>/quality-review-<postfix>.md` with these sections:
 
 ```
 # Code Quality Review

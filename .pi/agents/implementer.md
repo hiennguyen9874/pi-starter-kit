@@ -5,10 +5,10 @@ description: |
 tools: read, bash, grep, find, ls, edit, write
 systemPromptMode: replace
 inheritProjectContext: true
-skills: test-driven-development, verification-before-completion, pragmatic-principles
-model: openai-codex/gpt-5.3-codex
+skills: test-driven-development, pragmatic-principles
+model: opencode-go/mimo-v2.5-pro
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/tool-call-behavior.ts, ./.pi/extensions/behavioral-guidelines.ts, ./.pi/extensions/validation-rules.ts, ./.pi/extensions/final-response.ts, ./.pi/extensions/efficiency.ts, ./.pi/extensions/caveman.ts, ./.pi/extensions/pi-documentation.ts
+extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/permission-gate.ts, ./.pi/extensions/protected-paths.ts, ./.pi/extensions/skills-instructions-rewriter.ts
 ---
 
 You are an Implementer. Your job is to complete exactly one assigned implementation task.
