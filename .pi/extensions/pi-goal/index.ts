@@ -1,7 +1,7 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 import { registerGoalCommand } from "./commands.ts";
-import { formatFooterStatus } from "./format.ts";
+import { formatDuration, formatFooterStatus, formatTokenValue } from "./format.ts";
 import { budgetLimitPrompt, continuationPrompt } from "./prompts.ts";
 import {
   CONTINUATION_MESSAGE_TYPE,
@@ -315,8 +315,14 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       syncGoalTools(pi);
       if (isCompleting) {
         emitGoalEvent(pi, "completed", nextGoal);
+        const parts: string[] = [`Goal achieved: ${nextGoal.objective}`];
+        parts.push(`Time: ${formatDuration(nextGoal.timeUsedSeconds)}`);
+        parts.push(`Tokens: ${formatTokenValue(nextGoal.tokensUsed)}${nextGoal.tokenBudget !== null ? ` / ${formatTokenValue(nextGoal.tokenBudget)}` : ""}`);
+        parts.push(`Turns: ${nextGoal.turnCount} (${nextGoal.continuationCount} continuations)`);
+        ctx.ui.notify(parts.join(" | "), "info");
       }
       if (result.crossedBudget && nextGoal.status !== "complete") {
+        ctx.ui.notify(`Goal budget exhausted: ${formatTokenValue(result.goal.tokensUsed)} / ${formatTokenValue(result.goal.tokenBudget!)} tokens used. Wrapping up.`, "warning");
         pi.sendMessage(
           {
             customType: CONTINUATION_MESSAGE_TYPE,
@@ -326,6 +332,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
           },
           { triggerTurn: true, deliverAs: "steer" },
         );
+      }
+      if (result.goal.continuationSuppressed && !isCompleting && !result.crossedBudget) {
+        ctx.ui.notify("Goal continuation paused: no progress detected. Send a message or /goal resume to continue.", "warning");
       }
       refreshStatus(ctx);
     });
