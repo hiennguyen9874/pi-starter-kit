@@ -242,6 +242,35 @@ export function loadProfileKnownMcpServerNames(cwd: string): string[] {
   return Object.keys(servers).sort((a, b) => a.localeCompare(b));
 }
 
+/**
+ * Syncs .pi/settings.base.json into .pi/settings.json.
+ *
+ * For each top-level key present in the base file, the base value replaces
+ * the corresponding settings.json value (base is the source of truth).
+ * Keys that exist only in settings.json (e.g. `skills` managed by profiles)
+ * are preserved.
+ *
+ * Returns true if settings.json was modified.
+ */
+export function syncBaseSettings(cwd: string): boolean {
+  const baseSettings = readJsonObject(getSettingsBasePath(cwd));
+  if (!baseSettings) {
+    return false;
+  }
+
+  const currentSettings = readJsonObject(getSettingsPath(cwd)) ?? {};
+
+  // Start from current settings to preserve settings.json-only keys
+  // (e.g. `skills` managed by profile extension),
+  // then overwrite with every key from base (base is source of truth).
+  const merged: JsonObject = { ...currentSettings };
+  for (const key of Object.keys(baseSettings)) {
+    merged[key] = baseSettings[key];
+  }
+
+  return writeJsonObject(getSettingsPath(cwd), merged);
+}
+
 export function syncProfileResources(cwd: string, profileName: string, profile: ProfileDefinition): SyncProfileResourcesResult {
   mkdirSync(getPiDir(cwd), { recursive: true });
 

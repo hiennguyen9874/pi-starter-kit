@@ -13,6 +13,7 @@ import {
   loadProfileKnownMcpServerNames,
   loadProfileKnownSkillNames,
   readPersistedProfileName,
+  syncBaseSettings,
   syncProfileResources,
   writePersistedProfileName,
 } from "./profile-sync.ts";
@@ -433,6 +434,8 @@ export default function profileExtension(pi: ExtensionAPI): void {
   });
 
   pi.on("session_start", async (event, ctx) => {
+    syncBaseSettings(ctx.cwd);
+
     const loaded = loadProfilesConfig(ctx.cwd);
     state.profiles = loaded.config?.profiles ?? {};
     state.knownSkills = [...new Set([...loadProfileKnownSkillNames(ctx.cwd), ...getKnownSkillNames(pi.getCommands())])].sort(
