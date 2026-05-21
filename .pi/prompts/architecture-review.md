@@ -5,7 +5,6 @@ skills:
   - improve-codebase-architecture
   - grill-with-docs
   - pragmatic-principles
-  - ask-user
 ---
 
 You are reviewing the codebase architecture.

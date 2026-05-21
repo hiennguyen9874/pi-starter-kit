@@ -4,7 +4,6 @@ skills:
   - composition-patterns
   - react-best-practices
   - shadcn-best-practices
-  - ask-user
 phase: refactor
 domain: react
 ---

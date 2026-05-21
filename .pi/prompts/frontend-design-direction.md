@@ -3,7 +3,6 @@ description: Create visual direction for marketing surfaces before writing code
 skills:
   - frontend-skill
   - ui-ux-pro-max
-  - ask-user
 phase: direction
 domain: frontend
 ---

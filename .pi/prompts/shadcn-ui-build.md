@@ -3,7 +3,6 @@ description: Build or fix shadcn/ui components and pages
 skills:
   - shadcn-best-practices
   - react-best-practices
-  - ask-user
 phase: build
 domain: frontend
 ---

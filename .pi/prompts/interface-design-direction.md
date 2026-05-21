@@ -3,7 +3,6 @@ description: Create visual direction for product surfaces before writing code
 skills:
   - interface-design
   - ui-ux-pro-max
-  - ask-user
 phase: direction
 domain: frontend
 ---

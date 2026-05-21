@@ -5,6 +5,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "handoff",
         "prompt-leverage",
@@ -41,6 +42,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "brainstorming",
         "spec-driven-development",
@@ -183,6 +185,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "handoff",
         "pragmatic-principles",
@@ -230,6 +233,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -271,6 +275,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -308,6 +313,7 @@
     "design": {
       "skillsEnable": [
         "interview-me",
+        "grill-me",
         "ask-user",
         "frontend-skill",
         "interface-design",
@@ -341,6 +347,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "systematic-debugging",
         "pragmatic-principles",
@@ -377,6 +384,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "prompt-leverage",
         "agent-md-refactor",
@@ -411,6 +419,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "writing-skills",
         "skill-creator",
@@ -445,6 +454,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "prd",
         "documentation-and-adrs",
@@ -507,6 +517,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "context7-cli",
         "systematic-debugging",
@@ -545,6 +556,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "handoff",
         "prompt-leverage",
@@ -575,6 +587,7 @@
       "skillsEnable": [
         "bootstrap-project-context",
         "interview-me",
+        "grill-me",
         "ask-user",
         "pragmatic-principles",
         "systematic-debugging",
