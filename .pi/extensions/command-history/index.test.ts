@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { commandNameFrom, dedupeHistoryEntries, filterHistoryEntries, parseHistoryLine } from "./index.ts";
+import {
+	commandNameFrom,
+	dedupeHistoryEntries,
+	filterHistoryEntries,
+	navigateHistory,
+	parseHistoryLine,
+} from "./index.ts";
 
 test("commandNameFrom extracts slash command name without arguments", () => {
 	assert.equal(commandNameFrom("/commit-work"), "commit-work");
@@ -46,4 +52,23 @@ test("dedupeHistoryEntries keeps the latest duplicate", () => {
 	assert.equal(deduped[0].text, "plain text");
 	assert.equal(deduped[1].text, "/commit-work");
 	assert.equal(deduped[1].ts, 3);
+});
+
+test("navigateHistory moves backward and forward while preserving current editor text", () => {
+	const entries = [
+		{ cwd: "/repo", text: "first", ts: 1, isSlash: false, commandName: undefined },
+		{ cwd: "/repo", text: "second", ts: 2, isSlash: false, commandName: undefined },
+	];
+
+	const previous = navigateHistory(entries, -1, "", "draft", "previous");
+	assert.deepEqual(previous, { historyIndex: 0, savedEditorText: "draft", text: "second" });
+
+	const older = navigateHistory(entries, previous.historyIndex, previous.savedEditorText, "second", "previous");
+	assert.deepEqual(older, { historyIndex: 1, savedEditorText: "draft", text: "first" });
+
+	const newer = navigateHistory(entries, older.historyIndex, older.savedEditorText, "first", "next");
+	assert.deepEqual(newer, { historyIndex: 0, savedEditorText: "draft", text: "second" });
+
+	const restored = navigateHistory(entries, newer.historyIndex, newer.savedEditorText, "second", "next");
+	assert.deepEqual(restored, { historyIndex: -1, savedEditorText: "draft", text: "draft" });
 });

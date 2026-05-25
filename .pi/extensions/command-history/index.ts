@@ -84,7 +84,7 @@ function appendHistory(cwd: string, text: string): HistoryEntry {
 function setStatus(ctx: ExtensionContext, historyCount: number) {
 	ctx.ui.setStatus(
 		"folder-history",
-		historyCount > 0 ? `📜 ${historyCount} cmds (ctrl+↑/↓, /command-history)` : undefined,
+		historyCount > 0 ? `📜 ${historyCount} cmds (↑/↓, ctrl+↑/↓, /command-history)` : undefined,
 	);
 }
 
@@ -101,17 +101,103 @@ export function filterHistoryEntries(entries: HistoryEntry[], query: string): Hi
 	return entries.filter((entry) => entry.text.toLowerCase().includes(needle));
 }
 
-export default function (pi: ExtensionAPI) {
+type HistoryDirection = "previous" | "next";
+
+type HistoryNavigation = {
+	historyIndex: number;
+	savedEditorText: string;
+	text: string;
+};
+
+export function navigateHistory(
+	entries: HistoryEntry[],
+	historyIndex: number,
+	savedEditorText: string,
+	currentEditorText: string,
+	direction: HistoryDirection,
+): HistoryNavigation | null {
+	if (entries.length === 0) return null;
+
+	if (direction === "previous") {
+		const nextIndex = historyIndex + 1;
+		if (nextIndex >= entries.length) return null;
+		return {
+			historyIndex: nextIndex,
+			savedEditorText: historyIndex === -1 ? currentEditorText : savedEditorText,
+			text: entries[entries.length - 1 - nextIndex].text,
+		};
+	}
+
+	if (historyIndex <= -1) return null;
+	const nextIndex = historyIndex - 1;
+	return {
+		historyIndex: nextIndex,
+		savedEditorText,
+		text: nextIndex === -1 ? savedEditorText : entries[entries.length - 1 - nextIndex].text,
+	};
+}
+
+export default async function (pi: ExtensionAPI) {
+	const [{ CustomEditor }, { matchesKey }] = await Promise.all([
+		import("@earendil-works/pi-coding-agent"),
+		import("@earendil-works/pi-tui"),
+	]);
 	let currentCwd = "";
 	let history: HistoryEntry[] = [];
 	let historyIndex = -1;
 	let savedEditorText = "";
+
+	function applyHistoryNavigation(
+		direction: HistoryDirection,
+		getEditorText: () => string,
+		setEditorText: (text: string) => void,
+	): boolean {
+		const result = navigateHistory(
+			history,
+			historyIndex,
+			savedEditorText,
+			getEditorText(),
+			direction,
+		);
+		if (!result) return false;
+		historyIndex = result.historyIndex;
+		savedEditorText = result.savedEditorText;
+		setEditorText(result.text);
+		return true;
+	}
+
+	class HistoryEditor extends CustomEditor {
+		handleInput(data: string): void {
+			if (
+				matchesKey(data, "ctrl+up") ||
+				(matchesKey(data, "up") && !this.getText().includes("\n"))
+			) {
+				if (applyHistoryNavigation("previous", () => this.getText(), (text) => this.setText(text))) {
+					return;
+				}
+			}
+
+			if (
+				matchesKey(data, "ctrl+down") ||
+				(matchesKey(data, "down") && !this.getText().includes("\n"))
+			) {
+				if (applyHistoryNavigation("next", () => this.getText(), (text) => this.setText(text))) {
+					return;
+				}
+			}
+
+			super.handleInput(data);
+		}
+	}
 
 	pi.on("session_start", (_event, ctx) => {
 		currentCwd = ctx.cwd;
 		history = loadHistory(currentCwd);
 		historyIndex = -1;
 		savedEditorText = "";
+		ctx.ui.setEditorComponent((tui, theme, keybindings) =>
+			new HistoryEditor(tui, theme, keybindings),
+		);
 		setStatus(ctx, history.length);
 	});
 
@@ -131,25 +217,22 @@ export default function (pi: ExtensionAPI) {
 	pi.registerShortcut("ctrl+up", {
 		description: "Previous command from folder history",
 		handler: (ctx) => {
-			if (history.length === 0) return;
-			if (historyIndex === -1) savedEditorText = ctx.ui.getEditorText();
-			const nextIndex = historyIndex + 1;
-			if (nextIndex >= history.length) return;
-			historyIndex = nextIndex;
-			ctx.ui.setEditorText(history[history.length - 1 - historyIndex].text);
+			applyHistoryNavigation(
+				"previous",
+				() => ctx.ui.getEditorText(),
+				(text) => ctx.ui.setEditorText(text),
+			);
 		},
 	});
 
 	pi.registerShortcut("ctrl+down", {
 		description: "Next command from folder history",
 		handler: (ctx) => {
-			if (historyIndex <= -1) return;
-			historyIndex -= 1;
-			if (historyIndex === -1) {
-				ctx.ui.setEditorText(savedEditorText);
-				return;
-			}
-			ctx.ui.setEditorText(history[history.length - 1 - historyIndex].text);
+			applyHistoryNavigation(
+				"next",
+				() => ctx.ui.getEditorText(),
+				(text) => ctx.ui.setEditorText(text),
+			);
 		},
 	});
 
