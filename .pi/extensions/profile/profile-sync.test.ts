@@ -8,6 +8,7 @@ import {
   loadProfileKnownMcpServerNames,
   loadProfileKnownSkillNames,
   readPersistedProfileName,
+  syncBaseSystemResources,
   syncProfileResources,
 } from "./profile-sync.ts";
 
@@ -83,6 +84,30 @@ test("syncProfileResources filters mcp.json from baseline when switching profile
   });
   mcp = JSON.parse(readFileSync(join(root, ".pi", "mcp.json"), "utf8"));
   assert.deepEqual(Object.keys(mcp.mcpServers), ["chrome-devtools"]);
+});
+
+test("syncBaseSystemResources syncs settings/mcp base files and creates .local", () => {
+  const root = createRoot();
+  writeFileSync(join(root, ".pi", "settings.base.json"), JSON.stringify({ theme: "dark" }, null, 2));
+  writeFileSync(
+    join(root, ".pi", "mcp.base.json"),
+    JSON.stringify(
+      {
+        mcpServers: {
+          memory: { command: "npx" },
+        },
+      },
+      null,
+      2,
+    ),
+  );
+
+  const result = syncBaseSystemResources(root);
+
+  assert.equal(result.settingsChanged, true);
+  assert.equal(result.mcpChanged, true);
+  assert.equal(JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8")).theme, "dark");
+  assert.deepEqual(Object.keys(JSON.parse(readFileSync(join(root, ".pi", "mcp.json"), "utf8")).mcpServers), ["memory"]);
 });
 
 test("wildcard profile entries apply to skill and MCP resource syncing", () => {

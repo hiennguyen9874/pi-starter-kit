@@ -271,6 +271,26 @@ export function syncBaseSettings(cwd: string): boolean {
   return writeJsonObject(getSettingsPath(cwd), merged);
 }
 
+export function syncBaseSystemResources(cwd: string): { settingsChanged: boolean; mcpChanged: boolean } {
+  mkdirSync(getLocalStateDir(cwd), { recursive: true });
+
+  const settingsChanged = syncBaseSettings(cwd);
+
+  const baseMcp = readJsonObject(getMcpBasePath(cwd));
+  let mcpChanged = false;
+
+  if (baseMcp) {
+    const currentMcp = readJsonObject(getMcpPath(cwd)) ?? {};
+    const mergedMcp: JsonObject = { ...currentMcp };
+    for (const key of Object.keys(baseMcp)) {
+      mergedMcp[key] = baseMcp[key];
+    }
+    mcpChanged = writeJsonObject(getMcpPath(cwd), mergedMcp);
+  }
+
+  return { settingsChanged, mcpChanged };
+}
+
 export function syncProfileResources(cwd: string, profileName: string, profile: ProfileDefinition): SyncProfileResourcesResult {
   mkdirSync(getPiDir(cwd), { recursive: true });
 

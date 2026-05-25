@@ -42,6 +42,30 @@ test("missing selected profile returns recoverable error", () => {
   assert.match(result.error ?? "", /missing/i);
 });
 
+test("registers sync-profile-system CLI flag", () => {
+  const flags: string[] = [];
+
+  profileExtension({
+    registerFlag(name: string) {
+      flags.push(name);
+    },
+    registerCommand() {},
+    on() {},
+    appendEntry() {},
+    getFlag() {
+      return undefined;
+    },
+    getCommands() {
+      return [];
+    },
+    getAllTools() {
+      return [];
+    },
+  } as any);
+
+  assert.equal(flags.includes("sync-profile-system"), true);
+});
+
 test("session_start loads profiles using getCommands API and /profile can activate one", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-state-"));
   mkdirSync(join(root, ".pi"));

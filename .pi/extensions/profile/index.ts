@@ -1,5 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { DynamicBorder } from "@earendil-works/pi-coding-agent";
+import { writeSync } from "node:fs";
 import { Container, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
 
 import {
@@ -13,7 +14,7 @@ import {
   loadProfileKnownMcpServerNames,
   loadProfileKnownSkillNames,
   readPersistedProfileName,
-  syncBaseSettings,
+  syncBaseSystemResources,
   syncProfileResources,
   writePersistedProfileName,
 } from "./profile-sync.ts";
@@ -308,6 +309,12 @@ export default function profileExtension(pi: ExtensionAPI): void {
     type: "string",
   });
 
+  pi.registerFlag("sync-profile-system", {
+    description: "Sync .pi/settings.base.json and .pi/mcp.base.json into runtime .pi config files",
+    type: "boolean",
+    default: false,
+  });
+
   pi.registerCommand("profile", {
     description: "Switch active profile",
     handler: async (args, ctx) => {
@@ -434,7 +441,22 @@ export default function profileExtension(pi: ExtensionAPI): void {
   });
 
   pi.on("session_start", async (event, ctx) => {
-    syncBaseSettings(ctx.cwd);
+    const syncOnly = pi.getFlag("sync-profile-system") === true;
+    const syncResult = syncBaseSystemResources(ctx.cwd);
+
+    if (syncOnly) {
+      const lines = [
+        "Synced profile system resources from base files.",
+        `settings.json: ${syncResult.settingsChanged ? "updated" : "unchanged"}`,
+        `mcp.json: ${syncResult.mcpChanged ? "updated" : "unchanged"}`,
+      ];
+      writeSync(1, `${lines.join("\n")}\n`);
+      process.exit(0);
+    }
+
+    if (syncResult.settingsChanged || syncResult.mcpChanged) {
+      ctx.ui.notify("Synced profile system resources from base files", "info");
+    }
 
     const loaded = loadProfilesConfig(ctx.cwd);
     state.profiles = loaded.config?.profiles ?? {};
