@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { budgetLimitPrompt, continuationGoalIdFromMessage, continuationPrompt, escapeXmlText } from "./prompts.ts";
+import { budgetLimitPrompt, continuationGoalIdFromMessage, continuationPrompt, escapeXmlText, initPrompt } from "./prompts.ts";
 import type { GoalState } from "./state.ts";
 
 const goal: GoalState = {
@@ -23,6 +23,24 @@ const goal: GoalState = {
 
 test("escapes XML-sensitive objective text", () => {
   assert.equal(escapeXmlText("a < b && c > d"), "a &lt; b &amp;&amp; c &gt; d");
+});
+
+test("renders init prompt with audit and untrusted-objective guardrails", () => {
+  const prompt = initPrompt(goal);
+
+  assert.match(prompt, /<pi_goal_init goal_id="goal-abc">/);
+  assert.match(prompt, /Start working toward the new goal/);
+  assert.match(prompt, /<untrusted_objective>\nImplement &lt;feature&gt; &amp; verify\n<\/untrusted_objective>/);
+  assert.match(prompt, /Goal behavior/);
+  assert.match(prompt, /full objective intact/);
+  assert.match(prompt, /Work from evidence/);
+  assert.match(prompt, /Fidelity/);
+  assert.match(prompt, /Completion audit/i);
+  assert.match(prompt, /actual current state/);
+  assert.match(prompt, /requirement-by-requirement scrutiny/);
+  assert.match(prompt, /Treat uncertain or indirect evidence as not achieved/);
+  assert.match(prompt, /Report the final elapsed time/);
+  assert.match(prompt, /Do not call update_goal unless the goal is complete/);
 });
 
 test("renders continuation prompt with audit and untrusted-objective guardrails", () => {

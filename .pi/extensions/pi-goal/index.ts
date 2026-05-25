@@ -2,7 +2,7 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 
 import { registerGoalCommand } from "./commands.ts";
 import { formatDuration, formatFooterStatus, formatTokenValue } from "./format.ts";
-import { budgetLimitPrompt, continuationPrompt } from "./prompts.ts";
+import { budgetLimitPrompt, continuationPrompt, initPrompt } from "./prompts.ts";
 import {
   CONTINUATION_MESSAGE_TYPE,
   ENTRY_TYPE,
@@ -266,7 +266,7 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
         if (!isNewGoal && previousStatus === "active" && goal.status === "paused") emitGoalEvent(pi, "paused", goal);
         if (!isNewGoal && previousStatus !== "active" && goal.status === "active") emitGoalEvent(pi, "resumed", goal);
         if (isNewGoal && goal.status === "active" && ctx.isIdle() && !ctx.hasPendingMessages()) {
-          pi.sendUserMessage(goal.objective);
+          pi.sendUserMessage(initPrompt(goal));
         } else if (!isNewGoal && previousStatus !== "active" && goal.status === "active") {
           scheduleContinuation(pi, ctx);
         }

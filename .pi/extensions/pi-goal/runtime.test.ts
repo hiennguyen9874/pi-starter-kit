@@ -107,7 +107,8 @@ test("/goal command persists state, updates status, and starts first visible tur
   assert.equal(typeof persistedGoal.goalId, "string");
   assert.match(ctx.statuses["pi-goal"] ?? "", /Pursuing goal/);
   assert.equal(pi.messages.at(-1)?.message.role, "user");
-  assert.equal(pi.messages.at(-1)?.message.content, "Build feature");
+  assert.match(pi.messages.at(-1)?.message.content, /<pi_goal_init /);
+  assert.match(pi.messages.at(-1)?.message.content, /<untrusted_objective>\nBuild feature\n<\/untrusted_objective>/);
 });
 
 test("agent_end defers and sends one hidden continuation for active goal", async () => {
