@@ -81,13 +81,6 @@ function appendHistory(cwd: string, text: string): HistoryEntry {
 	return entry;
 }
 
-function setStatus(ctx: ExtensionContext, historyCount: number) {
-	ctx.ui.setStatus(
-		"folder-history",
-		historyCount > 0 ? `📜 ${historyCount} cmds (↑/↓, ctrl+↑/↓, /command-history)` : undefined,
-	);
-}
-
 function upsertInMemory(history: HistoryEntry[], next: HistoryEntry) {
 	const index = history.findIndex((entry) => entry.text === next.text);
 	if (index !== -1) history.splice(index, 1);
@@ -198,7 +191,6 @@ export default async function (pi: ExtensionAPI) {
 		ctx.ui.setEditorComponent((tui, theme, keybindings) =>
 			new HistoryEditor(tui, theme, keybindings),
 		);
-		setStatus(ctx, history.length);
 	});
 
 	pi.on("input", (event, ctx) => {
@@ -209,7 +201,6 @@ export default async function (pi: ExtensionAPI) {
 		upsertInMemory(history, entry);
 		historyIndex = -1;
 		savedEditorText = "";
-		setStatus(ctx, history.length);
 
 		return { action: "continue" as const };
 	});
