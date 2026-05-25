@@ -3,15 +3,14 @@
   "profiles": {
     "base": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
         "handoff",
-        "prompt-leverage",
         "pragmatic-principles",
         "systematic-debugging",
         "test-driven-development",
+        "context7-cli",
         "git-commit"
       ],
       "mcpServersEnable": [],
@@ -40,7 +39,6 @@
     },
     "planning": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -80,13 +78,13 @@
     },
     "execution": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "ask-user",
         "executing-plans",
         "subagent-driven-development",
         "dispatching-parallel-agents",
         "test-driven-development",
         "systematic-debugging",
+        "receiving-code-review",
         "verification-before-completion",
         "pragmatic-principles",
         "handoff"
@@ -117,7 +115,6 @@
     },
     "review": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "spec-review",
         "code-quality-review",
         "requesting-code-review",
@@ -183,7 +180,6 @@
     },
     "superpowers": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -231,7 +227,6 @@
     },
     "backend": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -273,7 +268,6 @@
     },
     "frontend": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -345,7 +339,6 @@
     },
     "devops": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -417,7 +410,6 @@
     },
     "skill-authoring": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -515,7 +507,6 @@
     },
     "ml-dev": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -554,7 +545,6 @@
     },
     "goal": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
         "ask-user",
@@ -585,9 +575,9 @@
     },
     "autoresearch": {
       "skillsEnable": [
-        "bootstrap-project-context",
         "interview-me",
         "grill-me",
+        "handoff",
         "ask-user",
         "pragmatic-principles",
         "systematic-debugging",

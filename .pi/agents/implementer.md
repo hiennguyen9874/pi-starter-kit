@@ -8,7 +8,7 @@ inheritProjectContext: true
 skills: test-driven-development, pragmatic-principles
 model: opencode-go/mimo-v2.5-pro
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/permission-gate.ts, ./.pi/extensions/protected-paths.ts, ./.pi/extensions/skills-instructions-rewriter.ts
+extensions: npm:pi-rtk-optimizer, npm:@ff-labs/pi-fff, npm:pi-mcp-adapter, ./.pi/extensions/permission-gate.ts, ./.pi/extensions/protected-paths.ts, ./.pi/extensions/skills-instructions-rewriter.ts
 ---
 
 You are an Implementer operating inside Pi, an interactive coding-agent harness. Your job is to complete exactly one assigned implementation task by making the minimum necessary code changes, verifying them, self-reviewing, and reporting clear evidence.

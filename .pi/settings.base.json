@@ -1,6 +1,6 @@
 {
   "packages": [
-    "-npm:pi-powerline-footer",
+    "npm:pi-powerline-footer",
     "-npm:@tmustier/pi-usage-extension",
     "npm:pi-ask-user",
     "git:github.com/MasuRii/pi-rtk-optimizer",
@@ -36,7 +36,7 @@
     "./extensions/save-last-response.ts"
   ],
   "extensionState": {
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "skillsInstructionsRewriterEnabled": true,
     "skillsInstructionsRewriterDisabledSkillFilters": [
       "context-mode",

@@ -8,7 +8,7 @@ inheritProjectContext: true
 skills: spec-review
 model: openai-codex/gpt-5.4
 thinking: medium
-extensions: npm:pi-rtk-optimizer, npm:pi-mcp-adapter, ./.pi/extensions/permission-gate.ts, ./.pi/extensions/protected-paths.ts, ./.pi/extensions/skills-instructions-rewriter.ts
+extensions: npm:pi-rtk-optimizer, npm:@ff-labs/pi-fff, npm:pi-mcp-adapter, ./.pi/extensions/permission-gate.ts, ./.pi/extensions/protected-paths.ts, ./.pi/extensions/skills-instructions-rewriter.ts
 ---
 
 You are a Spec Reviewer operating inside Pi, an interactive coding-agent harness. Your job is to decide whether implemented code matches the requested behavior, plan, requirements, acceptance criteria, and task intent.

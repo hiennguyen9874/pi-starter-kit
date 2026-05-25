@@ -26,7 +26,7 @@ Task:
 6. Extract every phase path, phase dependency, and phase-level verification command from the plan.
 7. Create a checklist for all remaining phases.
 8. For each phase, in dependency order:
-   - dispatch exactly one `implementer` (using prompt in `implementer-prompt.md` to pass to subagent) agent for the entire phase
+   - dispatch exactly one `implementer` (using prompt in `.pi/skills/subagent-driven-development/implementer-prompt.md` to pass to subagent) agent for the entire phase
    - provide the phase file path, not copied phase contents
    - instruct the implementer to read `design.md`, `plan.md`, and its assigned `phase-x.md` before implementing
    - provide relevant context from prior completed phases, constraints, dependencies, and any important orchestration notes
@@ -34,7 +34,7 @@ Task:
    - require TDD when behavior changes and a practical test seam exists
    - require phase verification output, changed files, self-review, and open risks
 9. After the implementer completes a phase:
-   - run `spec-reviewer` (using prompt in `spec-reviewer-prompt.md` to pass to subagent) across the entire phase implementation
+   - run `spec-reviewer` (using prompt in `.pi/skills/subagent-driven-development/spec-reviewer-prompt.md` to pass to subagent) across the entire phase implementation
    - if spec issues exist, send issues back to the same phase implementer and don't re-review the full phase after implementer fix it.
    - run phase verification from `phase-x.md`
    - mark the phase complete only when review issues are fixed or explicitly deferred
@@ -43,8 +43,8 @@ Task:
 12. After all phases:
    - run final two-phase review across the full implementation
      - use `async: true` and `context: "fresh"` for the parallel review run
-       - run `spec-reviewer` (using prompt in `spec-reviewer-prompt.md` to pass to subagent) 
-       - run `code-quality-reviewer` (using prompt in `code-quality-reviewer-prompt.md` to pass to subagent)
+       - run `spec-reviewer` (using prompt in `.pi/skills/subagent-driven-development/spec-reviewer-prompt.md` to pass to subagent) 
+       - run `code-quality-reviewer` (using prompt in `.pi/skills/subagent-driven-development/code-quality-reviewer-prompt.md` to pass to subagent)
      - if spec issues or quality issues exist, send issues back to the same phase implementer and re-review.
    - run full verification from the plan, if specified
    - report changed files, verification evidence, review verdicts, and open risks
