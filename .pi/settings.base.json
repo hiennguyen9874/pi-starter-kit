@@ -1,12 +1,12 @@
 {
   "packages": [
     "npm:pi-powerline-footer",
-    "npm:@tmustier/pi-usage-extension",
+    "-npm:@tmustier/pi-usage-extension",
     "npm:pi-command-history",
     "npm:pi-ask-user",
-    "npm:pi-rtk-optimizer",
-    "npm:pi-cache-graph",
-    "-npm:@ff-labs/pi-fff",
+    "git:github.com/MasuRii/pi-rtk-optimizer",
+    "-npm:pi-cache-graph",
+    "npm:@ff-labs/pi-fff",
     "-git:github.com/championswimmer/pi-context-usage",
     "-npm:pi-tool-display",
     "-npm:pi-mcp-adapter",
