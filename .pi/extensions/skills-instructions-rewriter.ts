@@ -74,6 +74,11 @@ function isEnabled(): boolean {
   return typeof value === "boolean" ? value : true;
 }
 
+function isSkillsDisabled(settings: any): boolean {
+  const value = settings?.extensionState?.skillsInstructionsRewriterDisableSkills;
+  return typeof value === "boolean" ? value : false;
+}
+
 function buildSkillsBlock(skills: Skill[]): string {
   const availableSkillsLines = skills.map((skill) => {
     const description = skill.description?.trim() || "No description provided.";
@@ -91,7 +96,32 @@ function buildSkillsBlock(skills: Skill[]): string {
   ].join("\n");
 }
 
+function removeSkillsSection(systemPrompt: string): string {
+  const blockStart = systemPrompt.indexOf(NEW_BLOCK_MARKER);
+  if (blockStart !== -1) {
+    const blockEndMarker = "</skills_instructions>";
+    const blockEndIndex = systemPrompt.indexOf(blockEndMarker, blockStart);
+    if (blockEndIndex === -1) return systemPrompt;
+
+    const before = systemPrompt.slice(0, blockStart).trimEnd();
+    const after = systemPrompt.slice(blockEndIndex + blockEndMarker.length).trimStart();
+    return `${before}${after.length > 0 ? `\n\n${after}` : ""}`;
+  }
+
+  const startIndex = systemPrompt.indexOf(LEGACY_START_MARKER);
+  if (startIndex === -1) return systemPrompt;
+
+  const endIndex = systemPrompt.indexOf(DATE_MARKER, startIndex);
+  if (endIndex === -1) return systemPrompt;
+
+  const before = systemPrompt.slice(0, startIndex).trimEnd();
+  const after = systemPrompt.slice(endIndex).trimStart();
+  return `${before}${after.length > 0 ? `\n\n${after}` : ""}`;
+}
+
 function rewriteSkillsSection(systemPrompt: string, skills: Skill[]): string {
+  if (skills.length === 0) return removeSkillsSection(systemPrompt);
+
   const skillsBlock = buildSkillsBlock(skills);
 
   const blockStart = systemPrompt.indexOf(NEW_BLOCK_MARKER);
@@ -119,6 +149,8 @@ function rewriteSkillsSection(systemPrompt: string, skills: Skill[]): string {
 
 function rewriteSkillsBlock(systemPrompt: string, skills: Skill[]): string {
   const settings = readSettings();
+  if (isSkillsDisabled(settings)) return removeSkillsSection(systemPrompt);
+
   const disabledFilters = readDisabledSkillFilters(settings);
   const filteredSkills = filterSkills(skills, disabledFilters);
 
