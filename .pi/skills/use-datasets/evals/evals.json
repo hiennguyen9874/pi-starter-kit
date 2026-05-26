@@ -1,0 +1,41 @@
+{
+  "skill_name": "use-datasets",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have train.tsv and test.tsv drug review files. Use Hugging Face datasets to load them as train/test splits, rename the Unnamed: 0 column to patient_id, drop rows with missing condition, lowercase condition, add a review_length column, filter out reviews with 30 words or fewer, create an 80/20 train/validation split from train, keep the original test split, and save the result for offline reuse.",
+      "expected_output": "A concise Python solution using load_dataset('csv', data_files={...}, delimiter='\\t'), DatasetDict operations, filter/map, train_test_split with a seed, validation split rename, test preservation, and save_to_disk/load_from_disk guidance.",
+      "files": [],
+      "assertions": [
+        "Loads TSV files with load_dataset using the csv loader, split-name data_files dictionary, and delimiter='\\t'.",
+        "Uses Dataset/DatasetDict transformations for rename_column, filter, and map rather than converting the full workflow to Pandas.",
+        "Creates validation from the training split with train_test_split and preserves the original test split.",
+        "Saves the final DatasetDict with save_to_disk for offline reuse."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to process a remote 60GB JSONL zst corpus but my laptop cannot store it. Show me how to stream it with datasets, tokenize text on the fly with a fast tokenizer, shuffle safely, and carve out 1000 validation examples without materializing the whole thing.",
+      "expected_output": "A streaming-focused Python example using load_dataset(..., streaming=True), IterableDataset.map with batched tokenization, shuffle(buffer_size=..., seed=...), take(1000), skip(1000), and warnings not to index or list the full dataset.",
+      "files": [],
+      "assertions": [
+        "Uses streaming=True and explains that the result is an IterableDataset.",
+        "Uses map(..., batched=True) for tokenization.",
+        "Uses shuffle with buffer_size and seed, then take/skip for validation/train splits.",
+        "Avoids random indexing, select(), or materializing the full streamed dataset."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Build a small semantic search pipeline over GitHub issue comments with Hugging Face datasets. I already have a Dataset with title, body, comments as a list, and html_url. I want one row per comment, filter tiny comments, concatenate searchable text, create embeddings, add FAISS, and query 'How do I load a dataset offline?'.",
+      "expected_output": "A pipeline that uses Pandas explode or a batched map to explode comments, Dataset.from_pandas if Pandas is used, map/filter for comment_length and text, embeddings as NumPy arrays, add_faiss_index(column='embeddings'), and get_nearest_examples for the query.",
+      "files": [],
+      "assertions": [
+        "Creates one row per comment and converts back to a Dataset if Pandas explode is used.",
+        "Filters short comments and creates a text column from title, body, and comment.",
+        "Stores embeddings as NumPy-compatible vectors in an embeddings column.",
+        "Uses add_faiss_index and get_nearest_examples with k results for semantic search."
+      ]
+    }
+  ]
+}
