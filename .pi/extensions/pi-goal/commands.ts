@@ -1,7 +1,15 @@
 import type { ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 
 import { formatFooterStatus, goalToolText } from "./format.ts";
-import { createGoal, parseTokenBudget, transitionGoal, type CreateGoalOptions, type GoalState } from "./state.ts";
+import {
+  canPauseGoal,
+  canResumeGoal,
+  createGoal,
+  parseTokenBudget,
+  transitionGoal,
+  type CreateGoalOptions,
+  type GoalState,
+} from "./state.ts";
 
 export type GoalCommand =
   | { action: "status" | "pause" | "resume" | "clear" }
@@ -76,9 +84,14 @@ export async function handleGoalCommand(
         ctx.ui.notify("No goal is set.", "warning");
         return;
       }
+      const check = parsed.action === "pause" ? canPauseGoal(current) : canResumeGoal(current);
+      if (!check.ok) {
+        ctx.ui.notify(check.message, "warning");
+        return;
+      }
       const next = transitionGoal(current, parsed.action === "pause" ? "paused" : "active");
       host.setGoal(next, "command", ctx);
-      ctx.ui.notify(parsed.action === "pause" ? "Goal paused." : "Goal resumed.", "info");
+      ctx.ui.notify(check.message, "info");
       return;
     }
 

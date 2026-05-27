@@ -27,6 +27,7 @@ function activeGoal(overrides: Partial<GoalState> = {}): GoalState {
 function fakeCtx(entries: unknown[] = []) {
   const statuses: Record<string, string | undefined> = {};
   const notifications: string[] = [];
+  let abortCount = 0;
   return {
     hasUI: true,
     cwd: process.cwd(),
@@ -39,10 +40,12 @@ function fakeCtx(entries: unknown[] = []) {
       notify(message: string) { notifications.push(message); },
       async confirm() { return true; },
     },
+    abort() { abortCount += 1; },
     isIdle: () => true,
     hasPendingMessages: () => false,
     statuses,
     notifications,
+    get abortCount() { return abortCount; },
   };
 }
 
@@ -403,19 +406,23 @@ test("goal resume schedules a hidden continuation when idle", async () => {
   assert.equal(pi.messages.at(-1)?.message.customType, "pi-goal-continuation");
 });
 
-test("update_goal rejects non-active goals at execution boundary", async () => {
+test("update_goal duplicate complete is idempotent", async () => {
   const pi = fakePi();
   createGoalExtension().register(pi as never);
-  const goal = activeGoal({ status: "paused" });
+  const goal = activeGoal({ status: "active" });
   const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
 
   await pi.handlers.session_start[0]({}, ctx);
 
-  await assert.rejects(
-    pi.tools.update_goal.execute("tool-1", { status: "complete" }, undefined, undefined, ctx),
-    /active goal/i,
-  );
-  assert.equal((pi.entries.at(-1)?.data as any)?.goal?.status, undefined);
+  await pi.tools.update_goal.execute("tool-1", { status: "complete" }, undefined, undefined, ctx);
+  await pi.handlers.turn_start[0]({ timestamp: 1000 }, ctx);
+  await pi.handlers.turn_end[0]({ message: { role: "assistant", usage: { totalTokens: 1 } } }, ctx);
+  const entriesAfterFirstComplete = pi.entries.length;
+
+  await pi.tools.update_goal.execute("tool-2", { status: "complete" }, undefined, undefined, ctx);
+
+  assert.equal(pi.entries.length, entriesAfterFirstComplete);
+  assert.equal((pi.entries.at(-1)?.data as any)?.goal?.status, "complete");
 });
 
 test("statusbar setting toggles and persists across restore", async () => {
@@ -525,6 +532,30 @@ test("stale continuation after clear does not revive a goal", async () => {
 
   assert.equal(pi.entries.length, 0);
   assert.equal(ctx.statuses["pi-goal"], undefined);
+});
+
+test("stale continuation aborts at turn_start", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const goal = activeGoal({ goalId: "new-goal" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.turn_start[0]({ details: { goalId: "old-goal" } }, ctx);
+
+  assert.equal(ctx.abortCount, 1);
+});
+
+test("stale continuation goal id falls back to parsing event.message", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const goal = activeGoal({ goalId: "new-goal" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.turn_start[0]({ message: '<pi_goal_continuation goal_id="old-goal">' }, ctx);
+
+  assert.equal(ctx.abortCount, 1);
 });
 
 test("multi-goal stale overlap: late goal-a continuation does not affect active goal-b", async () => {

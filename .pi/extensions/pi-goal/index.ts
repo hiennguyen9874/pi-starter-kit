@@ -2,7 +2,7 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 
 import { registerGoalCommand } from "./commands.ts";
 import { formatDuration, formatFooterStatus, formatTokenValue } from "./format.ts";
-import { budgetLimitPrompt, continuationPrompt, initPrompt } from "./prompts.ts";
+import { budgetLimitPrompt, continuationGoalIdFromMessage, continuationPrompt, initPrompt } from "./prompts.ts";
 import {
   CONTINUATION_MESSAGE_TYPE,
   ENTRY_TYPE,
@@ -13,6 +13,7 @@ import {
   reconstructGoal,
   transitionGoal,
   applyGoalUsage,
+  completeGoalIdempotently,
   type GoalEntry,
   type GoalState,
 } from "./state.ts";
@@ -290,11 +291,10 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       },
       completeGoal(_source, ctx) {
         if (!currentGoal) throw new Error("No goal is set.");
-        if (currentGoal.status !== "active") throw new Error("update_goal requires an active goal.");
-        pendingCompletionGoalId = currentGoal.goalId;
-        const complete = transitionGoal(currentGoal, "complete", clock());
+        const result = completeGoalIdempotently(currentGoal, clock());
+        if (result.changed) pendingCompletionGoalId = currentGoal.goalId;
         refreshStatus(ctx as ExtensionContext);
-        return complete;
+        return result.goal;
       },
     });
 
@@ -374,26 +374,22 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       activeTurnStartedAt = event.timestamp ?? clock();
       currentTurnHadToolCall = false;
       
-      // Classify queued goal id from event details
-      const queuedGoalId = typeof event.details?.goalId === "string" ? event.details.goalId : null;
+      const queuedGoalId = typeof event.details?.goalId === "string"
+        ? event.details.goalId
+        : typeof event.message === "string"
+          ? continuationGoalIdFromMessage(event.message)
+          : null;
       currentTurnQueuedGoalId = queuedGoalId;
-      
-      // Check if this turn is stale
+
       const plan = staleQueuedWorkGuard.planTurnStart({
         queuedGoalId,
         currentGoalId: currentGoal?.goalId ?? null,
         currentStatus: currentGoal?.status ?? null,
       });
       currentTurnIsStaleQueuedWork = plan.stale;
-      
+
       if (plan.stale) {
-        // Apply stale effects immediately
-        for (const effect of plan.effects) {
-          if (effect.type === "clearAccounting") {
-            activeTurnStartedAt = null;
-            currentTurnHadToolCall = false;
-          }
-        }
+        applyStaleQueuedWorkEffects(plan.effects, ctx);
         currentTurnIsContinuation = false;
         return;
       }

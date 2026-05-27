@@ -95,6 +95,20 @@ test("/goal pause, resume, and clear transition state", async () => {
   assert.equal(host.getGoal(), null);
 });
 
+test("/goal pause and resume reject completed goals", async () => {
+  const host = makeHost(createGoal("Build feature", null, { goalId: "g", now: 1 }));
+  const ctx = makeCtx();
+  host.setGoal({ ...host.getGoal()!, status: "complete" });
+
+  await handleGoalCommand(host, "pause", ctx as never);
+  assert.equal(host.getGoal()?.status, "complete");
+  assert.match(ctx.notifications.at(-1)?.message ?? "", /terminal/i);
+
+  await handleGoalCommand(host, "resume", ctx as never);
+  assert.equal(host.getGoal()?.status, "complete");
+  assert.match(ctx.notifications.at(-1)?.message ?? "", /terminal/i);
+});
+
 test("non-interactive replacement is rejected", async () => {
   const host = makeHost(createGoal("Existing", null, { goalId: "g", now: 1 }));
   const ctx = makeCtx(false);
@@ -154,6 +168,16 @@ test("update_goal only completes the current goal", async () => {
 
   assert.equal(getGoal()?.status, "complete");
   assert.match(result.content[0].text, /completionBudgetReport/);
+});
+
+test("update_goal duplicate complete is accepted", async () => {
+  const { tools, getGoal } = captureTools(createGoal("Build", 100, { goalId: "g", now: 1 }));
+
+  await tools.update_goal.execute("tool-1", { status: "complete" }, undefined, undefined, {});
+  const result = await tools.update_goal.execute("tool-2", { status: "complete" }, undefined, undefined, {});
+
+  assert.equal(getGoal()?.status, "complete");
+  assert.match(result.content[0].text, /"status": "complete"/);
 });
 
 test("update_goal rejects non-complete status at execute boundary", async () => {
