@@ -4,9 +4,13 @@ import assert from "node:assert/strict";
 import {
   ENTRY_TYPE,
   applyGoalUsage,
+  canPauseGoal,
+  canResumeGoal,
   clearGoalEntry,
+  completeGoalIdempotently,
   createGoal,
   goalEntry,
+  isTerminalGoalStatus,
   parseTokenBudget,
   reconstructGoal,
   transitionGoal,
@@ -157,4 +161,35 @@ test("formats tool response and completion budget report", () => {
   assert.deepEqual(goalToolResponse(null), { goal: null, remainingTokens: null, completionBudgetReport: null });
   assert.equal(goalToolResponse(complete, true).remainingTokens, 200);
   assert.match(goalToolResponse(complete, true).completionBudgetReport ?? "", /Goal achieved/);
+});
+
+test("terminal lifecycle helpers prevent reopening completed goals", () => {
+  const complete = activeGoal({ status: "complete", updatedAt: 1000 });
+
+  assert.equal(isTerminalGoalStatus("complete"), true);
+  assert.equal(isTerminalGoalStatus("cleared"), true);
+  assert.equal(isTerminalGoalStatus("active"), false);
+  assert.equal(canPauseGoal(complete).ok, false);
+  assert.match(canPauseGoal(complete).message, /completed goals are terminal/i);
+  assert.equal(canResumeGoal(complete).ok, false);
+  assert.match(canResumeGoal(complete).message, /completed goals are terminal/i);
+});
+
+test("completeGoalIdempotently returns unchanged complete goals without persistence", () => {
+  const complete = activeGoal({ status: "complete", updatedAt: 1000 });
+  const result = completeGoalIdempotently(complete, 2000);
+
+  assert.equal(result.goal, complete);
+  assert.equal(result.changed, false);
+  assert.equal(result.message, "Goal is already complete.");
+});
+
+test("completeGoalIdempotently completes active goals once", () => {
+  const active = activeGoal({ status: "active", updatedAt: 1000 });
+  const result = completeGoalIdempotently(active, 2000);
+
+  assert.equal(result.changed, true);
+  assert.equal(result.goal.status, "complete");
+  assert.equal(result.goal.updatedAt, 2000);
+  assert.equal(result.goal.continuationScheduled, false);
 });

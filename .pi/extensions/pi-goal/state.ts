@@ -167,3 +167,30 @@ export function reconstructGoal(entries: Iterable<SessionEntryLike>): GoalState 
   }
   return current;
 }
+
+export interface GoalLifecycleCheck {
+  ok: boolean;
+  message: string;
+}
+
+export function isTerminalGoalStatus(status: GoalStatus): boolean {
+  return status === "complete" || status === "cleared";
+}
+
+export function canPauseGoal(goal: GoalState): GoalLifecycleCheck {
+  if (goal.status === "complete") return { ok: false, message: "Completed goals are terminal and cannot be paused." };
+  if (goal.status !== "active") return { ok: false, message: "Only active goals can be paused." };
+  return { ok: true, message: "Goal paused." };
+}
+
+export function canResumeGoal(goal: GoalState): GoalLifecycleCheck {
+  if (goal.status === "complete") return { ok: false, message: "Completed goals are terminal and cannot be resumed." };
+  if (goal.status !== "paused") return { ok: false, message: "Only paused goals can be resumed." };
+  return { ok: true, message: "Goal resumed." };
+}
+
+export function completeGoalIdempotently(goal: GoalState, now = nowMs()): { goal: GoalState; changed: boolean; message: string } {
+  if (goal.status === "complete") return { goal, changed: false, message: "Goal is already complete." };
+  if (goal.status !== "active") throw new Error("update_goal requires an active goal.");
+  return { goal: transitionGoal(goal, "complete", now), changed: true, message: "Goal completed." };
+}
