@@ -48,8 +48,7 @@
       "ctx-purge",
       "ctx-stats",
       "ctx-upgrade",
-      "find-skills",
-      "ask-user"
+      "find-skills"
     ]
   },
   "subagents": {
