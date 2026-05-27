@@ -48,13 +48,16 @@ Continuation is blocked when:
 
 | File | Responsibility |
 |---|---|
-| `.pi/extensions/pi-goal/index.ts` | Runtime wiring: command/tool registration, lifecycle hooks, continuation scheduling, accounting, active-tool visibility, status refresh, context pruning. |
-| `.pi/extensions/pi-goal/state.ts` | Goal state shape, validation, creation, transitions, usage accounting, session-entry reconstruction. |
-| `.pi/extensions/pi-goal/commands.ts` | `/goal` parsing and command behavior. |
+| `.pi/extensions/pi-goal/index.ts` | Runtime wiring: command/tool registration, lifecycle hooks, continuation scheduling, accounting, active-tool visibility, status refresh, context pruning, stale-turn guard, and persistence coalescing. |
+| `.pi/extensions/pi-goal/state.ts` | Goal state shape, validation, creation, transitions, lifecycle checks, idempotent completion, usage accounting, session-entry reconstruction, and state equivalence checks. |
+| `.pi/extensions/pi-goal/commands.ts` | `/goal` parsing and command behavior, including terminal-state pause/resume checks. |
 | `.pi/extensions/pi-goal/tools.ts` | `get_goal`, `create_goal`, and `update_goal` model tools. |
-| `.pi/extensions/pi-goal/prompts.ts` | Hidden continuation and budget-limit prompt text. |
+| `.pi/extensions/pi-goal/prompts.ts` | Hidden continuation/budget-limit prompt text plus compact continuation marker parsing helpers. |
+| `.pi/extensions/pi-goal/queued-goal-messages.ts` | Continuation goal-id extraction from queued context message payloads. |
+| `.pi/extensions/pi-goal/queued-goal-work.ts` | Provider-context rewriting for latest/superseded/stale hidden continuations. |
+| `.pi/extensions/pi-goal/stale-queued-work-guard.ts` | Pure stale queued-turn planning (`turn_start`/`agent_end`) and abort effects. |
 | `.pi/extensions/pi-goal/format.ts` | Footer status, duration/token formatting, and tool response JSON. |
-| `.pi/extensions/pi-goal/*.test.ts` | Unit/runtime regression coverage for state, prompts, commands, tools, and scheduling behavior. |
+| `.pi/extensions/pi-goal/*.test.ts` | Unit/runtime regression coverage for state, prompts, commands, tools, scheduling, stale-queue handling, and persistence behavior. |
 
 ## State model
 
@@ -88,13 +91,15 @@ The extension implements several reliability guarantees to ensure consistent sta
 **Persistence coalescing:**
 - Runtime persistence is coalesced so unchanged snapshots are not appended repeatedly, while lifecycle changes and budget crossings remain durable.
 - Goal state equivalence is checked before appending session entries to avoid redundant writes.
+- Runtime snapshots flush on an interval (about 60s) when state changes are otherwise only accounting-only updates.
 
 **Terminal lifecycle states:**
 - Completed goals are terminal for pause/resume/automatic continuation, and duplicate `update_goal complete` is idempotent.
 - Cleared goals cannot be resumed or continued.
 
 **Stale queued work protection:**
-- Continuation turns are classified by goal ID and rejected if they target a stale or replaced goal.
+- Continuation turns are classified by goal ID (from `details.goalId` or parsed from continuation message text) and rejected if they target a stale or replaced goal.
+- Stale turns trigger guard effects including abort before work proceeds.
 - Stale turns do not charge usage to the current goal and do not queue new continuations.
 
 ## Tool visibility
