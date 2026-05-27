@@ -16,6 +16,7 @@ import {
 } from "./state.ts";
 import { registerGoalTools } from "./tools.ts";
 import { applyQueuedGoalProviderContextRewrites } from "./queued-goal-work.ts";
+import { createStaleQueuedWorkGuard, type StaleQueuedWorkEffect } from "./stale-queued-work-guard.ts";
 
 export interface GoalExtensionOptions {
   clock?: () => number;
@@ -85,6 +86,23 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
   let currentTurnIsContinuation = false;
   let pendingCompletionGoalId: string | null = null;
   let toolsRestricted = false;
+  const staleQueuedWorkGuard = createStaleQueuedWorkGuard();
+  let currentTurnQueuedGoalId: string | null = null;
+  let currentTurnIsStaleQueuedWork = false;
+
+  function clearActiveTurnAccounting(): void {
+    activeTurnStartedAt = null;
+    currentTurnHadToolCall = false;
+    currentTurnIsContinuation = false;
+  }
+
+  function applyStaleQueuedWorkEffects(effects: readonly StaleQueuedWorkEffect[], ctx: ExtensionContext): void {
+    for (const effect of effects) {
+      if (effect.type === "clearAccounting") clearActiveTurnAccounting();
+      else if (effect.type === "refreshUi") refreshStatus(ctx);
+      else if (effect.type === "abort") ctx.abort?.();
+    }
+  }
 
   function refreshStatus(ctx: Pick<ExtensionContext, "ui">): void {
     ctx.ui.setStatus("pi-goal", statusBarEnabled ? formatFooterStatus(currentGoal) : undefined);
@@ -111,6 +129,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     const clearedGoalId = currentGoal?.goalId ?? null;
     currentGoal = null;
     pendingCompletionGoalId = null;
+    staleQueuedWorkGuard.clear();
+    currentTurnQueuedGoalId = null;
+    currentTurnIsStaleQueuedWork = false;
     pi.appendEntry(ENTRY_TYPE, clearGoalEntry(clearedGoalId, clock(), statusBarEnabled));
   }
 
@@ -137,6 +158,9 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
     pendingContinuationGeneration++;
     pendingContinuationGoalId = null;
     pendingContinuationMessage = null;
+    staleQueuedWorkGuard.clear();
+    currentTurnQueuedGoalId = null;
+    currentTurnIsStaleQueuedWork = false;
     if (currentGoal?.continuationScheduled) {
       currentGoal = { ...currentGoal, continuationScheduled: false, updatedAt: clock() };
     }
@@ -323,13 +347,46 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       }
       return { action: "continue" };
     });
-    pi.on("turn_start", (event) => {
+    pi.on("turn_start", (event, ctx) => {
       activeTurnStartedAt = event.timestamp ?? clock();
       currentTurnHadToolCall = false;
+      
+      // Classify queued goal id from event details
+      const queuedGoalId = typeof event.details?.goalId === "string" ? event.details.goalId : null;
+      currentTurnQueuedGoalId = queuedGoalId;
+      
+      // Check if this turn is stale
+      const plan = staleQueuedWorkGuard.planTurnStart({
+        queuedGoalId,
+        currentGoalId: currentGoal?.goalId ?? null,
+        currentStatus: currentGoal?.status ?? null,
+      });
+      currentTurnIsStaleQueuedWork = plan.stale;
+      
+      if (plan.stale) {
+        // Apply stale effects immediately
+        for (const effect of plan.effects) {
+          if (effect.type === "clearAccounting") {
+            activeTurnStartedAt = null;
+            currentTurnHadToolCall = false;
+          }
+        }
+        currentTurnIsContinuation = false;
+        return;
+      }
+      
+      // Normal case: not stale
       currentTurnIsContinuation = currentGoal?.goalId === awaitingContinuationGoalId;
       if (currentGoal?.goalId === awaitingContinuationGoalId) awaitingContinuationGoalId = null;
     });
     pi.on("turn_end", (event, ctx) => {
+      if (currentTurnIsStaleQueuedWork) {
+        clearActiveTurnAccounting();
+        syncGoalTools(pi);
+        refreshStatus(ctx);
+        return;
+      }
+
       if (currentGoal?.status !== "active") {
         syncGoalTools(pi);
         refreshStatus(ctx);
@@ -377,7 +434,16 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       }
       refreshStatus(ctx);
     });
-    pi.on("agent_end", (_event, ctx) => {
+    pi.on("agent_end", (event, ctx) => {
+      const agentEndPlan = staleQueuedWorkGuard.planAgentEnd({ queuedGoalId: currentTurnQueuedGoalId });
+      if (agentEndPlan.skipContinuation) {
+        applyStaleQueuedWorkEffects(agentEndPlan.effects, ctx);
+        currentTurnQueuedGoalId = null;
+        currentTurnIsStaleQueuedWork = false;
+        syncGoalTools(pi);
+        refreshStatus(ctx);
+        return;
+      }
       ensurePendingContinuation(pi, ctx);
       syncGoalTools(pi);
       refreshStatus(ctx);

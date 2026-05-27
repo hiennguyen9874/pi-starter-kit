@@ -93,3 +93,18 @@ test("provider context removes runnable continuations when there is no active go
   assert.equal(result.changed, true);
   assert.match(String(result.messages[0].content), /There is no current active goal/);
 });
+
+test("provider context stale overlap: goal-a continuation rewritten as stale when goal-b is active", () => {
+  const goalA = goal({ goalId: "goal-a" });
+  const goalB = goal({ goalId: "goal-b" });
+  const result = applyQueuedGoalProviderContextRewrites([
+    { role: "custom", customType: "pi-goal-continuation", content: continuationPrompt(goalA), display: false, details: { goalId: "goal-a" } },
+    { role: "custom", customType: "pi-goal-continuation", content: continuationPrompt(goalB), display: false, details: { goalId: "goal-b" } },
+  ], goalB);
+
+  assert.equal(result.changed, true);
+  assert.match(String(result.messages[0].content), /stale.*cancelled/i);
+  assert.match(String(result.messages[0].content), /goal-a/);
+  assert.match(String(result.messages[1].content), /Continue working toward the active goal/);
+  assert.match(String(result.messages[1].content), /goal-b/);
+});

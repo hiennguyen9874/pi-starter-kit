@@ -486,3 +486,78 @@ test("session_compact retries continuation delivery from restored active goal st
   scheduled[0]();
   assert.equal(pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation").length, 1);
 });
+
+test("stale continuation after goal replacement does not charge replacement goal or requeue", async () => {
+  const scheduled: Function[] = [];
+  const pi = fakePi();
+  let time = 1000;
+  const extension = createGoalExtension({ scheduler: (fn) => scheduled.push(fn), clock: () => time });
+  extension.register(pi as never);
+  const replacement = activeGoal({ goalId: "new-goal", tokensUsed: 0, turnCount: 0 });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal: replacement, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  // Simulate a late hidden turn that was queued for an old goal before replacement.
+  await pi.handlers.turn_start[0]({ details: { goalId: "old-goal" } }, ctx);
+  time = 2000;
+  await pi.handlers.turn_end[0]({ message: { role: "assistant", usage: { totalTokens: 99 } } }, ctx);
+  await pi.handlers.agent_end[0]({ details: { goalId: "old-goal" }, messages: [] }, ctx);
+
+  // Stale turn should not append any new entries
+  assert.equal(pi.entries.length, 0);
+  
+  // Check in-memory state: replacement goal should be unchanged
+  assert.equal(extension.currentGoal?.goalId, "new-goal");
+  assert.equal(extension.currentGoal?.tokensUsed, 0);
+  assert.equal(extension.currentGoal?.turnCount, 0);
+  assert.equal(scheduled.length, 0);
+});
+
+test("stale continuation after clear does not revive a goal", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "clear", goal: null, clearedGoalId: "old-goal", at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.turn_start[0]({ details: { goalId: "old-goal" } }, ctx);
+  await pi.handlers.turn_end[0]({ message: { role: "assistant", usage: { totalTokens: 99 } } }, ctx);
+  await pi.handlers.agent_end[0]({ details: { goalId: "old-goal" }, messages: [] }, ctx);
+
+  assert.equal(pi.entries.length, 0);
+  assert.equal(ctx.statuses["pi-goal"], undefined);
+});
+
+test("multi-goal stale overlap: late goal-a continuation does not affect active goal-b", async () => {
+  const scheduled: Function[] = [];
+  const pi = fakePi();
+  let time = 1000;
+  const extension = createGoalExtension({ scheduler: (fn) => scheduled.push(fn), clock: () => time });
+  extension.register(pi as never);
+  const goalA = activeGoal({ goalId: "goal-a", tokensUsed: 10, turnCount: 1, continuationCount: 1 });
+  const goalB = activeGoal({ goalId: "goal-b", tokensUsed: 0, turnCount: 0, continuationCount: 0 });
+  const ctx = fakeCtx([
+    { type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal: goalA, at: 1 } },
+    { type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal: goalB, at: 2 } },
+  ]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  
+  // Simulate a late continuation turn for goal-a (which was replaced by goal-b)
+  await pi.handlers.turn_start[0]({ details: { goalId: "goal-a" } }, ctx);
+  time = 2000;
+  await pi.handlers.turn_end[0]({ message: { role: "assistant", usage: { totalTokens: 50 } } }, ctx);
+  await pi.handlers.agent_end[0]({ details: { goalId: "goal-a" }, messages: [] }, ctx);
+
+  // Verify goal-b remains active with unchanged values
+  assert.equal(extension.currentGoal?.goalId, "goal-b");
+  assert.equal(extension.currentGoal?.tokensUsed, 0);
+  assert.equal(extension.currentGoal?.turnCount, 0);
+  assert.equal(extension.currentGoal?.continuationCount, 0);
+  
+  // Verify no hidden message for goal-a was sent
+  const hiddenMessages = pi.messages.filter((m) => m.message?.customType === "pi-goal-continuation");
+  assert.equal(hiddenMessages.length, 0);
+  
+  // Verify no new entries were appended (stale turn)
+  assert.equal(pi.entries.length, 0);
+});
