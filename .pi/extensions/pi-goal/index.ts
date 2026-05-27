@@ -15,6 +15,7 @@ import {
   type GoalState,
 } from "./state.ts";
 import { registerGoalTools } from "./tools.ts";
+import { applyQueuedGoalProviderContextRewrites } from "./queued-goal-work.ts";
 
 export interface GoalExtensionOptions {
   clock?: () => number;
@@ -395,16 +396,8 @@ export function createGoalExtension(options: GoalExtensionOptions = {}) {
       pendingContinuationMessage = null;
     });
     pi.on("context", (event) => {
-      const latestActiveContinuationIndex = currentGoal?.status === "active"
-        ? event.messages.findLastIndex((message: { customType?: string; details?: { goalId?: unknown } }) => (
-          message.customType === CONTINUATION_MESSAGE_TYPE && message.details?.goalId === currentGoal.goalId
-        ))
-        : -1;
-      const messages = event.messages.filter((message: { customType?: string; details?: { goalId?: unknown } }, index: number) => {
-        if (message.customType !== CONTINUATION_MESSAGE_TYPE) return true;
-        return index === latestActiveContinuationIndex;
-      });
-      return messages.length === event.messages.length ? undefined : { messages };
+      const result = applyQueuedGoalProviderContextRewrites(event.messages, currentGoal);
+      return result.changed ? { messages: result.messages } : undefined;
     });
   }
 

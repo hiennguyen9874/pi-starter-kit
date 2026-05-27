@@ -309,7 +309,7 @@ test("user input invalidates an already scheduled continuation before callback f
   assert.equal(pi.messages.length, 0);
 });
 
-test("context hook prunes stale pi-goal continuation messages", async () => {
+test("context hook rewrites stale and superseded continuation messages", async () => {
   const pi = fakePi();
   createGoalExtension().register(pi as never);
   const active = activeGoal({ goalId: "active-goal" });
@@ -325,10 +325,22 @@ test("context hook prunes stale pi-goal continuation messages", async () => {
     ],
   }, ctx);
 
-  assert.equal(result.messages.length, 2);
-  assert.equal(result.messages[0].details.goalId, "active-goal");
-  assert.equal(result.messages[0].content, "current");
-  assert.equal(result.messages[1].role, "user");
+  assert.equal(result.messages.length, 4);
+  
+  // First message: stale marker for old-goal
+  assert.match(String(result.messages[0].content), /stale.*cancelled/i);
+  assert.match(String(result.messages[0].content), /old-goal/);
+  
+  // Second message: superseded marker for active-goal
+  assert.match(String(result.messages[1].content), /superseded/i);
+  assert.match(String(result.messages[1].content), /active-goal/);
+  
+  // Third message: latest active continuation with compact prompt
+  assert.match(String(result.messages[2].content), /Continue working toward the active goal/);
+  assert.match(String(result.messages[2].content), /active-goal/);
+  
+  // Fourth message: user message unchanged
+  assert.equal(result.messages[3].role, "user");
 });
 
 test("get_goal remains available while update_goal is active only for active goals", async () => {

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { budgetLimitPrompt, continuationGoalIdFromMessage, continuationPrompt, escapeXmlText, initPrompt } from "./prompts.ts";
+import { budgetLimitPrompt, compactContinuationPrompt, continuationGoalIdFromMessage, continuationPrompt, escapeXmlText, initPrompt } from "./prompts.ts";
 import type { GoalState } from "./state.ts";
 
 const goal: GoalState = {
@@ -60,6 +60,20 @@ test("renders continuation prompt with audit and untrusted-objective guardrails"
   assert.match(prompt, /Report the final elapsed time/);
   assert.match(prompt, /Do not call update_goal unless the goal is complete/);
   assert.equal(continuationGoalIdFromMessage(prompt), "goal-abc");
+});
+
+test("renders compact continuation prompt with required safety contract", () => {
+  const prompt = compactContinuationPrompt(goal);
+
+  assert.match(prompt, /<pi_goal_continuation goal_id="goal-abc">/);
+  assert.match(prompt, /internal hidden pi-goal continuation message/i);
+  assert.match(prompt, /Continue working toward the active goal/i);
+  assert.match(prompt, /<untrusted_objective>\nImplement &lt;feature&gt; &amp; verify\n<\/untrusted_objective>/);
+  assert.match(prompt, /Tokens used: 250/);
+  assert.match(prompt, /Token budget: 1K/);
+  assert.match(prompt, /Only call update_goal when concrete evidence proves the full objective is complete/i);
+  assert.equal(continuationGoalIdFromMessage(prompt), "goal-abc");
+  assert.ok(prompt.length < continuationPrompt(goal).length);
 });
 
 test("renders budget limit prompt as wrap-up only", () => {
