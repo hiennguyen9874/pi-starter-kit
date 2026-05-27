@@ -82,6 +82,25 @@ export function cloneGoal(goal: GoalState): GoalState {
   return { ...goal };
 }
 
+export function goalsEquivalent(a: GoalState | null, b: GoalState | null): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.version === b.version
+    && a.goalId === b.goalId
+    && a.objective === b.objective
+    && a.status === b.status
+    && a.tokenBudget === b.tokenBudget
+    && a.tokensUsed === b.tokensUsed
+    && a.timeUsedSeconds === b.timeUsedSeconds
+    && a.turnCount === b.turnCount
+    && a.continuationCount === b.continuationCount
+    && a.lastContinuationHadToolCall === b.lastContinuationHadToolCall
+    && a.continuationSuppressed === b.continuationSuppressed
+    && a.continuationScheduled === b.continuationScheduled
+    && a.createdAt === b.createdAt
+    && a.updatedAt === b.updatedAt;
+}
+
 export function createGoal(objective: string, tokenBudget: number | null, options: CreateGoalOptions = {}): GoalState {
   const error = validateObjective(objective);
   if (error) throw new Error(error);

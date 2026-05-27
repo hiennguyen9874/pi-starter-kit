@@ -76,6 +76,27 @@ Important fields:
 
 Session reconstruction scans the current branch and uses the latest valid `pi-goal` custom entry. A clear entry reconstructs as no current goal.
 
+## Reliability behavior
+
+The extension implements several reliability guarantees to ensure consistent state and prevent stale work:
+
+**Context pruning and continuation management:**
+- Provider context keeps only the latest active hidden continuation runnable.
+- Older active continuations are rewritten to superseded bookkeeping markers instead of being left as full runnable prompts.
+- Stale continuations for old, cleared, completed, or replaced goals are rewritten/cancelled and must not perform work.
+
+**Persistence coalescing:**
+- Runtime persistence is coalesced so unchanged snapshots are not appended repeatedly, while lifecycle changes and budget crossings remain durable.
+- Goal state equivalence is checked before appending session entries to avoid redundant writes.
+
+**Terminal lifecycle states:**
+- Completed goals are terminal for pause/resume/automatic continuation, and duplicate `update_goal complete` is idempotent.
+- Cleared goals cannot be resumed or continued.
+
+**Stale queued work protection:**
+- Continuation turns are classified by goal ID and rejected if they target a stale or replaced goal.
+- Stale turns do not charge usage to the current goal and do not queue new continuations.
+
 ## Tool visibility
 
 `index.ts` keeps goal tools synchronized with current state:

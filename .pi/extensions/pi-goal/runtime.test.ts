@@ -561,3 +561,47 @@ test("multi-goal stale overlap: late goal-a continuation does not affect active 
   // Verify no new entries were appended (stale turn)
   assert.equal(pi.entries.length, 0);
 });
+
+test("runtime restore and unchanged status refresh do not append duplicate goal entries", async () => {
+  const pi = fakePi();
+  createGoalExtension({ clock: () => 100 }).register(pi as never);
+  const goal = activeGoal({ goalId: "goal-1" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.session_tree[0]({}, ctx);
+
+  assert.equal(pi.entries.length, 0);
+});
+
+test("runtime does not append duplicate scheduled-continuation snapshots", async () => {
+  const scheduled: Function[] = [];
+  const pi = fakePi();
+  createGoalExtension({ scheduler: (fn) => scheduled.push(fn), clock: () => 100 }).register(pi as never);
+  const goal = activeGoal({ goalId: "goal-1" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.agent_end[0]({ messages: [] }, ctx);
+  const afterFirstSchedule = pi.entries.length;
+  await pi.handlers.agent_end[0]({ messages: [] }, ctx);
+
+  assert.equal(pi.entries.length, afterFirstSchedule);
+});
+
+test("shutdown flushes changed active goal usage once", async () => {
+  const pi = fakePi();
+  let time = 1000;
+  createGoalExtension({ clock: () => time }).register(pi as never);
+  const goal = activeGoal({ goalId: "goal-1" });
+  const ctx = fakeCtx([{ type: "custom", customType: ENTRY_TYPE, data: { version: 1, action: "set", goal, at: 1 } }]);
+
+  await pi.handlers.session_start[0]({}, ctx);
+  await pi.handlers.turn_start[0]({}, ctx);
+  time = 3000;
+  await pi.handlers.turn_end[0]({ message: { role: "assistant", usage: { totalTokens: 12 } } }, ctx);
+  const entriesAfterTurn = pi.entries.length;
+  await pi.handlers.session_shutdown[0]({}, ctx);
+
+  assert.equal(pi.entries.length, entriesAfterTurn);
+});
