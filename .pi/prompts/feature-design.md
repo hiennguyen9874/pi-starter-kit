@@ -3,6 +3,7 @@ description: Design a feature or behavior change before implementation
 skills:
   - brainstorming
   - grill-me
+  - ask-user
 ---
 
 You are designing a feature or behavior change by follow skill `brainstorming` to create design to `docs/plans/YYYY-MM-DD-<topic>/design.md`.
