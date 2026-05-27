@@ -10,6 +10,7 @@ import {
   completeGoalIdempotently,
   createGoal,
   goalEntry,
+  goalsEquivalent,
   isTerminalGoalStatus,
   parseTokenBudget,
   reconstructGoal,
@@ -192,4 +193,17 @@ test("completeGoalIdempotently completes active goals once", () => {
   assert.equal(result.goal.status, "complete");
   assert.equal(result.goal.updatedAt, 2000);
   assert.equal(result.goal.continuationScheduled, false);
+});
+
+test("goalsEquivalent compares persisted goal fields", () => {
+  const first = activeGoal({ updatedAt: 1000 });
+  const same = { ...first };
+  const changedUsage = { ...first, tokensUsed: first.tokensUsed + 1 };
+  const changedScheduleOnly = { ...first, continuationScheduled: !first.continuationScheduled };
+
+  assert.equal(goalsEquivalent(first, same), true);
+  assert.equal(goalsEquivalent(first, changedUsage), false);
+  assert.equal(goalsEquivalent(first, changedScheduleOnly), false);
+  assert.equal(goalsEquivalent(first, null), false);
+  assert.equal(goalsEquivalent(null, null), true);
 });
