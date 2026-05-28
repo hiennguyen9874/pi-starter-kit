@@ -37,7 +37,7 @@
     "./extensions/save-last-response.ts"
   ],
   "extensionState": {
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "projectContextRewriterDisableProjectContext": false,
     "skillsInstructionsRewriterEnabled": true,
     "skillsInstructionsRewriterDisableSkills": false,
