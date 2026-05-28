@@ -1,0 +1,34 @@
+skillsEnable:
+  - interview-me
+  - grill-me
+  - ask-user
+  - context7-cli
+  - systematic-debugging
+  - pragmatic-principles
+  - api-design
+  - backend-patterns
+  - database-migrations
+  - postgres-patterns
+  - golang-patterns
+  - golang-testing
+  - source-driven-development
+  - test-driven-development
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      repositoryInstructions: false
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      efficiency: true
+      finalResponse: true
+      planningDiscipline: false

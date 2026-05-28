@@ -1,5 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
+import { parse as parseYaml } from "yaml";
 
 import { BEHAVIORAL_GUIDELINE_SECTION_NAMES } from "./behavioral-guidelines.ts";
 import type { BehavioralGuidelinesConfig, BehavioralGuidelineSectionName } from "./behavioral-guidelines.ts";
@@ -105,50 +107,89 @@ function validateProfileDefinition(name: string, value: unknown): ProfileDefinit
   return result;
 }
 
-function validateProfilesConfig(value: unknown): ProfilesConfig {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error("profiles config must be an object");
-  }
-
-  const raw = value as Record<string, unknown>;
-
-  if (raw.defaultProfile !== undefined && typeof raw.defaultProfile !== "string") {
-    throw new Error('"defaultProfile" must be a string when present');
-  }
-
-  if (!raw.profiles || typeof raw.profiles !== "object" || Array.isArray(raw.profiles)) {
-    throw new Error('"profiles" must be an object');
-  }
-
-  const profiles: Record<string, ProfileDefinition> = {};
-  for (const [name, profile] of Object.entries(raw.profiles)) {
-    profiles[name] = validateProfileDefinition(name, profile);
-  }
-
-  return {
-    defaultProfile: raw.defaultProfile as string | undefined,
-    profiles,
-  };
-}
-
-export function loadProfilesConfig(cwd: string): LoadProfilesConfigResult {
-  const path = join(cwd, ".pi", "profiles.json");
-
-  if (!existsSync(path)) {
-    return { path, config: undefined };
+function loadDefaultProfile(piDir: string): { defaultProfile?: string; error?: string } {
+  const profilesJsonPath = join(piDir, "profiles.json");
+  if (!existsSync(profilesJsonPath)) {
+    return {};
   }
 
   try {
-    const content = readFileSync(path, "utf8");
+    const content = readFileSync(profilesJsonPath, "utf8");
     const parsed = JSON.parse(content) as unknown;
-    return {
-      path,
-      config: validateProfilesConfig(parsed),
-    };
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { error: "profiles.json must be an object" };
+    }
+
+    const raw = parsed as Record<string, unknown>;
+    if (raw.defaultProfile !== undefined && typeof raw.defaultProfile !== "string") {
+      return { error: '"defaultProfile" must be a string when present' };
+    }
+
+    return { defaultProfile: raw.defaultProfile as string | undefined };
   } catch (error) {
-    return {
-      path,
-      error: error instanceof Error ? error.message : String(error),
-    };
+    return { error: error instanceof Error ? error.message : String(error) };
   }
+}
+
+function isProfileYamlFile(name: string): boolean {
+  return name.endsWith(".yaml") && !name.startsWith(".") && !name.startsWith("_");
+}
+
+function loadProfilesFromDirectory(profilesDir: string): {
+  profiles: Record<string, ProfileDefinition>;
+  errors: string[];
+} {
+  if (!existsSync(profilesDir)) {
+    return { profiles: {}, errors: [] };
+  }
+
+  const profiles: Record<string, ProfileDefinition> = {};
+  const errors: string[] = [];
+
+  let entries: string[];
+  try {
+    entries = readdirSync(profilesDir);
+  } catch (error) {
+    errors.push(`Failed to read profiles directory: ${error instanceof Error ? error.message : String(error)}`);
+    return { profiles, errors };
+  }
+
+  const yamlFiles = entries.filter(isProfileYamlFile).sort();
+
+  for (const fileName of yamlFiles) {
+    const profileName = fileName.slice(0, -5); // Remove .yaml extension
+    const filePath = join(profilesDir, fileName);
+
+    try {
+      const content = readFileSync(filePath, "utf8");
+      const parsed = parseYaml(content);
+      const profile = validateProfileDefinition(profileName, parsed);
+      profiles[profileName] = profile;
+    } catch (error) {
+      errors.push(`${filePath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  return { profiles, errors };
+}
+
+export function loadProfilesConfig(cwd: string): LoadProfilesConfigResult {
+  const piDir = join(cwd, ".pi");
+  const profilesDir = join(piDir, "profiles");
+  const profilesJsonPath = join(piDir, "profiles.json");
+
+  const { defaultProfile, error: defaultError } = loadDefaultProfile(piDir);
+  if (defaultError) {
+    return { path: profilesJsonPath, error: defaultError };
+  }
+
+  const { profiles, errors } = loadProfilesFromDirectory(profilesDir);
+  if (errors.length > 0) {
+    return { path: profilesDir, error: errors.join("\n") };
+  }
+
+  return {
+    path: profilesDir,
+    config: { defaultProfile, profiles },
+  };
 }

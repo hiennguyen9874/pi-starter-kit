@@ -1,0 +1,28 @@
+skillsEnable:
+  - interview-me
+  - grill-me
+  - ask-user
+  - handoff
+  - prompt-leverage
+  - pragmatic-principles
+  - systematic-debugging
+  - git-commit
+mcpServersEnable:
+  - exa
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      repositoryInstructions: false
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      efficiency: true
+      finalResponse: true
+      planningDiscipline: false

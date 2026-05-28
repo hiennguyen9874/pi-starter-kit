@@ -1,0 +1,30 @@
+skillsEnable:
+  - bootstrap-project-context
+  - interview-me
+  - grill-me
+  - ask-user
+  - prd
+  - documentation-and-adrs
+  - spec-driven-development
+  - writing-plans
+  - handoff
+  - readiness-report
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      repositoryInstructions: false
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      efficiency: true
+      finalResponse: true
+      planningDiscipline: true

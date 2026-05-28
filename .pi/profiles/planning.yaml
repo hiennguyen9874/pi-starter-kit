@@ -1,0 +1,32 @@
+skillsEnable:
+  - interview-me
+  - grill-me
+  - ask-user
+  - brainstorming
+  - spec-driven-development
+  - prd
+  - writing-plans
+  - prototype
+  - grill-with-docs
+  - improve-codebase-architecture
+  - documentation-and-adrs
+  - pragmatic-principles
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      repositoryInstructions: false
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      efficiency: true
+      finalResponse: true
+      planningDiscipline: true

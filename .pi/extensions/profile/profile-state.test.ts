@@ -69,16 +69,14 @@ test("registers sync-profile-system CLI flag", () => {
 test("session_start loads profiles using getCommands API and /profile can activate one", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-state-"));
   mkdirSync(join(root, ".pi"));
+  mkdirSync(join(root, ".pi", "profiles"));
   writeFileSync(
     join(root, ".pi", "profiles.json"),
-    JSON.stringify({
-      defaultProfile: "backend",
-      profiles: {
-        backend: {
-          skillsEnable: ["backend-patterns"],
-        },
-      },
-    }),
+    JSON.stringify({ defaultProfile: "backend" }),
+  );
+  writeFileSync(
+    join(root, ".pi", "profiles", "backend.yaml"),
+    "skillsEnable:\n  - backend-patterns\n",
   );
   writeFileSync(join(root, ".pi", "mcp.json"), JSON.stringify({ mcpServers: {} }));
 
@@ -136,7 +134,7 @@ test("session_start loads profiles using getCommands API and /profile can activa
   await handlers.session_start?.({ reason: "startup" }, ctx);
   await commands.profile.handler("backend", ctx);
 
-  assert.equal(notifications.includes("No profiles defined in .pi/profiles.json"), false);
+  assert.equal(notifications.includes("No profiles defined in .pi/profiles/"), false);
   assert.equal(notifications.some((message) => message.includes("Unknown skill:")), false);
   assert.equal(
     notifications.includes('Profile "backend" activated. Reloading to apply startup resource filtering.'),
@@ -149,17 +147,15 @@ test("session_start loads profiles using getCommands API and /profile can activa
 test("session_start does not warn when skill commands are not discovered yet", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-state-"));
   mkdirSync(join(root, ".pi"));
+  mkdirSync(join(root, ".pi", "profiles"));
   mkdirSync(join(root, ".pi", "skills", "backend-patterns"), { recursive: true });
   writeFileSync(
     join(root, ".pi", "profiles.json"),
-    JSON.stringify({
-      defaultProfile: "backend",
-      profiles: {
-        backend: {
-          skillsEnable: ["backend-patterns"],
-        },
-      },
-    }),
+    JSON.stringify({ defaultProfile: "backend" }),
+  );
+  writeFileSync(
+    join(root, ".pi", "profiles", "backend.yaml"),
+    "skillsEnable:\n  - backend-patterns\n",
   );
   writeFileSync(
     join(root, ".pi", "skills", "backend-patterns", "SKILL.md"),
@@ -243,14 +239,14 @@ test("buildProfileExplanation describes active profile restrictions", () => {
 test("/profile explain reports current active profile without switching", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-explain-"));
   mkdirSync(join(root, ".pi"));
+  mkdirSync(join(root, ".pi", "profiles"));
   writeFileSync(
     join(root, ".pi", "profiles.json"),
-    JSON.stringify({
-      defaultProfile: "backend",
-      profiles: {
-        backend: { skillsEnable: ["backend-patterns"] },
-      },
-    }),
+    JSON.stringify({ defaultProfile: "backend" }),
+  );
+  writeFileSync(
+    join(root, ".pi", "profiles", "backend.yaml"),
+    "skillsEnable:\n  - backend-patterns\n",
   );
   writeFileSync(join(root, ".pi", "mcp.json"), JSON.stringify({ mcpServers: {} }));
 
@@ -313,15 +309,18 @@ test("/profile explain reports current active profile without switching", async 
 test("session_start prefers persisted profile state from disk", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-state-"));
   mkdirSync(join(root, ".pi"));
+  mkdirSync(join(root, ".pi", "profiles"));
   writeFileSync(
     join(root, ".pi", "profiles.json"),
-    JSON.stringify({
-      defaultProfile: "frontend",
-      profiles: {
-        backend: { skillsEnable: ["backend-patterns"] },
-        frontend: { skillsEnable: ["frontend-design"] },
-      },
-    }),
+    JSON.stringify({ defaultProfile: "frontend" }),
+  );
+  writeFileSync(
+    join(root, ".pi", "profiles", "backend.yaml"),
+    "skillsEnable:\n  - backend-patterns\n",
+  );
+  writeFileSync(
+    join(root, ".pi", "profiles", "frontend.yaml"),
+    "skillsEnable:\n  - frontend-design\n",
   );
   mkdirSync(join(root, ".pi", ".local"), { recursive: true });
   writeFileSync(join(root, ".pi", ".local", "profile-state.json"), JSON.stringify({ name: "backend" }));
