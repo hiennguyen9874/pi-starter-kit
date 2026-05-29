@@ -1,6 +1,6 @@
 ---
 name: pi-goal
-description: Use when a user wants to run Pi /goal, create a long-running autonomous coding objective, avoid repeated “continue” prompts, set token budgets, pause/resume/clear goals, or learn how to prepare effective goal documents and acceptance criteria for pi-goal.
+description: Use when a user wants to run Pi /goal, create, write, improve, audit, or review a long-running autonomous coding objective, avoid repeated “continue” prompts, set token budgets, pause/resume/clear goals, or prepare effective goal documents and acceptance criteria for pi-goal.
 ---
 
 # Pi Goal
@@ -31,12 +31,30 @@ Do not use `/goal` for:
 
 For broad, vague, stalled, high-risk, or multi-hour work, prefer preparing a small goal board before starting `/goal`.
 
+## Goal Contract
+
+Never produce or accept a vague goal such as “make this better,” “finish the feature,” or “improve the codebase.” Turn the rough intent into an auditable completion contract.
+
+A strong `/goal` objective includes:
+
+1. **Outcome** — what must be true when the work is done.
+2. **Verification surface** — tests, commands, benchmark output, artifacts, screenshots, logs, review notes, or other concrete evidence.
+3. **Constraints** — what must not regress or be changed.
+4. **Boundaries** — files, directories, tools, systems, data sources, or permissions the agent may or may not use.
+5. **Iteration policy** — how the agent should choose the next action after each attempt.
+6. **Blocked stop condition** — when the agent should stop with evidence and the next needed input instead of continuing blindly.
+
+Draft goals as a single pasteable command plus a short checklist or rationale showing how the six parts are covered. Gather repository context first when the verification surface depends on real files, scripts, issues, plans, or external documentation; do not invent commands.
+
+For high-stakes or ambiguous work, offer two goal options: a narrower safer goal and a broader goal that delegates more discovery. Recommend one.
+
 ## Command Quick Reference
 
 | Command | Purpose |
 |---|---|
 | `/goal <objective>` | Create or replace the current goal and start the first visible model turn. |
 | `/goal <objective> --budget 12k` | Create a goal with a token budget. Supports integers plus `k`/`M` suffixes. |
+| `/goal <objective> --tokens 50k` | Equivalent token-budget form. Put budget flags after the objective. |
 | `/goal` or `/goal status` | Show current goal state. |
 | `/goal pause` | Pause automatic continuation. |
 | `/goal resume` | Resume and schedule hidden continuation when idle. |
@@ -65,6 +83,15 @@ Before allowing a goal to complete, audit the work:
 5. Only use `update_goal({ status: "complete" })` when the audit passes.
 
 Tell users to include what evidence counts as done in the original goal objective.
+
+When reviewing a goal before it starts, verify:
+
+- Can the agent tell when it is done?
+- Can the user independently audit the completion claim?
+- Are regressions, scope boundaries, and forbidden approaches named?
+- Does the goal allow iteration without unlimited drift?
+- Does it define what to do when tests, credentials, network, data, or product decisions block progress?
+- Is it pasteable as one `/goal` command?
 
 ## Goal Readiness Grill
 
