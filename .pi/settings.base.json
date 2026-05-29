@@ -1,12 +1,10 @@
 {
   "packages": [
     "npm:pi-powerline-footer",
-    "-npm:@tmustier/pi-usage-extension",
     "npm:pi-ask-user",
     "git:github.com/MasuRii/pi-rtk-optimizer",
-    "-npm:pi-cache-graph",
+    "npm:pi-cache-graph",
     "npm:@ff-labs/pi-fff",
-    "-git:github.com/championswimmer/pi-context-usage",
     "-npm:pi-tool-display",
     "-npm:pi-mcp-adapter",
     "-npm:context-mode",
@@ -16,8 +14,6 @@
     "-npm:pi-web-access",
     "-npm:pi-btw",
     "-git:github.com/davebcn87/pi-autoresearch",
-    "-git:github.com/jonjonrankin/pi-caveman",
-    "-npm:pi-context-prune",
     "-npm:pi-hashline-readmap"
   ],
   "extensions": [
@@ -33,8 +29,8 @@
     "./extensions/project-context-rewriter.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/dump-system-prompt.ts",
-    "./extensions/save-last-response.ts"
+    "./extensions/save-last-response.ts",
+    "-./extensions/dump-system-prompt.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
