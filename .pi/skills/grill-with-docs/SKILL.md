@@ -89,4 +89,4 @@ If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](
 
 </supporting-info>
 
-Use `pi-ask-user` to ask.
+Use `ask-user` to ask.

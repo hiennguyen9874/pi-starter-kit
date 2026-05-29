@@ -58,7 +58,7 @@ Hard rules:
 - Follow each phase exactly unless the code proves the plan is wrong.
 - If a phase conflicts with the codebase, stop and explain the conflict.
 - Do not silently change architecture/API/schema/security decisions.
-- Use ask-user for high-stakes decisions, destructive actions, or unresolved product choices.
+- Use `ask-user` for high-stakes decisions, destructive actions, or unresolved product choices.
 - Do not add speculative features.
 - Do not merge, delete branches, or remove files unless explicitly requested.
 - Do not claim completion without verification evidence.
