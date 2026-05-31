@@ -1,5 +1,4 @@
 .local
 mcp.json
 settings.json
-extensions/node_modules
-extensions/node_modules
+extensions/profile/node_modules

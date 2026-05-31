@@ -5,6 +5,8 @@ description: "Use when loading, cleaning, transforming, streaming, saving, shari
 
 # Use Datasets
 
+Reference: [datasets](https://huggingface.co/docs/datasets/llms.txt)
+
 ## Overview
 
 Use the Hugging Face `datasets` library as the default path for ML/NLP dataset work: load data from the Hub, local files, or remote URLs; transform it with `Dataset.map()` and `Dataset.filter()`; handle large corpora with memory mapping or streaming; save/share cleaned datasets; and build FAISS-backed semantic search over embeddings.

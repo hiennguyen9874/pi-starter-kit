@@ -52,7 +52,8 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "disabled": false
+        "disabled": false,
+        "model": "openai-codex/gpt-5.4-mini"
       },
       "planner": {
         "disabled": true
@@ -73,7 +74,8 @@
         "disabled": true
       },
       "oracle": {
-        "disabled": false
+        "disabled": false,
+        "model": "openai-codex/gpt-5.5"
       }
     }
   }
