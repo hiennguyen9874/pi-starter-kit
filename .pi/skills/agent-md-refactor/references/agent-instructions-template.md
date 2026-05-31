@@ -7,11 +7,6 @@ Create only topic files that contain useful project-specific guidance. Omit sect
 ```markdown
 # {Topic}
 
-## Read When
-
-- [Specific task trigger that tells an agent when to read this file.]
-- [Another trigger, if useful.]
-
 ## Purpose
 
 [What this file helps the agent do. Keep it short.]
