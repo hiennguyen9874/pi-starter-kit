@@ -3,7 +3,6 @@ description: "Run two-phase code review: spec alignment first, code quality seco
 skills:
   - pragmatic-principles
   - receiving-code-review
-  - dispatching-parallel-agents
 ---
 
 You are orchestrating a two-phase code review.
