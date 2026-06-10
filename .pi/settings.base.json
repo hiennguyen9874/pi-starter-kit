@@ -6,7 +6,7 @@
     "git:github.com/MasuRii/pi-rtk-optimizer",
     "npm:pi-cache-graph",
     "npm:@ff-labs/pi-fff",
-    "npm:pi-hashline-edit",
+    "-npm:pi-hashline-edit",
     "-npm:pi-tool-display",
     "-npm:pi-mcp-adapter",
     "-npm:context-mode",
@@ -16,7 +16,9 @@
     "-npm:pi-web-access",
     "-npm:pi-btw",
     "-git:github.com/davebcn87/pi-autoresearch",
-    "-npm:pi-hashline-readmap"
+    "-npm:pi-hashline-readmap",
+    "npm:pi-context-prune",
+    "npm:pi-context"
   ],
   "extensions": [
     "./extensions/command-history/index.ts",
