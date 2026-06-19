@@ -9,4 +9,4 @@ Ask the questions one at a time.
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
-Use `ask-user` for each question.
+Use `ask_user_question` for each question.

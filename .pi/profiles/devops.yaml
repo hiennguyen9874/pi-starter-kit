@@ -1,7 +1,6 @@
 skillsEnable:
   - interview-me
   - grill-me
-  - ask-user
   - systematic-debugging
   - pragmatic-principles
   - docker-patterns

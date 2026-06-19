@@ -1,6 +1,5 @@
 skillsEnable:
   - grill-me
-  - ask-user
   - handoff
   - context7-cli
 mcpServersEnable:

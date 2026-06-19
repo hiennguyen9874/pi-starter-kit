@@ -1,7 +1,6 @@
 skillsEnable:
   - interview-me
   - grill-me
-  - ask-user
   - context7-cli
   - systematic-debugging
   - pragmatic-principles

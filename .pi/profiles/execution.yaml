@@ -1,5 +1,4 @@
 skillsEnable:
-  - ask-user
   - executing-plans
   - subagent-driven-development
   - dispatching-parallel-agents

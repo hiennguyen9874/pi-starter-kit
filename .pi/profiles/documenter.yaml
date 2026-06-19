@@ -2,7 +2,6 @@ skillsEnable:
   - bootstrap-project-context
   - interview-me
   - grill-me
-  - ask-user
   - prd
   - documentation-and-adrs
   - spec-driven-development

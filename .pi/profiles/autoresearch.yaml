@@ -2,7 +2,6 @@ skillsEnable:
   - interview-me
   - grill-me
   - handoff
-  - ask-user
   - pragmatic-principles
   - systematic-debugging
   - git-commit
