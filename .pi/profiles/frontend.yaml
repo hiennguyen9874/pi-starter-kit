@@ -42,3 +42,5 @@ packagesDisable:
   - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
+extensionsDisable:
+  - ./extensions/pi-goal/index.ts

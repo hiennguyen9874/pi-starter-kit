@@ -4,7 +4,6 @@
     "-npm:pi-ask-user",
     "npm:@juicesharp/rpiv-ask-user-question",
     "git:github.com/MasuRii/pi-rtk-optimizer",
-    "npm:@ff-labs/pi-fff",
     "-npm:pi-cache-graph",
     "-npm:pi-tool-display",
     "-npm:context-mode",

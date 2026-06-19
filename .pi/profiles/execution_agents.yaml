@@ -38,3 +38,5 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
+extensionsDisable:
+  - ./extensions/pi-goal/index.ts
