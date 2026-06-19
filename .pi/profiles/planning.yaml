@@ -30,9 +30,9 @@ extensionState:
       finalResponse: true
       planningDiscipline: true
 packagesEnable:
-  - npm:pi-context-prune
   - npm:@ff-labs/pi-fff
 packagesDisable:
+  - npm:pi-context-prune
   - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap

@@ -28,9 +28,9 @@ extensionState:
       planningDiscipline: false
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-hashline-edit
-  - npm:pi-context-prune
   - npm:pi-mcp-adapter
 packagesDisable:
+  - npm:pi-context-prune
   - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap

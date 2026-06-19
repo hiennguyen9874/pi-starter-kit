@@ -32,8 +32,8 @@ packagesEnable:
   - npm:pi-subagents
   - npm:pi-intercom
   - npm:@ff-labs/pi-fff
-  - npm:pi-context-prune
 packagesDisable:
+  - npm:pi-context-prune
   - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap

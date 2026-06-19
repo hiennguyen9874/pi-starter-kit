@@ -28,8 +28,8 @@ packagesEnable:
   - npm:pi-mcp-adapter
   - git:github.com/davebcn87/pi-autoresearch
   - git:github.com/hiennguyen9874/pi-hashline-edit
-  - npm:pi-context-prune
 packagesDisable:
+  - npm:pi-context-prune
   - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
