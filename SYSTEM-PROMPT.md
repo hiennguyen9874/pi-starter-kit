@@ -21,7 +21,6 @@ Available tools:
 - ask_user_question: Ask the user up to 4 structured questions (2-4 options each) when requirements are ambiguous
 - insert: Add new lines without changing existing text. Use when you only need to add content; follow the schema and tool description for exact patch mechanics.
 - grep: Search file contents. Use for targeted content search; follow the schema and tool description for exact parameters and anchor behavior.
-- context_tree_query: Retrieve original pruned tool outputs by short ref
 
 In addition to the tools above, you may have access to other custom tools depending on the project.
 
@@ -40,7 +39,6 @@ Guidelines:
 - Each question MUST have 2-4 options. Every option requires a concise label (1-5 words) and a description explaining what the choice means or its trade-offs. The user can additionally type a custom answer ("Type something." row is appended automatically to single-select questions) or pick "Chat about this" to abandon the questionnaire.
 - Set multiSelect: true when multiple answers are valid; this suppresses the "Type something." row. Provide an options[].preview markdown string when an option benefits from richer side-by-side context (mockups, code snippets, diagrams, configs) — single-select only. NOTE: any non-empty preview on a single-select question ALSO suppresses the "Type something." row (no room in the side-by-side layout); "Chat about this" remains the escape hatch. If you recommend a specific option, make it the first option and append "(Recommended)" to its label.
 - Do not stack multiple ask_user_question calls back-to-back — group all clarifying questions into one invocation.
-- When you need the full output of a tool call that was summarized and pruned from context, use context_tree_query with the short refs listed in the relevant pruner-summary message.
 - Be concise in your responses
 - Show file paths clearly when working with files
 
