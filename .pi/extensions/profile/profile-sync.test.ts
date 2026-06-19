@@ -89,16 +89,16 @@ test("syncProfileResources overlays package and extension entries from the activ
 
   const firstSettings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
   assert.deepEqual(firstSettings.packages, [
-    "npm:pi-powerline-footer",
-    "npm:pi-cache-graph",
+    "-npm:pi-powerline-footer",
+    "-npm:pi-cache-graph",
     "npm:@juicesharp/rpiv-ask-user-question",
     "git:github.com/MasuRii/pi-rtk-optimizer",
     "npm:pi-web-access",
   ]);
   assert.deepEqual(firstSettings.extensions, [
     "./extensions/command-history/index.ts",
-    "./extensions/profile/index.ts",
-    "./extensions/dirty-repo-guard.ts",
+    "-./extensions/profile/index.ts",
+    "-./extensions/dirty-repo-guard.ts",
     "./extensions/pi-goal/index.ts",
   ]);
 

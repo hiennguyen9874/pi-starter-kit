@@ -174,22 +174,49 @@ function resourceName(entry: string): string {
   return entry.startsWith("-") ? entry.slice(1) : entry;
 }
 
-function getEnabledSettingEntries(settings: JsonObject | undefined, key: "packages" | "extensions"): string[] {
-  return Array.isArray(settings?.[key])
-    ? settings[key].filter((entry): entry is string => typeof entry === "string" && !entry.startsWith("-"))
-    : [];
+function getSettingEntries(settings: JsonObject | undefined, key: "packages" | "extensions"): string[] {
+  return Array.isArray(settings?.[key]) ? settings[key].filter((entry): entry is string => typeof entry === "string") : [];
 }
 
-function buildManagedSettingEntries(defaultEnabled: string[], enabled: string[] = [], disabled: string[] = []): string[] {
-  const defaultEnabledSet = new Set(defaultEnabled.map(resourceName));
-  const disabledEntries = disabled
-    .filter((entry) => !defaultEnabledSet.has(resourceName(entry)))
-    .map((entry) => `-${resourceName(entry)}`);
+function buildManagedSettingEntries(defaultEntries: string[], enabled: string[] = [], disabled: string[] = []): string[] {
+  const enabledNames = new Set(enabled.map(resourceName));
+  const disabledNames = new Set(disabled.map(resourceName));
+  const seenNames = new Set<string>();
+  const entries: string[] = [];
 
-  return [...defaultEnabled, ...enabled.map(resourceName), ...disabledEntries].filter((entry, index, entries) => {
+  function add(entry: string): void {
     const name = resourceName(entry);
-    return entries.findIndex((candidate) => resourceName(candidate) === name) === index;
-  });
+    if (seenNames.has(name)) {
+      return;
+    }
+
+    seenNames.add(name);
+    entries.push(entry);
+  }
+
+  for (const entry of defaultEntries) {
+    const name = resourceName(entry);
+    if (disabledNames.has(name)) {
+      add(`-${name}`);
+    } else if (enabledNames.has(name)) {
+      add(name);
+    } else {
+      add(entry);
+    }
+  }
+
+  for (const entry of enabled) {
+    const name = resourceName(entry);
+    if (!disabledNames.has(name)) {
+      add(name);
+    }
+  }
+
+  for (const entry of disabled) {
+    add(`-${resourceName(entry)}`);
+  }
+
+  return entries;
 }
 
 function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): string[] {
@@ -337,12 +364,12 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const baseSettings = readJsonObject(getSettingsBasePath(cwd));
   const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
   const nextManagedPackageEntries = buildManagedSettingEntries(
-    getEnabledSettingEntries(baseSettings, "packages"),
+    getSettingEntries(baseSettings, "packages"),
     profile.packagesEnable,
     profile.packagesDisable,
   );
   const nextManagedExtensionEntries = buildManagedSettingEntries(
-    getEnabledSettingEntries(baseSettings, "extensions"),
+    getSettingEntries(baseSettings, "extensions"),
     profile.extensionsEnable,
     profile.extensionsDisable,
   );
