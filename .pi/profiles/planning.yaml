@@ -26,7 +26,7 @@ extensionState:
       executionPolicy: true
       evidenceDiscipline: true
       changeScope: false
-      validation: false
+      validation: true
       efficiency: true
       finalResponse: true
       planningDiscipline: true
