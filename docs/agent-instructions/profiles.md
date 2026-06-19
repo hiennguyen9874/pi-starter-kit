@@ -3,7 +3,7 @@
 ## Read When
 
 - You modify `.pi/profiles.json`.
-- You change skill or MCP server availability behavior.
+- You change skill, MCP server, package, or extension availability behavior.
 - You investigate profile sync side effects in config files.
 
 ## Purpose
@@ -16,9 +16,11 @@ Define how profile selection and filtering work so profile-related changes are s
 - Prefer editing profile policy in `.pi/profiles.json` over manual toggles in managed config.
 - Respect precedence:
   - `skillsDisable` / `mcpServersDisable` override enables.
+  - Positive `packages` / `extensions` entries in `.pi/settings.base.json` are default-enabled for every profile.
+  - `packagesEnable` / `packagesDisable` and `extensionsEnable` / `extensionsDisable` are copied into `.pi/settings.json`.
   - Empty enable list means allow unless disabled.
-  - Non-empty enable list means deny unless enabled.
-  - `*` means all.
+  - Non-empty enable list means deny unless enabled for skills/MCP servers.
+  - `*` means all for skills/MCP servers.
 - Verify behavior with focused profile extension tests when changing profile logic.
 
 ## Commands

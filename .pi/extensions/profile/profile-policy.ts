@@ -11,6 +11,10 @@ export interface ProfileDefinition {
   skillsDisable?: string[];
   mcpServersEnable?: string[];
   mcpServersDisable?: string[];
+  packagesEnable?: string[];
+  packagesDisable?: string[];
+  extensionsEnable?: string[];
+  extensionsDisable?: string[];
   extensionState?: ProfileExtensionState;
 }
 

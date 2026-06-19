@@ -22,5 +22,12 @@ extensionState:
       changeScope: true
       validation: true
       efficiency: true
-      finalResponse: true
+      finalResponse: false
       planningDiscipline: false
+packagesEnable:
+  - npm:@ff-labs/pi-fff
+packagesDisable:
+  - npm:pi-context-prune
+  - git:github.com/hiennguyen9874/pi-hashline-edit
+  - npm:pi-hashline-edit
+  - npm:pi-hashline-readmap

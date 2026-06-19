@@ -25,3 +25,9 @@ extensionState:
       efficiency: true
       finalResponse: true
       planningDiscipline: false
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-hashline-edit
+packagesDisable:
+  - npm:@ff-labs/pi-fff
+  - npm:pi-hashline-edit
+  - npm:pi-hashline-readmap

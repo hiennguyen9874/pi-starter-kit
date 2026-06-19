@@ -9,6 +9,8 @@ interface JsonObject {
 
 interface ManagedProfileState {
   managedSkillEntries?: string[];
+  managedPackageEntries?: string[];
+  managedExtensionEntries?: string[];
 }
 
 export interface SyncProfileResourcesResult {
@@ -94,6 +96,12 @@ function readManagedState(cwd: string): ManagedProfileState {
     managedSkillEntries: Array.isArray(parsed.managedSkillEntries)
       ? parsed.managedSkillEntries.filter((entry): entry is string => typeof entry === "string")
       : [],
+    managedPackageEntries: Array.isArray(parsed.managedPackageEntries)
+      ? parsed.managedPackageEntries.filter((entry): entry is string => typeof entry === "string")
+      : [],
+    managedExtensionEntries: Array.isArray(parsed.managedExtensionEntries)
+      ? parsed.managedExtensionEntries.filter((entry): entry is string => typeof entry === "string")
+      : [],
   };
 }
 
@@ -162,6 +170,28 @@ function dedupeSorted(values: string[]): string[] {
   return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
+function resourceName(entry: string): string {
+  return entry.startsWith("-") ? entry.slice(1) : entry;
+}
+
+function getEnabledSettingEntries(settings: JsonObject | undefined, key: "packages" | "extensions"): string[] {
+  return Array.isArray(settings?.[key])
+    ? settings[key].filter((entry): entry is string => typeof entry === "string" && !entry.startsWith("-"))
+    : [];
+}
+
+function buildManagedSettingEntries(defaultEnabled: string[], enabled: string[] = [], disabled: string[] = []): string[] {
+  const defaultEnabledSet = new Set(defaultEnabled.map(resourceName));
+  const disabledEntries = disabled
+    .filter((entry) => !defaultEnabledSet.has(resourceName(entry)))
+    .map((entry) => `-${resourceName(entry)}`);
+
+  return [...defaultEnabled, ...enabled.map(resourceName), ...disabledEntries].filter((entry, index, entries) => {
+    const name = resourceName(entry);
+    return entries.findIndex((candidate) => resourceName(candidate) === name) === index;
+  });
+}
+
 function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): string[] {
   const enabledSet = new Set(profile.skillsEnable ?? []);
   const disabledSet = new Set(profile.skillsDisable ?? []);
@@ -175,18 +205,26 @@ function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): stri
   );
 }
 
-function mergeManagedSkillEntries(settings: JsonObject, previousManaged: string[], nextManaged: string[]): JsonObject {
-  const preservedEntries = Array.isArray(settings.skills)
-    ? settings.skills.filter((entry): entry is string => typeof entry === "string" && !previousManaged.includes(entry))
+function mergeManagedSettingEntries(
+  settings: JsonObject,
+  key: "skills" | "packages" | "extensions",
+  previousManaged: string[],
+  nextManaged: string[],
+): JsonObject {
+  const managedResourceNames = new Set([...previousManaged, ...nextManaged].map(resourceName));
+  const preservedEntries = Array.isArray(settings[key])
+    ? settings[key].filter(
+        (entry): entry is string => typeof entry === "string" && !managedResourceNames.has(resourceName(entry)),
+      )
     : [];
 
   const nextSettings: JsonObject = { ...settings };
   const mergedEntries = [...preservedEntries, ...nextManaged];
 
   if (mergedEntries.length > 0) {
-    nextSettings.skills = mergedEntries;
+    nextSettings[key] = mergedEntries;
   } else {
-    delete nextSettings.skills;
+    delete nextSettings[key];
   }
 
   return nextSettings;
@@ -295,13 +333,38 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   mkdirSync(getPiDir(cwd), { recursive: true });
 
   const managedState = readManagedState(cwd);
-  const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
   const settingsPath = getSettingsPath(cwd);
-  const currentSettings = readJsonObject(getSettingsBasePath(cwd)) ?? readJsonObject(settingsPath) ?? {};
-  const nextSettings = mergeManagedSkillEntries(
-    currentSettings,
-    managedState.managedSkillEntries ?? [],
-    nextManagedSkillEntries,
+  const baseSettings = readJsonObject(getSettingsBasePath(cwd));
+  const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
+  const nextManagedPackageEntries = buildManagedSettingEntries(
+    getEnabledSettingEntries(baseSettings, "packages"),
+    profile.packagesEnable,
+    profile.packagesDisable,
+  );
+  const nextManagedExtensionEntries = buildManagedSettingEntries(
+    getEnabledSettingEntries(baseSettings, "extensions"),
+    profile.extensionsEnable,
+    profile.extensionsDisable,
+  );
+  const currentSettings = baseSettings ?? readJsonObject(settingsPath) ?? {};
+  const previousManagedSkillEntries = baseSettings ? [] : (managedState.managedSkillEntries ?? []);
+  const previousManagedPackageEntries = baseSettings ? [] : (managedState.managedPackageEntries ?? []);
+  const previousManagedExtensionEntries = baseSettings ? [] : (managedState.managedExtensionEntries ?? []);
+  const nextSettings = mergeManagedSettingEntries(
+    mergeManagedSettingEntries(
+      mergeManagedSettingEntries(
+        currentSettings,
+        "skills",
+        previousManagedSkillEntries,
+        nextManagedSkillEntries,
+      ),
+      "packages",
+      previousManagedPackageEntries,
+      nextManagedPackageEntries,
+    ),
+    "extensions",
+    previousManagedExtensionEntries,
+    nextManagedExtensionEntries,
   );
   const settingsChanged = writeJsonObject(settingsPath, nextSettings);
 
@@ -315,6 +378,8 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const persistedChanged = writePersistedProfileName(cwd, profileName);
   const managedStateChanged = writeJsonObject(getManagedStatePath(cwd), {
     managedSkillEntries: nextManagedSkillEntries,
+    managedPackageEntries: nextManagedPackageEntries,
+    managedExtensionEntries: nextManagedExtensionEntries,
   });
 
   return {

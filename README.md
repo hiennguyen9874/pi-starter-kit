@@ -268,8 +268,6 @@ Local skills live in `.pi/skills/`. Profiles expose only task-relevant subsets.
 | Skill | Description |
 |---|---|
 | `developing-with-streamlit` | Routing skill for Streamlit app development sub-skills |
-| `creating-custom-tensorrt-plugins` | Build, register, and validate custom TensorRT plugins |
-| `sei-uuidv7-injection` | Inject UUIDv7 into H.264/H.265 streams via GStreamer |
 
 #### Agent Authoring & Docs
 

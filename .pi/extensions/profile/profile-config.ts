@@ -18,7 +18,16 @@ export interface LoadProfilesConfigResult {
   error?: string;
 }
 
-const LIST_FIELDS = ["skillsEnable", "skillsDisable", "mcpServersEnable", "mcpServersDisable"] as const;
+const LIST_FIELDS = [
+  "skillsEnable",
+  "skillsDisable",
+  "mcpServersEnable",
+  "mcpServersDisable",
+  "packagesEnable",
+  "packagesDisable",
+  "extensionsEnable",
+  "extensionsDisable",
+] as const;
 const BEHAVIORAL_GUIDELINE_SECTION_NAME_SET = new Set<string>(BEHAVIORAL_GUIDELINE_SECTION_NAMES);
 
 function isStringArray(value: unknown): value is string[] {

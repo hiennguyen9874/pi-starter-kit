@@ -1,24 +1,14 @@
 skillsEnable:
-  - interview-me
-  - grill-me
   - ask-user
-  - handoff
-  - pragmatic-principles
-  - systematic-debugging
-  - brainstorming
-  - spec-driven-development
-  - writing-plans
   - executing-plans
   - subagent-driven-development
   - dispatching-parallel-agents
   - test-driven-development
-  - spec-review
-  - code-quality-review
-  - requesting-code-review
+  - systematic-debugging
   - receiving-code-review
   - verification-before-completion
-  - finishing-a-development-branch
-  - git-commit
+  - pragmatic-principles
+  - handoff
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -38,3 +28,13 @@ extensionState:
       efficiency: true
       finalResponse: true
       planningDiscipline: false
+packagesEnable:
+  - npm:pi-prompt-template-model
+  - npm:pi-subagents
+  - npm:pi-intercom
+  - npm:@ff-labs/pi-fff
+  - npm:pi-context-prune
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-hashline-edit
+  - npm:pi-hashline-edit
+  - npm:pi-hashline-readmap

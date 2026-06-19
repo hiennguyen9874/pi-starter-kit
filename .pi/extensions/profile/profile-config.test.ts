@@ -74,6 +74,33 @@ test("loads defaultProfile from profiles.json and profiles from YAML files", () 
   });
 });
 
+test("loads package and extension profile fields from YAML files", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "profiles", "base.yaml"),
+    [
+      "packagesEnable:",
+      "  - npm:pi-web-access",
+      "packagesDisable:",
+      "  - npm:pi-cache-graph",
+      "extensionsEnable:",
+      "  - ./extensions/pi-goal/index.ts",
+      "extensionsDisable:",
+      "  - ./extensions/dirty-repo-guard.ts",
+    ].join("\n"),
+  );
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.error, undefined);
+  assert.deepEqual(result.config?.profiles.base, {
+    packagesEnable: ["npm:pi-web-access"],
+    packagesDisable: ["npm:pi-cache-graph"],
+    extensionsEnable: ["./extensions/pi-goal/index.ts"],
+    extensionsDisable: ["./extensions/dirty-repo-guard.ts"],
+  });
+});
+
 test("rejects invalid behavioral guideline section in YAML file", () => {
   const root = createRoot();
   writeFileSync(

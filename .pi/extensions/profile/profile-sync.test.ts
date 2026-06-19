@@ -56,6 +56,71 @@ test("syncProfileResources writes skill exclusions for project skills outside th
   assert.deepEqual(loadProfileKnownSkillNames(root), ["backend-patterns", "frontend-design", "ui-styling"]);
 });
 
+test("syncProfileResources overlays package and extension entries from the active profile", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "settings.base.json"),
+    JSON.stringify(
+      {
+        packages: [
+          "npm:pi-powerline-footer",
+          "npm:pi-cache-graph",
+          "npm:@juicesharp/rpiv-ask-user-question",
+          "git:github.com/MasuRii/pi-rtk-optimizer",
+          "-npm:pi-web-access",
+        ],
+        extensions: [
+          "./extensions/command-history/index.ts",
+          "./extensions/profile/index.ts",
+          "./extensions/dirty-repo-guard.ts",
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+
+  syncProfileResources(root, "research", {
+    packagesEnable: ["npm:pi-web-access"],
+    packagesDisable: ["npm:pi-cache-graph", "npm:pi-powerline-footer"],
+    extensionsEnable: ["./extensions/pi-goal/index.ts"],
+    extensionsDisable: ["./extensions/dirty-repo-guard.ts", "./extensions/profile/index.ts"],
+  });
+
+  const firstSettings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+  assert.deepEqual(firstSettings.packages, [
+    "npm:pi-powerline-footer",
+    "npm:pi-cache-graph",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "git:github.com/MasuRii/pi-rtk-optimizer",
+    "npm:pi-web-access",
+  ]);
+  assert.deepEqual(firstSettings.extensions, [
+    "./extensions/command-history/index.ts",
+    "./extensions/profile/index.ts",
+    "./extensions/dirty-repo-guard.ts",
+    "./extensions/pi-goal/index.ts",
+  ]);
+
+  syncProfileResources(root, "base", {
+    packagesDisable: ["npm:pi-web-access"],
+  });
+
+  const secondSettings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+  assert.deepEqual(secondSettings.packages, [
+    "npm:pi-powerline-footer",
+    "npm:pi-cache-graph",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "git:github.com/MasuRii/pi-rtk-optimizer",
+    "-npm:pi-web-access",
+  ]);
+  assert.deepEqual(secondSettings.extensions, [
+    "./extensions/command-history/index.ts",
+    "./extensions/profile/index.ts",
+    "./extensions/dirty-repo-guard.ts",
+  ]);
+});
+
 test("syncProfileResources filters mcp.json from baseline when switching profiles", () => {
   const root = createRoot();
   writeFileSync(

@@ -15,7 +15,14 @@ extensionState:
       executionPolicy: true
       evidenceDiscipline: true
       changeScope: false
-      validation: true
+      validation: false
       efficiency: true
       finalResponse: true
       planningDiscipline: false
+packagesEnable:
+  - npm:@ff-labs/pi-fff
+packagesDisable:
+  - npm:pi-context-prune
+  - git:github.com/hiennguyen9874/pi-hashline-edit
+  - npm:pi-hashline-edit
+  - npm:pi-hashline-readmap
