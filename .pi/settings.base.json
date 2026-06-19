@@ -3,7 +3,7 @@
     "npm:pi-powerline-footer",
     "-npm:pi-ask-user",
     "npm:@juicesharp/rpiv-ask-user-question",
-    "git:github.com/MasuRii/pi-rtk-optimizer",
+    "-git:github.com/MasuRii/pi-rtk-optimizer",
     "-npm:pi-cache-graph",
     "-npm:pi-tool-display",
     "-npm:context-mode",
