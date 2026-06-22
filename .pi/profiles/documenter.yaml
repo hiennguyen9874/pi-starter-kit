@@ -1,9 +1,8 @@
 skillsEnable:
   - bootstrap-project-context
   - interview-me
-  - grill-me
+  - grilling
   - prd
-  - documentation-and-adrs
   - spec-driven-development
   - writing-plans
   - handoff

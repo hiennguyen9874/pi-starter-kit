@@ -15,7 +15,6 @@ Context sources:
 1. Read `AGENTS.md` and `README.md` first when present.
 2. Read current root agent files and any existing `docs/agent-instructions/` files fully before editing.
 3. Inspect repo files needed to verify commands, architecture, workflows, and conventions.
-4. Read `CONTEXT.md` or `CONTEXT-MAP.md` plus relevant `docs/adr/` files when instruction wording depends on domain language, architecture decisions, or responsibility boundaries.
 
 Rules:
 - Keep root agent files concise.

@@ -1,10 +1,12 @@
 skillsEnable:
   - interview-me
   - grilling
-  - writing-skills
-  - skill-creator
-  - prompt-leverage
+  - grill-with-docs
+  - handoff
   - pragmatic-principles
+  - domain-modeling
+  - codebase-design
+  - improve-codebase-architecture
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -19,15 +21,16 @@ extensionState:
       repositoryInstructions: false
       executionPolicy: true
       evidenceDiscipline: true
-      changeScope: true
+      changeScope: false
       validation: true
       efficiency: true
-      finalResponse: true
-      planningDiscipline: false
+      finalResponse: false
+      planningDiscipline: true
 packagesEnable:
-  - git:github.com/hiennguyen9874/pi-hashline-edit
-packagesDisable:
   - npm:@ff-labs/pi-fff
+packagesDisable:
+  - npm:pi-context-prune
+  - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
 extensionsDisable:

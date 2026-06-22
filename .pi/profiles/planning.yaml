@@ -1,14 +1,11 @@
 skillsEnable:
   - interview-me
-  - grill-me
+  - grilling
   - brainstorming
   - spec-driven-development
   - prd
   - writing-plans
   - prototype
-  - grill-with-docs
-  - improve-codebase-architecture
-  - documentation-and-adrs
   - pragmatic-principles
 mcpServersEnable: []
 mcpServersDisable:
@@ -27,7 +24,7 @@ extensionState:
       changeScope: false
       validation: true
       efficiency: true
-      finalResponse: true
+      finalResponse: false
       planningDiscipline: true
 packagesEnable:
   - npm:@ff-labs/pi-fff

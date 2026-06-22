@@ -277,7 +277,6 @@ Local skills live in `.pi/skills/`. Profiles expose only task-relevant subsets.
 | `context7-cli` | Fetch library docs, manage skills, set up Context7 MCP |
 | `prompt-leverage` | Upgrade raw prompts into execution-ready prompts |
 | `prd` | Production-grade Product Requirements Documents |
-| `documentation-and-adrs` | Architectural decision records and "why" documentation |
 | `readiness-report` | Static repo audit for autonomous agent readiness |
 | `skill-creator` | Create and iteratively improve new skills |
 | `writing-skills` | Skill authoring standard — structure, progressive disclosure, TDD-style testing |

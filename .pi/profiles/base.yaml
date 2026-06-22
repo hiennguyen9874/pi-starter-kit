@@ -1,7 +1,6 @@
 skillsEnable:
   - interview-me
-  - grill-me
-  - ask-user
+  - grilling
   - handoff
   - pragmatic-principles
   - systematic-debugging

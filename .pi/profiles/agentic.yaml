@@ -1,7 +1,7 @@
 skillsEnable:
   - bootstrap-project-context
   - interview-me
-  - grill-me
+  - grilling
   - prompt-leverage
   - agent-md-refactor
   - context7-cli
