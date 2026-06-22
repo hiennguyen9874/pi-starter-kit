@@ -83,7 +83,7 @@ test("syncProfileResources overlays package and extension entries from the activ
   syncProfileResources(root, "research", {
     packagesEnable: ["npm:pi-web-access"],
     packagesDisable: ["npm:pi-cache-graph", "npm:pi-powerline-footer"],
-    extensionsEnable: ["./extensions/pi-goal/index.ts"],
+    extensionsEnable: ["git:github.com/hiennguyen9874/pi-goal"],
     extensionsDisable: ["./extensions/dirty-repo-guard.ts", "./extensions/profile/index.ts"],
   });
 
@@ -99,7 +99,7 @@ test("syncProfileResources overlays package and extension entries from the activ
     "./extensions/command-history/index.ts",
     "-./extensions/profile/index.ts",
     "-./extensions/dirty-repo-guard.ts",
-    "./extensions/pi-goal/index.ts",
+    "git:github.com/hiennguyen9874/pi-goal",
   ]);
 
   syncProfileResources(root, "base", {

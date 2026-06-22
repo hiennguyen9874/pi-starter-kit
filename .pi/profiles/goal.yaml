@@ -35,4 +35,4 @@ packagesDisable:
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
 extensionsEnable:
-  - ./extensions/pi-goal/index.ts
+  - git:github.com/hiennguyen9874/pi-goal

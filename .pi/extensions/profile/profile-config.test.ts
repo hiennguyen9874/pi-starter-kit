@@ -84,7 +84,7 @@ test("loads package and extension profile fields from YAML files", () => {
       "packagesDisable:",
       "  - npm:pi-cache-graph",
       "extensionsEnable:",
-      "  - ./extensions/pi-goal/index.ts",
+      "  - git:github.com/hiennguyen9874/pi-goal",
       "extensionsDisable:",
       "  - ./extensions/dirty-repo-guard.ts",
     ].join("\n"),
@@ -96,7 +96,7 @@ test("loads package and extension profile fields from YAML files", () => {
   assert.deepEqual(result.config?.profiles.base, {
     packagesEnable: ["npm:pi-web-access"],
     packagesDisable: ["npm:pi-cache-graph"],
-    extensionsEnable: ["./extensions/pi-goal/index.ts"],
+    extensionsEnable: ["git:github.com/hiennguyen9874/pi-goal"],
     extensionsDisable: ["./extensions/dirty-repo-guard.ts"],
   });
 });
