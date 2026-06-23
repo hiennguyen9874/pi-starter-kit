@@ -37,5 +37,6 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
+  - npm:@juicesharp/rpiv-ask-user-question
 extensionsDisable:
   - git:github.com/hiennguyen9874/pi-goal
