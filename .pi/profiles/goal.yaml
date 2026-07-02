@@ -29,10 +29,9 @@ extensionState:
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-mcp-adapter
+  - git:github.com/hiennguyen9874/pi-goal
 packagesDisable:
   - npm:pi-context-prune
   - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
-extensionsEnable:
-  - git:github.com/hiennguyen9874/pi-goal

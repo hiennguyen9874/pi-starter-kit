@@ -41,5 +41,4 @@ packagesDisable:
   - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
-extensionsDisable:
   - git:github.com/hiennguyen9874/pi-goal
