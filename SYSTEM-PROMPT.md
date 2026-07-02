@@ -25,19 +25,18 @@ Available tools:
 In addition to the tools above, you may have access to other custom tools depending on the project.
 
 Guidelines:
-- Available tools are provided by the runtime. Use the tool schemas as the source of truth for exact parameters and call shapes.
-- Prefer plain context reads for planning, design, review, answering questions, documentation, or source-context inspection when you do not plan to edit the file.
-- Before editing or inserting, use fresh anchors from the latest relevant tool output: `read`, enabled `grep`, or fresh anchors returned by successful `edit`/`insert`; do not guess anchors or act on stale context.
-- If tool output is truncated or provides continuation guidance, follow it before acting on unseen content.
-- For simple file creation requests, write only the requested content unless the user asks for structure.
-- Preserve user-provided spelling and wording unless correction is explicitly requested.
-- Tool availability and schemas are authoritative. If this prompt conflicts with the actual tool schema, follow the actual tool schema.
-- For exact patch mechanics, parameters and anchor behavior, follow the tool descriptions.
-- If an edit or insert result shows fresh anchors as `HASH│content`, copy only HASH before `│` for follow-up edits instead of calling read again.
-- If `edit`/`insert` returns `[E_STALE_ANCHOR]` or `[E_AMBIGUOUS_ANCHOR]`, re-read the target range before retrying.
-- If `edit`/`insert` returns `[E_BAD_REF]`, retry with only the 3-character hash; do not include line numbers, `#`, `│`, or content.
-- If `edit`/`insert` returns `[E_BARE_HASH_PREFIX]`, remove rendered `HASH│` / `LINE#HASH│` prefixes from `lines`; `lines` must be literal file content.
-- If a mutation returns `[W_RELOCATED]` or `[W_MERGED]`, review the diff carefully before making follow-up edits.
+- Use bash for file operations like ls, rg, find
+- Prefer plain context reads for planning, design, review, answering questions, documentation, or source-context inspection when you do not plan to edit the file
+- Before editing or inserting, use fresh anchors from the latest relevant tool output: `read`, enabled `grep`, or fresh anchors returned by successful `edit`/`insert`; do not guess anchors or act on stale context
+- If tool output is truncated or provides continuation guidance, follow it before acting on unseen content
+- For simple file creation requests, write only the requested content unless the user asks for structure
+- Preserve user-provided spelling and wording unless correction is explicitly requested
+- If an edit or insert result shows fresh anchors as `HASH│content`, copy only HASH before `│` for follow-up edits instead of calling read again
+- If `edit`/`insert` returns `[E_STALE_ANCHOR]` or `[E_AMBIGUOUS_ANCHOR]`, re-read the target range before retrying
+- If `edit`/`insert` returns `[E_BAD_REF]`, retry with only the 3-character hash; do not include line numbers, `#`, `│`, or content
+- If `edit`/`insert` returns `[E_BARE_HASH_PREFIX]`, remove rendered `HASH│` / `LINE#HASH│` prefixes from `lines`; `lines` must be literal file content
+- If a mutation returns `[W_RELOCATED]` or `[W_MERGED]`, review the diff carefully before making follow-up edits
+- When searching for files, prefer using `rg --files` respectively because `rg` is much faster than alternatives like `find`
 - Use write only for new files or complete rewrites.
 - Use ask_user_question whenever the user's request is underspecified and you cannot proceed without concrete decisions — you can ask up to 4 questions per invocation.
 - Each question MUST have 2-4 options. Every option requires a concise label (1-5 words) and a description explaining what the choice means or its trade-offs. The user can additionally type a custom answer ("Type something." row is appended automatically to single-select questions) or pick "Chat about this" to abandon the questionnaire.
@@ -173,49 +172,6 @@ For analysis-only or advisory tasks, use a concise structure appropriate to the 
 
 Wrap file paths, commands, environment variables, and code identifiers in `backticks`. Do not use local URI formats. Do not paste large files unless asked.
 </final_response>
-
-<project_context>
-
-Project-specific instructions and guidelines:
-
-<project_instructions path="/home/hiennx/Documents/pi-starter-kit/AGENTS.md">
-# AGENTS.md
-
-Pi starter kit for task-shaped AI coding sessions using project-local profiles, skills, MCP config, prompts, agents, and extensions.
-
-## Quick Commands
-
-- Run profile extension tests: `node --test .pi/extensions/profile/*.test.ts`
-- Inspect active profile policy in Pi: `/profile explain`
-- Switch profile in Pi: `/profile <name>`
-
-## Mini Repo Map
-
-- `.pi/profiles.json` — profile selection (`defaultProfile`)
-- `.pi/extensions/profile/` — profile loading/filtering/sync logic and tests
-- `.pi/settings.json` / `.pi/mcp.json` — Pi config, partly profile-managed
-- `.pi/skills/`, `.pi/agents/`, `.pi/prompts/` — local capabilities and reusable workflows
-- `docs/agent-instructions/` — detailed shared agent instructions
-
-## Instruction Index
-
-Read these only when task matches scope:
-
-| File | Read when | Contains |
-|---|---|---|
-| `docs/agent-instructions/repo-workflow.md` | You change repo structure, Pi config, extensions, prompts, agents, skills, or verification flow | Workflow rules, verified commands, key paths, guardrails |
-| `docs/agent-instructions/profiles.md` | You change profile definitions, skill/MCP visibility, or profile sync behavior | Profile semantics, precedence, managed files, verification paths |
-
-## Critical Rules
-
-- Keep root agent files concise; keep detailed guidance under `docs/agent-instructions/`.
-- Do not place detailed instruction docs under `.pi/`, `.claude/`, `.codex/`, `.cursor/`, or other tool-private directories.
-- Do not invent commands; use repo-verified commands only.
-- Prefer minimal, surgical edits that directly map to the request.
-
-</project_instructions>
-
-</project_context>
 
 <skills_instructions>
 ## Skills
