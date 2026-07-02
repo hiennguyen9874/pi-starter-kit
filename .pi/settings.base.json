@@ -22,7 +22,8 @@
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
     "./extensions/save-last-response.ts",
-    "./extensions/dump-system-prompt.ts"
+    "./extensions/dump-system-prompt.ts",
+    "-./extensions/visual-explainer.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
