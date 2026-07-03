@@ -39,6 +39,7 @@ test("unknown skills produce warnings", () => {
   const warnings = validateProfileReferences(
     { skillsEnable: ["missing-skill"] },
     ["backend-patterns"],
+    [],
     ["chrome-devtools"],
   );
 
@@ -52,7 +53,7 @@ test("skill warnings are skipped until skills have been discovered", () => {
       mcpServersDisable: ["missing-server"],
     },
     [],
-    ["chrome-devtools"],
+    [],
   );
 
   assert.deepEqual(warnings, ["Unknown MCP server: missing-server"]);
@@ -62,6 +63,7 @@ test("unknown MCP servers produce warnings", () => {
   const warnings = validateProfileReferences(
     { mcpServersDisable: ["missing-server"] },
     ["backend-patterns"],
+    [],
     ["chrome-devtools"],
   );
 
@@ -77,6 +79,7 @@ test("conflicts are not validation errors because disable-wins is intentional", 
       mcpServersDisable: ["chrome-devtools"],
     },
     ["backend-patterns"],
+    [],
     ["chrome-devtools"],
   );
 
@@ -92,6 +95,7 @@ test("wildcard references are treated as built-in values", () => {
       mcpServersDisable: ["missing-server"],
     },
     ["backend-patterns"],
+    [],
     ["chrome-devtools"],
   );
 

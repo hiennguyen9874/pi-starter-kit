@@ -4,7 +4,7 @@ skillsEnable:
   - handoff
   - context7-cli
   - teach
-  - visual-explainer
+promptsEnable: []
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -32,5 +32,3 @@ packagesDisable:
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
   - git:github.com/hiennguyen9874/pi-goal
-extensionsEnable:
-  - ./extensions/visual-explainer.ts

@@ -1,6 +1,7 @@
 skillsEnable: []
 skillsDisable:
   - "*"
+promptsEnable: []
 mcpServersEnable: []
 mcpServersDisable:
   - exa

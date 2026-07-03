@@ -181,3 +181,24 @@ test("multiple profiles load from separate YAML files", () => {
   assert.deepEqual(result.config?.profiles.a.skillsEnable, ["skill-a"]);
   assert.deepEqual(result.config?.profiles.b.skillsEnable, ["skill-b"]);
 });
+
+test("loads prompt profile fields from YAML files", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "profiles", "review.yaml"),
+    [
+      "promptsEnable:",
+      "  - review-code",
+      "promptsDisable:",
+      "  - generate-slides",
+    ].join("\n"),
+  );
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.error, undefined);
+  assert.deepEqual(result.config?.profiles.review, {
+    promptsEnable: ["review-code"],
+    promptsDisable: ["generate-slides"],
+  });
+});

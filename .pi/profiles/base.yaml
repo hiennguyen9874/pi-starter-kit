@@ -7,6 +7,9 @@ skillsEnable:
   - test-driven-development
   - context7-cli
   - git-commit
+promptsEnable:
+  - commit-work
+  - debug-issue
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

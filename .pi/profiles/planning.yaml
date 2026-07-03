@@ -7,6 +7,9 @@ skillsEnable:
   - writing-plans
   - prototype
   - pragmatic-principles
+promptsEnable:
+  - feature-design
+  - write-implementation-plan
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

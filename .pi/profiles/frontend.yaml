@@ -14,6 +14,18 @@ skillsEnable:
   - performance-optimization
   - source-driven-development
   - test-driven-development
+promptsEnable:
+  - debug-issue
+  - execute-plan-simple
+  - frontend-design-direction
+  - frontend-polish-pass
+  - frontend-ui-audit
+  - interface-design-direction
+  - interface-polish-pass
+  - react-component-api-refactor
+  - react-performance-pass
+  - react-view-transitions-build
+  - shadcn-ui-build
 mcpServersEnable:
   - chrome-devtools
 mcpServersDisable:

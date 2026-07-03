@@ -12,6 +12,7 @@ import { getKnownSkillNames, summarizeProfile } from "./profile-discovery.ts";
 import { createProfilePolicy, PROFILE_WILDCARD, type ProfileDefinition, type ProfilePolicy } from "./profile-policy.ts";
 import {
   loadProfileKnownMcpServerNames,
+  loadProfileKnownPromptNames,
   loadProfileKnownSkillNames,
   readPersistedProfileName,
   syncBaseSystemResources,
@@ -115,7 +116,7 @@ export function buildProfilePrompt(
   if (mode === "compact") {
     return [
       `Active profile: ${profileName}.`,
-      "Profile-based startup filtering is enabled for skills and MCP servers.",
+      "Profile-based startup filtering is enabled for prompts, skills, and MCP servers.",
       "Use only the resources that are currently loaded in this session.",
     ].join("\n");
   }
@@ -128,6 +129,12 @@ export function buildProfilePrompt(
   if (profile.skillsDisable?.length) {
     lines.push(`Disallowed skills: ${profile.skillsDisable.join(", ")}.`);
   }
+  if (profile.promptsEnable?.length) {
+    lines.push(`Allowed prompts: ${profile.promptsEnable.join(", ")}.`);
+  }
+  if (profile.promptsDisable?.length) {
+    lines.push(`Disallowed prompts: ${profile.promptsDisable.join(", ")}.`);
+  }
   if (profile.mcpServersEnable?.length) {
     lines.push(`Allowed MCP servers: ${profile.mcpServersEnable.join(", ")}.`);
   }
@@ -135,24 +142,34 @@ export function buildProfilePrompt(
     lines.push(`Disallowed MCP servers: ${profile.mcpServersDisable.join(", ")}.`);
   }
 
-  lines.push("If a skill or MCP server is disallowed, do not attempt to use it.");
+  lines.push("If a prompt, skill, or MCP server is disallowed, do not attempt to use it.");
   return lines.join("\n");
 }
 
 export function validateProfileReferences(
   profile: ProfileDefinition,
   knownSkills: string[],
+  knownPrompts: string[],
   knownServers: string[],
 ): string[] {
   const warnings: string[] = [];
   const knownSkillSet = new Set(knownSkills);
+  const knownPromptSet = new Set(knownPrompts);
   const knownServerSet = new Set(knownServers);
   const shouldValidateSkills = knownSkillSet.size > 0;
+  const shouldValidatePrompts = knownPromptSet.size > 0;
 
   if (shouldValidateSkills) {
     for (const skill of [...(profile.skillsEnable ?? []), ...(profile.skillsDisable ?? [])]) {
       if (skill !== PROFILE_WILDCARD && !knownSkillSet.has(skill)) {
         warnings.push(`Unknown skill: ${skill}`);
+      }
+    }
+  }
+  if (shouldValidatePrompts) {
+    for (const prompt of [...(profile.promptsEnable ?? []), ...(profile.promptsDisable ?? [])]) {
+      if (prompt !== PROFILE_WILDCARD && !knownPromptSet.has(prompt)) {
+        warnings.push(`Unknown prompt: ${prompt}`);
       }
     }
   }
@@ -174,6 +191,7 @@ export function buildProfileExplanation(input: {
   activeProfileName?: string;
   activeProfile?: ProfileDefinition;
   knownSkills: string[];
+  knownPrompts: string[];
   knownMcpServers: string[];
   resourcesRequireReload: boolean;
 }): string {
@@ -181,11 +199,18 @@ export function buildProfileExplanation(input: {
     return "No active profile.";
   }
 
-  const warnings = validateProfileReferences(input.activeProfile, input.knownSkills, input.knownMcpServers);
+  const warnings = validateProfileReferences(
+    input.activeProfile,
+    input.knownSkills,
+    input.knownPrompts,
+    input.knownMcpServers,
+  );
   const lines = [
     `Active profile: ${input.activeProfileName}`,
     `Skills enabled: ${formatList(input.activeProfile.skillsEnable, "all unless disabled")}`,
     `Skills disabled: ${formatList(input.activeProfile.skillsDisable)}`,
+    `Prompts enabled: ${formatList(input.activeProfile.promptsEnable, "all unless disabled")}`,
+    `Prompts disabled: ${formatList(input.activeProfile.promptsDisable)}`,
     `MCP servers enabled: ${formatList(input.activeProfile.mcpServersEnable, "all unless disabled")}`,
     `MCP servers disabled: ${formatList(input.activeProfile.mcpServersDisable)}`,
     `Behavioral guidelines: ${input.activeProfile.extensionState?.behavioralGuidelines?.enabled === false ? "off" : "on"}`,
@@ -240,9 +265,10 @@ function notifyValidationWarnings(
   profileName: string,
   profile: ProfileDefinition,
   knownSkills: string[],
+  knownPrompts: string[],
   knownServers: string[],
 ): void {
-  const warnings = validateProfileReferences(profile, knownSkills, knownServers);
+  const warnings = validateProfileReferences(profile, knownSkills, knownPrompts, knownServers);
   if (warnings.length > 0) {
     ctx.ui.notify(`Profile "${profileName}" warnings:\n${warnings.join("\n")}`, "warning");
   }
@@ -252,6 +278,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
   const state: {
     profiles: Record<string, ProfileDefinition>;
     knownSkills: string[];
+    knownPrompts: string[];
     knownMcpServers: string[];
     activeProfileName?: string;
     activeProfile?: ProfileDefinition;
@@ -262,6 +289,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
   } = {
     profiles: {},
     knownSkills: [],
+    knownPrompts: [],
     knownMcpServers: [],
     warnedAboutDirectMcpTools: false,
     warnedAboutMissingGuidelinesMarker: false,
@@ -289,7 +317,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
       a.localeCompare(b),
     );
     updateStatus(ctx, name);
-    notifyValidationWarnings(ctx, name, profile, state.knownSkills, state.knownMcpServers);
+    notifyValidationWarnings(ctx, name, profile, state.knownSkills, state.knownPrompts, state.knownMcpServers);
   }
 
   function persistProfileState(cwd?: string): void {
@@ -333,6 +361,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
               activeProfileName: state.activeProfileName,
               activeProfile: state.activeProfile,
               knownSkills: state.knownSkills,
+              knownPrompts: state.knownPrompts,
               knownMcpServers: state.knownMcpServers,
               resourcesRequireReload: state.resourcesRequireReload,
             }),
@@ -463,6 +492,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     state.knownSkills = [...new Set([...loadProfileKnownSkillNames(ctx.cwd), ...getKnownSkillNames(pi.getCommands())])].sort(
       (a, b) => a.localeCompare(b),
     );
+    state.knownPrompts = loadProfileKnownPromptNames(ctx.cwd);
     state.knownMcpServers = loadProfileKnownMcpServerNames(ctx.cwd);
     state.warnedAboutDirectMcpTools = false;
     state.warnedAboutMissingGuidelinesMarker = false;

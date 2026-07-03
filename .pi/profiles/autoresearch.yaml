@@ -5,6 +5,7 @@ skillsEnable:
   - pragmatic-principles
   - systematic-debugging
   - git-commit
+promptsEnable: []
 mcpServersEnable:
   - exa
 mcpServersDisable:

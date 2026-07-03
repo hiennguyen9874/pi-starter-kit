@@ -12,6 +12,9 @@ skillsEnable:
   - golang-testing
   - source-driven-development
   - test-driven-development
+promptsEnable:
+  - debug-issue
+  - execute-plan-simple
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

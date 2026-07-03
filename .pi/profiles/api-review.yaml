@@ -1,5 +1,7 @@
 skillsEnable:
   - api-designer
+promptsEnable:
+  - api-review
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

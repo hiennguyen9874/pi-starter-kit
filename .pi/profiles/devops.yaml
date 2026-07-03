@@ -7,6 +7,9 @@ skillsEnable:
   - ci-cd-and-automation
   - git-workflow-and-versioning
   - verification-before-completion
+promptsEnable:
+  - debug-issue
+  - execute-plan-simple
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

@@ -8,6 +8,13 @@ skillsEnable:
   - verification-before-completion
   - pragmatic-principles
   - handoff
+promptsEnable:
+  - commit-work
+  - execute-plan-simple
+  - execute-plan-with-subagents
+  - execute-plan-with-subagents-async
+  - fix-review-issues
+  - verify-before-done
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

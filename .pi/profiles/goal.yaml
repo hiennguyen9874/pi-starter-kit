@@ -7,6 +7,8 @@ skillsEnable:
   - systematic-debugging
   - git-commit
   - pi-goal
+promptsEnable:
+  - create-goal
 mcpServersEnable:
   - exa
 mcpServersDisable:

@@ -6,6 +6,7 @@ import { join } from "node:path";
 
 import {
   loadProfileKnownMcpServerNames,
+  loadProfileKnownPromptNames,
   loadProfileKnownSkillNames,
   readPersistedProfileName,
   syncBaseSystemResources,
@@ -35,6 +36,12 @@ function writeSkill(root: string, name: string): void {
   );
 }
 
+function writePrompt(root: string, name: string): void {
+  const promptsDir = join(root, ".pi", "prompts");
+  mkdirSync(promptsDir, { recursive: true });
+  writeFileSync(join(promptsDir, `${name}.md`), `---\ndescription: ${name}\n---\n\n# ${name}\n`);
+}
+
 test("syncProfileResources writes skill exclusions for project skills outside the allow-list", () => {
   const root = createRoot();
   writeSkill(root, "backend-patterns");
@@ -54,6 +61,24 @@ test("syncProfileResources writes skill exclusions for project skills outside th
   assert.deepEqual(settings.skills, ["+skills/custom", "-skills/frontend-design", "-skills/ui-styling"]);
   assert.equal(settings.theme, "dark");
   assert.deepEqual(loadProfileKnownSkillNames(root), ["backend-patterns", "frontend-design", "ui-styling"]);
+});
+
+test("syncProfileResources writes prompt exclusions for project prompts outside the allow-list", () => {
+  const root = createRoot();
+  writePrompt(root, "api-review");
+  writePrompt(root, "debug-issue");
+  writePrompt(root, "frontend-ui-audit");
+  writeFileSync(join(root, ".pi", "settings.base.json"), JSON.stringify({ theme: "dark", prompts: ["+prompts/custom.md"] }, null, 2));
+
+  syncProfileResources(root, "review", {
+    promptsEnable: ["api-review"],
+    promptsDisable: ["debug-issue"],
+  });
+
+  const settings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+
+  assert.deepEqual(settings.prompts, ["+prompts/custom.md", "-prompts/debug-issue.md", "-prompts/frontend-ui-audit.md"]);
+  assert.deepEqual(loadProfileKnownPromptNames(root), ["api-review", "debug-issue", "frontend-ui-audit"]);
 });
 
 test("syncProfileResources overlays package and extension entries from the active profile", () => {

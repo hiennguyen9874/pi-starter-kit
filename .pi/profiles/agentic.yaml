@@ -6,6 +6,12 @@ skillsEnable:
   - agent-md-refactor
   - context7-cli
   - pragmatic-principles
+promptsEnable:
+  - create-agent-workflow
+  - create-new-skill
+  - improve-prompt-system
+  - improve-skill-system
+  - refactor-agent-instructions
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

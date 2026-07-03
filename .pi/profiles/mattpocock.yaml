@@ -1,9 +1,13 @@
 skillsEnable:
-  - git-commit
-  - git-workflow-and-versioning
-  - finishing-a-development-branch
-  - verification-before-completion
+  - interview-me
+  - grilling
+  - grill-with-docs
   - handoff
+  - pragmatic-principles
+  - domain-modeling
+  - codebase-design
+  - improve-codebase-architecture
+promptsEnable: []
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -18,16 +22,16 @@ extensionState:
       repositoryInstructions: false
       executionPolicy: true
       evidenceDiscipline: true
-      changeScope: true
+      changeScope: false
       validation: true
       efficiency: true
-      finalResponse: true
-      planningDiscipline: false
+      finalResponse: false
+      planningDiscipline: true
 packagesEnable:
-  - git:github.com/hiennguyen9874/pi-hashline-edit
+  - npm:@ff-labs/pi-fff
 packagesDisable:
   - npm:pi-context-prune
-  - npm:@ff-labs/pi-fff
+  - git:github.com/hiennguyen9874/pi-hashline-edit
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
   - git:github.com/hiennguyen9874/pi-goal

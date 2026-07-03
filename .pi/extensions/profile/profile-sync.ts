@@ -9,6 +9,7 @@ interface JsonObject {
 
 interface ManagedProfileState {
   managedSkillEntries?: string[];
+  managedPromptEntries?: string[];
   managedPackageEntries?: string[];
   managedExtensionEntries?: string[];
 }
@@ -96,6 +97,9 @@ function readManagedState(cwd: string): ManagedProfileState {
     managedSkillEntries: Array.isArray(parsed.managedSkillEntries)
       ? parsed.managedSkillEntries.filter((entry): entry is string => typeof entry === "string")
       : [],
+    managedPromptEntries: Array.isArray(parsed.managedPromptEntries)
+      ? parsed.managedPromptEntries.filter((entry): entry is string => typeof entry === "string")
+      : [],
     managedPackageEntries: Array.isArray(parsed.managedPackageEntries)
       ? parsed.managedPackageEntries.filter((entry): entry is string => typeof entry === "string")
       : [],
@@ -178,6 +182,25 @@ function getSettingEntries(settings: JsonObject | undefined, key: "packages" | "
   return Array.isArray(settings?.[key]) ? settings[key].filter((entry): entry is string => typeof entry === "string") : [];
 }
 
+function loadProjectPromptResources(cwd: string): ProjectSkillResource[] {
+  const piDir = getPiDir(cwd);
+  const promptsDir = join(piDir, "prompts");
+  if (!existsSync(promptsDir)) {
+    return [];
+  }
+
+  return readdirSync(promptsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md") && !entry.name.startsWith(".") && !entry.name.startsWith("_"))
+    .map((entry) => {
+      const fullPath = join(promptsDir, entry.name);
+      return {
+        name: entry.name.replace(/\.md$/i, ""),
+        overrideEntry: relative(piDir, fullPath).replace(/\\/g, "/"),
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function buildManagedSettingEntries(defaultEntries: string[], enabled: string[] = [], disabled: string[] = []): string[] {
   const enabledNames = new Set(enabled.map(resourceName));
   const disabledNames = new Set(disabled.map(resourceName));
@@ -231,10 +254,22 @@ function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): stri
       .map((skill) => `-${skill.overrideEntry}`),
   );
 }
+function buildManagedPromptEntries(cwd: string, profile: ProfileDefinition): string[] {
+  const enabledSet = new Set(profile.promptsEnable ?? []);
+  const disabledSet = new Set(profile.promptsDisable ?? []);
+  const enableAll = enabledSet.has(PROFILE_WILDCARD);
+  const disableAll = disabledSet.has(PROFILE_WILDCARD);
+
+  return dedupeSorted(
+    loadProjectPromptResources(cwd)
+      .filter((prompt) => disableAll || disabledSet.has(prompt.name) || (!enableAll && enabledSet.size > 0 && !enabledSet.has(prompt.name)))
+      .map((prompt) => `-${prompt.overrideEntry}`),
+  );
+}
 
 function mergeManagedSettingEntries(
   settings: JsonObject,
-  key: "skills" | "packages" | "extensions",
+  key: "skills" | "prompts" | "packages" | "extensions",
   previousManaged: string[],
   nextManaged: string[],
 ): JsonObject {
@@ -301,6 +336,9 @@ export function loadProfileKnownSkillNames(cwd: string): string[] {
   return dedupeSorted(loadProjectSkillResources(cwd).map((skill) => skill.name));
 }
 
+export function loadProfileKnownPromptNames(cwd: string): string[] {
+  return dedupeSorted(loadProjectPromptResources(cwd).map((prompt) => prompt.name));
+}
 export function loadProfileKnownMcpServerNames(cwd: string): string[] {
   const source = readJsonObject(getMcpBasePath(cwd)) ?? readJsonObject(getMcpPath(cwd));
   const servers = isObject(source?.mcpServers) ? source.mcpServers : {};
@@ -363,6 +401,7 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const settingsPath = getSettingsPath(cwd);
   const baseSettings = readJsonObject(getSettingsBasePath(cwd));
   const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
+  const nextManagedPromptEntries = buildManagedPromptEntries(cwd, profile);
   const nextManagedPackageEntries = buildManagedSettingEntries(
     getSettingEntries(baseSettings, "packages"),
     profile.packagesEnable,
@@ -375,15 +414,21 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   );
   const currentSettings = baseSettings ?? readJsonObject(settingsPath) ?? {};
   const previousManagedSkillEntries = baseSettings ? [] : (managedState.managedSkillEntries ?? []);
+  const previousManagedPromptEntries = baseSettings ? [] : (managedState.managedPromptEntries ?? []);
   const previousManagedPackageEntries = baseSettings ? [] : (managedState.managedPackageEntries ?? []);
   const previousManagedExtensionEntries = baseSettings ? [] : (managedState.managedExtensionEntries ?? []);
   const nextSettings = mergeManagedSettingEntries(
     mergeManagedSettingEntries(
       mergeManagedSettingEntries(
-        currentSettings,
-        "skills",
-        previousManagedSkillEntries,
-        nextManagedSkillEntries,
+        mergeManagedSettingEntries(
+          currentSettings,
+          "skills",
+          previousManagedSkillEntries,
+          nextManagedSkillEntries,
+        ),
+        "prompts",
+        previousManagedPromptEntries,
+        nextManagedPromptEntries,
       ),
       "packages",
       previousManagedPackageEntries,
@@ -405,6 +450,7 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const persistedChanged = writePersistedProfileName(cwd, profileName);
   const managedStateChanged = writeJsonObject(getManagedStatePath(cwd), {
     managedSkillEntries: nextManagedSkillEntries,
+    managedPromptEntries: nextManagedPromptEntries,
     managedPackageEntries: nextManagedPackageEntries,
     managedExtensionEntries: nextManagedExtensionEntries,
   });

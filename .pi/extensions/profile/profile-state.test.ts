@@ -225,6 +225,7 @@ test("buildProfileExplanation describes active profile restrictions", () => {
       mcpServersDisable: ["memory"],
     },
     knownSkills: ["frontend-design"],
+    knownPrompts: [],
     knownMcpServers: ["chrome-devtools", "memory"],
     resourcesRequireReload: true,
   });

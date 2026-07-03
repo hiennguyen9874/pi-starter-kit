@@ -9,6 +9,13 @@ skillsEnable:
   - banner-design
   - slides
   - web-design-guidelines
+promptsEnable:
+  - frontend-design-direction
+  - frontend-polish-pass
+  - frontend-ui-audit
+  - interface-design-direction
+  - interface-polish-pass
+  - react-view-transitions-build
 mcpServersEnable:
   - chrome-devtools
 mcpServersDisable:

@@ -49,6 +49,12 @@ export function summarizeProfile(name: string, profile: ProfileDefinition): stri
   if (profile.skillsDisable?.length) {
     parts.push(`skills -${profile.skillsDisable.join(", ")}`);
   }
+  if (profile.promptsEnable?.length) {
+    parts.push(`prompts +${profile.promptsEnable.join(", ")}`);
+  }
+  if (profile.promptsDisable?.length) {
+    parts.push(`prompts -${profile.promptsDisable.join(", ")}`);
+  }
   if (profile.mcpServersEnable?.length) {
     parts.push(`mcp +${profile.mcpServersEnable.join(", ")}`);
   }

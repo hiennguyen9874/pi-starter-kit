@@ -21,6 +21,8 @@ export interface LoadProfilesConfigResult {
 const LIST_FIELDS = [
   "skillsEnable",
   "skillsDisable",
+  "promptsEnable",
+  "promptsDisable",
   "mcpServersEnable",
   "mcpServersDisable",
   "packagesEnable",

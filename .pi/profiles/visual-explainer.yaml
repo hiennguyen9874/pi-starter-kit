@@ -1,12 +1,15 @@
 skillsEnable:
-  - bootstrap-project-context
   - interview-me
   - grilling
-  - prd
-  - spec-driven-development
-  - writing-plans
   - handoff
-  - readiness-report
+  - context7-cli
+  - visual-explainer
+promptsEnable:
+  - generate-slides
+  - generate-visual-plan
+  - generate-web-diagram
+  - project-recap
+  - plan-review
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -34,3 +37,5 @@ packagesDisable:
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
   - git:github.com/hiennguyen9874/pi-goal
+extensionsEnable:
+  - ./extensions/visual-explainer.ts

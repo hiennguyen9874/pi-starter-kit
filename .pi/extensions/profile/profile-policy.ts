@@ -9,6 +9,8 @@ export interface ProfileExtensionState {
 export interface ProfileDefinition {
   skillsEnable?: string[];
   skillsDisable?: string[];
+  promptsEnable?: string[];
+  promptsDisable?: string[];
   mcpServersEnable?: string[];
   mcpServersDisable?: string[];
   packagesEnable?: string[];
@@ -20,8 +22,10 @@ export interface ProfileDefinition {
 
 export interface ProfilePolicy {
   hasSkillAllowList: boolean;
+  hasPromptAllowList: boolean;
   hasMcpAllowList: boolean;
   isSkillAllowed(name: string): boolean;
+  isPromptAllowed(name: string): boolean;
   isMcpServerAllowed(name: string): boolean;
 }
 
@@ -50,12 +54,18 @@ export function createProfilePolicy(profile: ProfileDefinition = {}): ProfilePol
   const skillDisabledSet = new Set(profile.skillsDisable ?? []);
   const mcpEnabledSet = new Set(profile.mcpServersEnable ?? []);
   const mcpDisabledSet = new Set(profile.mcpServersDisable ?? []);
+  const promptEnabledSet = new Set(profile.promptsEnable ?? []);
+  const promptDisabledSet = new Set(profile.promptsDisable ?? []);
 
   return {
     hasSkillAllowList: hasRestrictiveAllowList(skillEnabledSet),
+    hasPromptAllowList: hasRestrictiveAllowList(promptEnabledSet),
     hasMcpAllowList: hasRestrictiveAllowList(mcpEnabledSet),
     isSkillAllowed(name: string) {
       return isAllowed(name, skillEnabledSet, skillDisabledSet);
+    },
+    isPromptAllowed(name: string) {
+      return isAllowed(name, promptEnabledSet, promptDisabledSet);
     },
     isMcpServerAllowed(name: string) {
       return isAllowed(name, mcpEnabledSet, mcpDisabledSet);
