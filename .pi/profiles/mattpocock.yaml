@@ -16,7 +16,6 @@ skillsEnable:
   - triage
   - grilling
   - handoff
-  - writing-great-skills
   - bootstrap-project-context
 promptsEnable:
   - project-next-step
