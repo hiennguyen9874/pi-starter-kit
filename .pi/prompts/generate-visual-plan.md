@@ -5,7 +5,7 @@ skills:
   - visual-explainer
 ---
 
-Use visual-explainer skill and generate a self-contained HTML implementation plan for: $@
+Generate a self-contained HTML implementation plan for: $@
 
 ## Research first
 

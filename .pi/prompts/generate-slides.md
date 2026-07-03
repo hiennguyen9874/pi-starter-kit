@@ -5,7 +5,7 @@ skills:
   - visual-explainer
 ---
 
-Use visual-explainer skill and generate a slide deck for: $@
+Generate a slide deck for: $@
 
 Before writing HTML, read `./templates/slide-deck.html`, `./references/slide-patterns.md`, and only the shared CSS/library sections needed for the source.
 

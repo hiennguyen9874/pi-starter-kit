@@ -5,7 +5,7 @@ skills:
   - visual-explainer
 ---
 
-Use visual-explainer skill and generate a self-contained HTML project recap.
+Generate a self-contained HTML project recap.
 
 ## Data gathering before HTML
 
