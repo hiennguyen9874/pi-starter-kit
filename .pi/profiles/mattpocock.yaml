@@ -1,12 +1,22 @@
 skillsEnable:
-  - interview-me
-  - grilling
-  - grill-with-docs
-  - handoff
-  - pragmatic-principles
-  - domain-modeling
+  - code-review
   - codebase-design
+  - diagnosing-bugs
+  - domain-modeling
+  - grill-with-docs
+  - implement
   - improve-codebase-architecture
+  - prototype
+  - research
+  - resolving-merge-conflicts
+  - setup-matt-pocock-skills
+  - tdd
+  - to-issues
+  - to-prd
+  - triage
+  - grilling
+  - handoff
+  - writing-great-skills
   - bootstrap-project-context
 promptsEnable:
   - project-next-step
@@ -24,16 +34,16 @@ extensionState:
       repositoryInstructions: false
       executionPolicy: true
       evidenceDiscipline: true
-      changeScope: false
+      changeScope: true
       validation: true
       efficiency: true
-      finalResponse: false
-      planningDiscipline: true
+      finalResponse: true
+      planningDiscipline: false
 packagesEnable:
-  - npm:@ff-labs/pi-fff
+  - git:github.com/hiennguyen9874/pi-hashline-edit
 packagesDisable:
   - npm:pi-context-prune
-  - git:github.com/hiennguyen9874/pi-hashline-edit
+  - npm:@ff-labs/pi-fff
   - npm:pi-hashline-edit
   - npm:pi-hashline-readmap
   - git:github.com/hiennguyen9874/pi-goal
