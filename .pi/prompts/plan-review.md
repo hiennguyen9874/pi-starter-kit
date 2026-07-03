@@ -5,7 +5,7 @@ skills:
   - visual-explainer
 ---
 
-Load the visual-explainer skill and generate a self-contained HTML plan review.
+Use visual-explainer skill and generate a self-contained HTML plan review.
 
 ## Inputs
 
