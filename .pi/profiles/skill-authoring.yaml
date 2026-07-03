@@ -6,7 +6,6 @@ skillsEnable:
   - prompt-leverage
   - pragmatic-principles
 promptsEnable:
-  - code-quality-review
   - create-agent-workflow
   - create-new-skill
   - improve-prompt-system

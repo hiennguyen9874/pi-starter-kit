@@ -7,7 +7,9 @@ skillsEnable:
   - domain-modeling
   - codebase-design
   - improve-codebase-architecture
-promptsEnable: []
+  - bootstrap-project-context
+promptsEnable:
+  - project-next-step
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
