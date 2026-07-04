@@ -15,6 +15,24 @@ if (!REGISTRY) {
   throw new Error("Expected repository behavioral guideline registry to load");
 }
 
+test("loadBehavioralGuidelineRegistry exposes current behavioral guideline sections", () => {
+  assert.deepEqual(
+    REGISTRY.guidelines.map(({ name }) => name),
+    [
+      "communicationAndToolUse",
+      "repositoryInstructions",
+      "executionAndDelivery",
+      "evidenceDiscipline",
+      "planningDiscipline",
+      "changeScope",
+      "validation",
+      "finalResponse",
+    ],
+  );
+  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "repositoryInstructions")?.defaultEnabled, true);
+  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "planningDiscipline")?.defaultEnabled, false);
+});
+
 test("injectBehavioralGuidelines disables configured sections per profile", () => {
   const result = injectBehavioralGuidelines(
     SYSTEM_PROMPT,

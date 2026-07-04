@@ -6,12 +6,11 @@ import { parse as parseYaml } from "yaml";
 export const FALLBACK_BEHAVIORAL_GUIDELINE_SECTION_NAMES = [
   "communicationAndToolUse",
   "repositoryInstructions",
-  "executionPolicy",
+  "executionAndDelivery",
   "evidenceDiscipline",
   "planningDiscipline",
   "changeScope",
   "validation",
-  "efficiency",
   "finalResponse",
 ] as const;
 

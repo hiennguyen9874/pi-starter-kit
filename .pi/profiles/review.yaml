@@ -21,12 +21,10 @@ extensionState:
     enabled: true
     sections:
       communicationAndToolUse: true
-      repositoryInstructions: false
-      executionPolicy: true
+      executionAndDelivery: true
       evidenceDiscipline: true
       changeScope: true
       validation: true
-      efficiency: true
       finalResponse: false
       planningDiscipline: false
 packagesEnable:

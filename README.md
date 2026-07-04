@@ -61,16 +61,11 @@ Everything Pi-specific lives in `.pi/`:
 
 ### Behavior / Prompt Injection
 
-These extensions inject guidelines into the system prompt. Each can be toggled with a `/command` and persists state in `.pi/settings.json` under `extensionState`.
+These extensions and profile settings shape injected system prompt content. Behavioral guideline sections are registered in `.pi/guidelines/guidelines.yaml` and can be enabled, disabled, or explicitly included per profile via `extensionState.behavioralGuidelines`.
 
-| Extension | Command | Default | Injected guidelines |
+| Extension / setting | Control | Default | Injected guidelines |
 |---|---|---|---|
-| `tool-call-behavior.ts` | `/tool-call-behavior` | on | Preface meaningful tool calls; skip fluff for routine reads. |
-| `repository-instructions.ts` | `/repository-instructions` | on | Respect `AGENTS.md` hierarchy and priority rules. |
-| `behavioral-guidelines.ts` | `/behavioral-guidelines` | on | Think before coding, simplicity first, surgical changes, goal-driven execution. |
-| `validation-rules.ts` | `/validation-rules` | on | Run narrow checks first, iterate up to 3 times on related failures. |
-| `efficiency.ts` | `/efficiency` | on | Prefer targeted reads, avoid re-reading after successful edits. |
-| `final-response.ts` | `/final-response` | on | Concise handoff format: Result, Files, Validation, Notes. |
+| `profile/behavioral-guidelines.ts` | profile `extensionState.behavioralGuidelines` | on | Communication/tool use, `AGENTS.md` hierarchy, execution/delivery, evidence discipline, change scope, validation, and final response. Planning discipline is available but default-off. |
 | `pi-documentation.ts` | `/pi-documentation` | off | Removes the Pi documentation section from the system prompt when off. |
 | `caveman.ts` | `/caveman` | full | Terse communication mode (lite/full/ultra/wenyan/commit/review/compress). |
 

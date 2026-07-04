@@ -27,12 +27,10 @@ extensionState:
     enabled: true
     sections:
       communicationAndToolUse: true
-      repositoryInstructions: false
-      executionPolicy: true
+      executionAndDelivery: true
       evidenceDiscipline: true
       changeScope: false
       validation: false
-      efficiency: true
       finalResponse: false
       planningDiscipline: true
 packagesEnable:
