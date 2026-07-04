@@ -4,7 +4,7 @@ skillsEnable:
   - handoff
   - context7-cli
   - teach
-promptsEnable: []
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

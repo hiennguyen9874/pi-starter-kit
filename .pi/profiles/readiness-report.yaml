@@ -1,6 +1,6 @@
 skillsEnable:
   - readiness-report
-promptsEnable: []
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

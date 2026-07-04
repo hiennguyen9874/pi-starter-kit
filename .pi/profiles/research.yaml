@@ -2,7 +2,7 @@ skillsEnable:
   - grilling
   - handoff
   - context7-cli
-promptsEnable: []
+promptsDisable: ["*"]
 mcpServersEnable:
   - deepwiki
   - exa
