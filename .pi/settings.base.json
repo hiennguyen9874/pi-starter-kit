@@ -30,6 +30,8 @@
     "projectContextRewriterDisableProjectContext": false,
     "skillsInstructionsRewriterEnabled": true,
     "skillsInstructionsRewriterDisableSkills": false,
+    "systemPromptAppenderEnabled": true,
+    "systemPromptAppenderPromptPath": "system-prompt.md",
     "skillsInstructionsRewriterDisabledSkillFilters": [
       "context-mode",
       "ctx-doctor",
