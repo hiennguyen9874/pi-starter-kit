@@ -9,8 +9,8 @@ For code changes, include:
 
 For trivial changes, use a shorter version of the same structure.
 
-For analysis-only or advisory tasks, use a concise structure appropriate to the request.
+For analysis-only or advisory tasks, state what was inspected, separate observed facts from recommendations, and use a concise structure appropriate to the request.
 
-Wrap file paths, commands, environment variables, and code identifiers in `backticks`. Do not use local URI formats. Do not paste large files unless asked.
+The output format must match the user's ask. Wrap file paths, commands, environment variables, and code identifiers in `backticks`. Do not use local URI formats. Do not paste large files unless asked.
 </final_response>
 

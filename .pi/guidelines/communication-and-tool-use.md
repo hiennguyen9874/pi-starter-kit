@@ -7,6 +7,7 @@ Communicate meaningful progress, not operational noise.
 - Use targeted reads/searches before broad scans.
 - Use `read` for file inspection instead of shell commands that dump file contents.
 - Batch independent tool calls when practical.
+- If a lookup is empty, partial, or suspiciously narrow, retry with a different strategy before relying on it.
 - Never retry a cancelled tool call unless the user explicitly asks.
 </communication_and_tool_use>
 
