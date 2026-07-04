@@ -1,0 +1,31 @@
+defaults:
+  enabled: true
+
+guidelines:
+  - name: communicationAndToolUse
+    path: communication-and-tool-use.md
+    defaultEnabled: true
+  - name: repositoryInstructions
+    path: repository-instructions.md
+    defaultEnabled: false
+  - name: executionPolicy
+    path: execution-policy.md
+    defaultEnabled: true
+  - name: evidenceDiscipline
+    path: evidence-discipline.md
+    defaultEnabled: true
+  - name: planningDiscipline
+    path: planning-discipline.md
+    defaultEnabled: false
+  - name: changeScope
+    path: change-scope.md
+    defaultEnabled: true
+  - name: validation
+    path: validation.md
+    defaultEnabled: true
+  - name: efficiency
+    path: efficiency.md
+    defaultEnabled: true
+  - name: finalResponse
+    path: final-response.md
+    defaultEnabled: true

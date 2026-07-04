@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { parse as parseYaml } from "yaml";
 
-import { BEHAVIORAL_GUIDELINE_SECTION_NAMES } from "./behavioral-guidelines.ts";
+import { loadBehavioralGuidelineSectionNames } from "./behavioral-guidelines.ts";
 import type { BehavioralGuidelinesConfig, BehavioralGuidelineSectionName } from "./behavioral-guidelines.ts";
 import type { ProfileDefinition, ProfileExtensionState } from "./profile-policy.ts";
 
@@ -30,7 +30,6 @@ const LIST_FIELDS = [
   "extensionsEnable",
   "extensionsDisable",
 ] as const;
-const BEHAVIORAL_GUIDELINE_SECTION_NAME_SET = new Set<string>(BEHAVIORAL_GUIDELINE_SECTION_NAMES);
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -40,7 +39,11 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function validateBehavioralGuidelinesConfig(profileName: string, value: unknown): BehavioralGuidelinesConfig {
+function validateBehavioralGuidelinesConfig(
+  profileName: string,
+  value: unknown,
+  behavioralGuidelineSectionNameSet: Set<string>,
+): BehavioralGuidelinesConfig {
   if (!isObject(value)) {
     throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines" must be an object`);
   }
@@ -61,7 +64,7 @@ function validateBehavioralGuidelinesConfig(profileName: string, value: unknown)
 
     const sections: Partial<Record<BehavioralGuidelineSectionName, boolean>> = {};
     for (const [sectionName, sectionValue] of Object.entries(value.sections)) {
-      if (!BEHAVIORAL_GUIDELINE_SECTION_NAME_SET.has(sectionName)) {
+      if (!behavioralGuidelineSectionNameSet.has(sectionName)) {
         throw new Error(`Profile "${profileName}" has unknown behavioral guideline section "${sectionName}"`);
       }
       if (typeof sectionValue !== "boolean") {
@@ -74,23 +77,56 @@ function validateBehavioralGuidelinesConfig(profileName: string, value: unknown)
     result.sections = sections;
   }
 
+  if (value.include !== undefined) {
+    if (!isStringArray(value.include)) {
+      throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines.include" must be a string[]`);
+    }
+
+    for (const sectionName of value.include) {
+      if (!behavioralGuidelineSectionNameSet.has(sectionName)) {
+        throw new Error(`Profile "${profileName}" has unknown behavioral guideline section "${sectionName}"`);
+      }
+    }
+
+    result.include = value.include;
+  }
+
+  if (value.useDefaults !== undefined) {
+    if (typeof value.useDefaults !== "boolean") {
+      throw new Error(`Profile "${profileName}" field "extensionState.behavioralGuidelines.useDefaults" must be a boolean`);
+    }
+    result.useDefaults = value.useDefaults;
+  }
+
   return result;
 }
 
-function validateProfileExtensionState(name: string, value: unknown): ProfileExtensionState {
+function validateProfileExtensionState(
+  name: string,
+  value: unknown,
+  behavioralGuidelineSectionNameSet: Set<string>,
+): ProfileExtensionState {
   if (!isObject(value)) {
     throw new Error(`Profile "${name}" field "extensionState" must be an object`);
   }
 
   const result: ProfileExtensionState = {};
   if (value.behavioralGuidelines !== undefined) {
-    result.behavioralGuidelines = validateBehavioralGuidelinesConfig(name, value.behavioralGuidelines);
+    result.behavioralGuidelines = validateBehavioralGuidelinesConfig(
+      name,
+      value.behavioralGuidelines,
+      behavioralGuidelineSectionNameSet,
+    );
   }
 
   return result;
 }
 
-function validateProfileDefinition(name: string, value: unknown): ProfileDefinition {
+function validateProfileDefinition(
+  name: string,
+  value: unknown,
+  behavioralGuidelineSectionNameSet: Set<string>,
+): ProfileDefinition {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(`Profile "${name}" must be an object`);
   }
@@ -112,7 +148,7 @@ function validateProfileDefinition(name: string, value: unknown): ProfileDefinit
   }
 
   if (profile.extensionState !== undefined) {
-    result.extensionState = validateProfileExtensionState(name, profile.extensionState);
+    result.extensionState = validateProfileExtensionState(name, profile.extensionState, behavioralGuidelineSectionNameSet);
   }
 
   return result;
@@ -146,7 +182,7 @@ function isProfileYamlFile(name: string): boolean {
   return name.endsWith(".yaml") && !name.startsWith(".") && !name.startsWith("_");
 }
 
-function loadProfilesFromDirectory(profilesDir: string): {
+function loadProfilesFromDirectory(profilesDir: string, behavioralGuidelineSectionNameSet: Set<string>): {
   profiles: Record<string, ProfileDefinition>;
   errors: string[];
 } {
@@ -174,7 +210,7 @@ function loadProfilesFromDirectory(profilesDir: string): {
     try {
       const content = readFileSync(filePath, "utf8");
       const parsed = parseYaml(content);
-      const profile = validateProfileDefinition(profileName, parsed);
+      const profile = validateProfileDefinition(profileName, parsed, behavioralGuidelineSectionNameSet);
       profiles[profileName] = profile;
     } catch (error) {
       errors.push(`${filePath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -194,7 +230,8 @@ export function loadProfilesConfig(cwd: string): LoadProfilesConfigResult {
     return { path: profilesJsonPath, error: defaultError };
   }
 
-  const { profiles, errors } = loadProfilesFromDirectory(profilesDir);
+  const behavioralGuidelineSectionNameSet = new Set(loadBehavioralGuidelineSectionNames(cwd));
+  const { profiles, errors } = loadProfilesFromDirectory(profilesDir, behavioralGuidelineSectionNameSet);
   if (errors.length > 0) {
     return { path: profilesDir, error: errors.join("\n") };
   }

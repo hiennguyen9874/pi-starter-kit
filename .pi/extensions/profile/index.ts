@@ -6,6 +6,8 @@ import { Container, type SelectItem, SelectList, Text } from "@mariozechner/pi-t
 import {
   hasBehavioralGuidelinesInsertionMarker,
   injectBehavioralGuidelines,
+  loadBehavioralGuidelineRegistry,
+  type BehavioralGuidelineRegistry,
 } from "./behavioral-guidelines.ts";
 import { loadProfilesConfig } from "./profile-config.ts";
 import { getKnownSkillNames, summarizeProfile } from "./profile-discovery.ts";
@@ -286,6 +288,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     warnedAboutDirectMcpTools: boolean;
     warnedAboutMissingGuidelinesMarker: boolean;
     resourcesRequireReload: boolean;
+    behavioralGuidelineRegistry?: BehavioralGuidelineRegistry;
   } = {
     profiles: {},
     knownSkills: [],
@@ -498,6 +501,12 @@ export default function profileExtension(pi: ExtensionAPI): void {
     state.warnedAboutMissingGuidelinesMarker = false;
     state.resourcesRequireReload = false;
 
+    const loadedGuidelines = loadBehavioralGuidelineRegistry(ctx.cwd);
+    state.behavioralGuidelineRegistry = loadedGuidelines.registry;
+    if (loadedGuidelines.error) {
+      ctx.ui.notify(`Failed to load behavioral guidelines: ${loadedGuidelines.error}`, "warning");
+    }
+
     if (loaded.error) {
       ctx.ui.notify(`Failed to load profiles: ${loaded.error}`, "warning");
       setActiveProfile(undefined, ctx);
@@ -616,7 +625,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     }
 
     return {
-      systemPrompt: injectBehavioralGuidelines(event.systemPrompt, behavioralGuidelines),
+      systemPrompt: injectBehavioralGuidelines(event.systemPrompt, behavioralGuidelines, state.behavioralGuidelineRegistry),
     };
   });
 }

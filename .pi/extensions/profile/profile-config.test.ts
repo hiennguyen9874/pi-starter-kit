@@ -119,14 +119,14 @@ test("rejects invalid behavioral guideline section in YAML file", () => {
   assert.match(result.error ?? "", /unknown behavioral guideline section/i);
 });
 
-test("repository base profile allows bundled extension skills used by prompts", () => {
+test("repository base profile allows configured skills", () => {
   const result = loadProfilesConfig(process.cwd());
   const baseProfile = result.config?.profiles.base;
   assert.ok(baseProfile);
 
   const policy = createProfilePolicy(baseProfile);
 
-  assert.equal(policy.isSkillAllowed("ask-user"), true);
+  assert.equal(policy.isSkillAllowed("git-commit"), true);
 });
 
 test("invalid defaultProfile type is rejected", () => {
