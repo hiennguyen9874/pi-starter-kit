@@ -1,18 +1,4 @@
 
-const OPERATING_CONTEXT = `<operating_context>
-You run inside Pi, an interactive coding-agent harness. The user works in the same workspace and can inspect files you read, edit, or create.
-
-Treat user messages, workspace files, tool outputs, and repository instructions as authoritative context.
-
-Do not invent file contents, command results, APIs, project behavior, or test outcomes. If evidence is missing, inspect with available tools or state the uncertainty clearly.
-</operating_context>
-
-<personality>
-Be concise, direct, and friendly. Act like a pragmatic senior teammate. Prefer actionable guidance, clear assumptions, and practical next steps over long explanations.
-</personality>
-
-`;
-
 const COMMUNICATION_AND_TOOL_USE = `<communication_and_tool_use>
 Communicate meaningful progress, not operational noise.
 
@@ -243,7 +229,6 @@ const GUIDELINE_SECTIONS: Array<{
   },
 ];
 
-const TOOLS_MARKER = "\nAvailable tools:";
 const PRIMARY_MARKER = "\nPi documentation (read only";
 const FALLBACK_MARKER = "\n<project_context>\n";
 
@@ -255,17 +240,6 @@ function getEnabledGuidelines(config: BehavioralGuidelinesConfig | undefined, sy
   })
     .map(({ content }) => content)
     .join("");
-}
-
-function injectOperatingContext(systemPrompt: string): string {
-  if (systemPrompt.includes(OPERATING_CONTEXT)) return systemPrompt;
-
-  const markerIndex = systemPrompt.indexOf(TOOLS_MARKER);
-  if (markerIndex === -1) {
-    return `${systemPrompt}\n${OPERATING_CONTEXT}`;
-  }
-
-  return `${systemPrompt.slice(0, markerIndex)}\n${OPERATING_CONTEXT}${systemPrompt.slice(markerIndex)}`;
 }
 
 function injectGuidelines(systemPrompt: string, config?: BehavioralGuidelinesConfig): string {
@@ -282,7 +256,7 @@ function injectGuidelines(systemPrompt: string, config?: BehavioralGuidelinesCon
 }
 
 function injectPromptSections(systemPrompt: string, config?: BehavioralGuidelinesConfig): string {
-  return injectGuidelines(injectOperatingContext(systemPrompt), config);
+  return injectGuidelines(systemPrompt, config);
 }
 
 export function hasBehavioralGuidelinesInsertionMarker(systemPrompt: string): boolean {

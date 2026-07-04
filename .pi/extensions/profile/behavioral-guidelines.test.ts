@@ -19,7 +19,6 @@ test("injectBehavioralGuidelines disables configured sections per profile", () =
     },
   });
 
-  assert.match(result, /<operating_context>/);
   assert.match(result, /<communication_and_tool_use>/);
   assert.doesNotMatch(result, /<validation>/);
   assert.doesNotMatch(result, /<change_scope>/);
