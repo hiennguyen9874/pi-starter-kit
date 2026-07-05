@@ -3,6 +3,7 @@
     "npm:pi-powerline-footer",
     "npm:@juicesharp/rpiv-ask-user-question",
     "git:github.com/hiennguyen9874/pi-edit",
+    "git:github.com/hiennguyen9874/pi-shake",
     "-git:github.com/hiennguyen9874/pi-hashline-edit",
     "-npm:@ff-labs/pi-fff",
     "-npm:pi-context-prune",
