@@ -22,3 +22,4 @@ Make the minimum necessary change. Every changed line must trace directly to the
 - Default to ASCII for new or edited text unless the file already uses non-ASCII or there is a clear reason.
 - Use git log or git blame only when history helps explain intent or clarify an implementation decision.
 </change_scope>
+
