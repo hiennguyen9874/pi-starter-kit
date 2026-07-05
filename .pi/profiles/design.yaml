@@ -34,11 +34,5 @@ extensionState:
       finalResponse: false
       planningDiscipline: true
 packagesEnable:
-  - npm:@ff-labs/pi-fff
   - npm:pi-mcp-adapter
-packagesDisable:
-  - npm:pi-context-prune
-  - git:github.com/hiennguyen9874/pi-hashline-edit
-  - npm:pi-hashline-edit
-  - npm:pi-hashline-readmap
-  - git:github.com/hiennguyen9874/pi-goal
+packagesDisable: []

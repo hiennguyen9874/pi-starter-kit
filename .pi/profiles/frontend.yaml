@@ -45,10 +45,4 @@ extensionState:
       planningDiscipline: false
 packagesEnable:
   - npm:pi-mcp-adapter
-  - git:github.com/hiennguyen9874/pi-hashline-edit
-packagesDisable:
-  - npm:pi-context-prune
-  - npm:@ff-labs/pi-fff
-  - npm:pi-hashline-edit
-  - npm:pi-hashline-readmap
-  - git:github.com/hiennguyen9874/pi-goal
+packagesDisable: []

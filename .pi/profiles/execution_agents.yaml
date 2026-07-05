@@ -36,11 +36,4 @@ packagesEnable:
   - npm:pi-prompt-template-model
   - npm:pi-subagents
   - npm:pi-intercom
-  - npm:@ff-labs/pi-fff
-packagesDisable:
-  - npm:pi-context-prune
-  - git:github.com/hiennguyen9874/pi-hashline-edit
-  - npm:pi-hashline-edit
-  - npm:pi-hashline-readmap
-  - npm:@juicesharp/rpiv-ask-user-question
-  - git:github.com/hiennguyen9874/pi-goal
+packagesDisable: []
