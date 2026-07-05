@@ -52,6 +52,10 @@
       "find-skills"
     ]
   },
+  "piEdit": {
+    "fuzzyMatch": true,
+    "fuzzyThreshold": 0.95
+  },
   "subagents": {
     "agentOverrides": {
       "scout": {
