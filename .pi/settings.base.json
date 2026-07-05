@@ -23,7 +23,6 @@
   "extensions": [
     "./extensions/command-history/index.ts",
     "./extensions/permission-gate.ts",
-    "./extensions/protected-paths.ts",
     "-./extensions/confirm-destructive.ts",
     "-./extensions/dirty-repo-guard.ts",
     "./extensions/inline-bash.ts",
