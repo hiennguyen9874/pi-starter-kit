@@ -27,5 +27,6 @@ extensionState:
       validation: true
       finalResponse: false
       planningDiscipline: true
-packagesEnable: []
+packagesEnable:
+  - npm:@juicesharp/rpiv-ask-user-question
 packagesDisable: []

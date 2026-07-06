@@ -32,7 +32,6 @@ Available tools:
 - bash: Execute bash commands (ls, grep, find, etc.)
 - edit: Perform exact string replacement in a file
 - write: Create or overwrite files
-- ask_user_question: Ask the user up to 4 structured questions (2-4 options each) when requirements are ambiguous
 - grep: grep: search file contents by regex or literal text
 - glob: glob: find files/directories by path or glob pattern
 
@@ -44,10 +43,6 @@ Guidelines:
 - old_string must match exactly, including whitespace and newlines, and be unique unless replace_all is true.
 - Use replace_all only when the user wants every occurrence replaced.
 - Use write only for new files or complete rewrites.
-- Use ask_user_question whenever the user's request is underspecified and you cannot proceed without concrete decisions — you can ask up to 4 questions per invocation.
-- Each question MUST have 2-4 options. Every option requires a concise label (1-5 words) and a description explaining what the choice means or its trade-offs. The user can additionally type a custom answer ("Type something." row is appended automatically to single-select questions) or pick "Chat about this" to abandon the questionnaire.
-- Set multiSelect: true when multiple answers are valid; this suppresses the "Type something." row. Provide an options[].preview markdown string when an option benefits from richer side-by-side context (mockups, code snippets, diagrams, configs) — single-select only. NOTE: any non-empty preview on a single-select question ALSO suppresses the "Type something." row (no room in the side-by-side layout); "Chat about this" remains the escape hatch. If you recommend a specific option, make it the first option and append "(Recommended)" to its label.
-- Do not stack multiple ask_user_question calls back-to-back — group all clarifying questions into one invocation.
 - Set literal=true when you want exact text, especially if the pattern includes regex characters like ., *, (, [, or ?.
 - Prefer the narrowest path you can; use a specific directory or glob before searching the whole workspace.
 - Use skip to page through more matching files; each response returns at most 20 files.
