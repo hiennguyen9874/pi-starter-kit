@@ -24,3 +24,6 @@ extensionState:
       planningDiscipline: false
 packagesEnable: []
 packagesDisable: []
+extensionsEnable:
+  - ./extensions/disable-edit-tools.ts
+  - ./extensions/disable-write-tool.ts

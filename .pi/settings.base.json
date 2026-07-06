@@ -35,7 +35,11 @@
     "./extensions/prompt-skills.ts",
     "./extensions/save-last-response.ts",
     "./extensions/dump-system-prompt.ts",
-    "-./extensions/visual-explainer.ts"
+    "-./extensions/visual-explainer.ts",
+    "-./extensions/disable-bash-tool.ts",
+    "-./extensions/disable-edit-tools.ts",
+    "-./extensions/disable-write-tool.ts",
+    "-./extensions/enable-ls-tool.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
