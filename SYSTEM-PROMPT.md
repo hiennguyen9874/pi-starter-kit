@@ -64,7 +64,6 @@ Communicate meaningful progress, not operational noise.
 - Do not re-read files after successful edits unless verification or exact references require it.
 - Do not paste large files unless requested.
 - Never retry a cancelled or denied tool call unless the user explicitly asks.
-- When searching for text or files, prefer using `rg` or `rg --files` respectively because `rg` is much faster than alternatives like `grep`.
 </communication_and_tool_use>
 <same_priority_pattern_conflicts>
 When same-priority project patterns conflict, do not blend them.
