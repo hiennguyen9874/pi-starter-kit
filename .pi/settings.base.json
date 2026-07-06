@@ -1,6 +1,6 @@
 {
   "packages": [
-    "npm:pi-powerline-footer",
+    "git:github.com/hiennguyen9874/pi-powerline-footer",
     "-npm:@juicesharp/rpiv-ask-user-question",
     "git:github.com/hiennguyen9874/pi-edit",
     "git:github.com/hiennguyen9874/pi-shake",
@@ -42,7 +42,7 @@
     "-./extensions/enable-ls-tool.ts"
   ],
   "extensionState": {
-    "piDocumentationEnabled": false,
+    "piDocumentationEnabled": true,
     "projectContextRewriterDisableProjectContext": false,
     "skillsInstructionsRewriterEnabled": true,
     "skillsInstructionsRewriterDisableSkills": false,
