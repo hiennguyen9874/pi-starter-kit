@@ -33,11 +33,12 @@ Available tools:
 - edit: Perform exact string replacement in a file
 - write: Create or overwrite files
 - ask_user_question: Ask the user up to 4 structured questions (2-4 options each) when requirements are ambiguous
+- grep: grep: search file contents by regex or literal text
+- glob: glob: find files/directories by path or glob pattern
 
 In addition to the tools above, you may have access to other custom tools depending on the project.
 
 Guidelines:
-- Use bash for file operations like ls, rg, find
 - Use read to examine files instead of cat or sed.
 - Use edit with file_path, old_string, and new_string for precise replacements.
 - old_string must match exactly, including whitespace and newlines, and be unique unless replace_all is true.
@@ -47,6 +48,9 @@ Guidelines:
 - Each question MUST have 2-4 options. Every option requires a concise label (1-5 words) and a description explaining what the choice means or its trade-offs. The user can additionally type a custom answer ("Type something." row is appended automatically to single-select questions) or pick "Chat about this" to abandon the questionnaire.
 - Set multiSelect: true when multiple answers are valid; this suppresses the "Type something." row. Provide an options[].preview markdown string when an option benefits from richer side-by-side context (mockups, code snippets, diagrams, configs) — single-select only. NOTE: any non-empty preview on a single-select question ALSO suppresses the "Type something." row (no room in the side-by-side layout); "Chat about this" remains the escape hatch. If you recommend a specific option, make it the first option and append "(Recommended)" to its label.
 - Do not stack multiple ask_user_question calls back-to-back — group all clarifying questions into one invocation.
+- Set literal=true when you want exact text, especially if the pattern includes regex characters like ., *, (, [, or ?.
+- Prefer the narrowest path you can; use a specific directory or glob before searching the whole workspace.
+- Use skip to page through more matching files; each response returns at most 20 files.
 - Be concise in your responses
 - Show file paths clearly when working with files
 
@@ -190,5 +194,5 @@ The following skills provide specialized instructions for specific tasks.
 - Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.
 </skills_instructions>
 
-Current date: 2026-07-05
+Current date: 2026-07-06
 Current working directory: /home/hiennx/Documents/pi-starter-kit
