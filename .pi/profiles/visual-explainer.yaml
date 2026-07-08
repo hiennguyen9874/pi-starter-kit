@@ -4,6 +4,7 @@ skillsEnable:
   - handoff
   - context7-cli
   - visual-explainer
+  - architecture-diagram
 promptsEnable:
   - generate-slides
   - generate-visual-plan

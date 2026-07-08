@@ -37,7 +37,7 @@ Do not use this skill for general Pandas-only analysis unless the data is intend
 | Multiprocess pure Python transforms | `map(..., num_proc=N)` |
 | Preserve train/test/validation split names | pass `data_files` as a split-name dictionary |
 | Offline handoff | `save_to_disk()` on online machine, `load_from_disk()` offline |
-| Share dataset publicly or privately | login, then `dataset.push_to_hub("repo-name")` |
+| Share dataset publicly or privately | login, `dataset.push_to_hub("repo-name")`, then add a dataset card |
 | Vector search | create embeddings column, `add_faiss_index()`, then `get_nearest_examples()` |
 
 ## Loading Datasets
@@ -223,6 +223,8 @@ notebook_login()  # or `huggingface-cli login` in a terminal
 clean.push_to_hub("my-dataset")
 ```
 
+After publishing, add a dataset card in the dataset repo's `README.md`. Include intended use, data sources, collection process, fields/splits, licensing or privacy constraints, and known biases so users can decide whether the dataset is appropriate.
+
 Never paste GitHub or Hugging Face tokens into code that may be committed or shared. Prefer environment variables or a `.env` file.
 
 ## Large Datasets and Streaming
@@ -263,7 +265,7 @@ preview = list(islice(combined, 2))
 
 ## Creating Datasets from APIs
 
-For API-sourced data, fetch JSON records, save JSONL locally, then load with `load_dataset("json", ...)`.
+For API-sourced data, fetch JSON records, save JSONL locally, then load with `load_dataset("json", ...)`. Keep the raw dataset mostly intact until the target application is clear; add derived columns like `is_pull_request` or `comments` when they unlock downstream tasks.
 
 ```python
 import os
@@ -334,6 +336,7 @@ Use a sentence-transformer checkpoint suited to semantic search, such as `senten
 | Indexing a streamed dataset | Iterate, `take()`, or `skip()` instead |
 | Materializing a huge streamed dataset with `list(...)` | Only take small previews or stream into training/preprocessing |
 | Saving only cache-dependent work | Use `save_to_disk()` or export split files explicitly |
+| Publishing a dataset without context | Add a dataset card covering intended use, provenance, fields, license/privacy, and bias notes |
 | Hardcoding tokens | Use environment variables, CLI login, or `.env` files |
 
 ## Completion Checklist
@@ -345,3 +348,4 @@ Before handing off dataset code:
 - Use `batched=True` for tokenizer or list-friendly transforms.
 - Avoid loading huge datasets into memory unless intentionally materializing a sample.
 - Save or document the final dataset path/repo if downstream work depends on it.
+- If the dataset is published, include or request a dataset card before calling the work complete.

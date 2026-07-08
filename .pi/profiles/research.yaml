@@ -2,6 +2,7 @@ skillsEnable:
   - grilling
   - handoff
   - context7-cli
+  - defuddle
 promptsDisable: ["*"]
 mcpServersEnable:
   - deepwiki

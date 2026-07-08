@@ -8,6 +8,7 @@ skillsEnable:
   - verification-before-completion
   - pragmatic-principles
   - handoff
+  - finishing-a-development-branch
 promptsEnable:
   - commit-work
   - execute-plan-simple

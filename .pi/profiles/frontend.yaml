@@ -14,6 +14,8 @@ skillsEnable:
   - performance-optimization
   - source-driven-development
   - test-driven-development
+  - coding-standards
+  - code-simplification
 promptsEnable:
   - debug-issue
   - execute-plan-simple
