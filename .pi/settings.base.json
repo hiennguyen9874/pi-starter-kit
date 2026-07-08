@@ -66,7 +66,9 @@
   "enabledModels": [
     "openai-codex/*",
     "opencode-go/*",
-    "opencode/*-free*"
+    "opencode/*-free",
+    "opencode/*-free*",
+    "tencent/hy3:free"
   ],
   "subagents": {
     "agentOverrides": {
