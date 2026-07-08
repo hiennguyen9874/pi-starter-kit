@@ -63,6 +63,11 @@
     "fuzzyMatch": true,
     "fuzzyThreshold": 0.95
   },
+  "enabledModels": [
+    "openai-codex/*",
+    "opencode-go/*",
+    "opencode/*-free*"
+  ],
   "subagents": {
     "agentOverrides": {
       "scout": {
