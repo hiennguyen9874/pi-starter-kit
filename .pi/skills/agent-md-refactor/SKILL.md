@@ -1,105 +1,80 @@
 ---
 name: agent-md-refactor
-description: Use when creating or refactoring standard Markdown AGENTS.md, CLAUDE.md, COPILOT.md, or other agent instruction files; when root agent instructions are missing, bloated, contradictory, tool-private, generic, or need docs-only progressive disclosure under docs/agent-instructions/.
+description: Refactor or create a repository's root AGENTS.md into a concise root file plus docs/agent-instructions/ detail, Pi-only.
 disable-model-invocation: true
 ---
 
 # Agent MD Refactor
 
-Create or refactor standard Markdown agent instruction files using docs-only progressive disclosure.
+Create or refactor a repository's root `AGENTS.md` using **docs-only** progressive disclosure: a concise root file that links to detailed project guidance under `docs/agent-instructions/`.
 
-## Non-Negotiable Output Model
+This skill is Pi-only. `AGENTS.md` is the root instruction file; there are no per-tool instruction files to merge.
 
-Detailed project instructions must live under `docs/agent-instructions/`.
+## Leading words
 
-Root agent files (`AGENTS.md`, `CLAUDE.md`, `COPILOT.md`, etc.) may exist at repository root, but must stay concise and link to files under `docs/agent-instructions/`.
+- **load-bearing** — an instruction that changes agent behavior for this repo (prevents a specific mistake, reveals non-obvious behavior, gives an exact command, or overrides a wrong default). The test every retained instruction must pass.
+- **no-op** — an instruction that fails the **load-bearing** test: vague, generic, obvious from the codebase, stale, or default behavior the agent already follows. The target of pruning.
+- **docs-only** — detailed project instructions live under `docs/agent-instructions/`, never in tool-private directories or nested `AGENTS.md` files.
 
-Do not create detailed instruction files under:
+## Branches
 
-- `.claude/`
-- `.pi/`
-- `.codex/`
-- `.cursor/`
-- other tool-private directories
+Run the phases each branch needs:
 
-Do not create nested `AGENTS.md` files by default. If user explicitly asks for nested files, explain that this skill's default is docs-only and ask before deviating.
+| Branch | Phases | Notes |
+|---|---|---|
+| Create | 1, 4, 5, 6 | No existing file to analyze. |
+| Refactor | 1–7 | Full sequence. |
+| Merge | 1, 2, 5, 6 | Consolidating scattered instructions into docs. |
+| Review | 2, 3, 7 | Report only — no edits unless the user asks. |
 
-Use standard Markdown only. If an existing instruction file uses custom tag-only or plain-text syntax, preserve it unless the user explicitly asks to convert it.
+## Output Model
 
-## Supported Workflows
+One root `AGENTS.md`, plus detailed Markdown files under `docs/agent-instructions/`.
 
-Use this skill to:
+```text
+project-root/
+├── AGENTS.md
+└── docs/
+    └── agent-instructions/
+        ├── overview.md
+        ├── build-system.md
+        └── ...
+```
 
-- Create a missing root `AGENTS.md`.
-- Refactor bloated `AGENTS.md`, `CLAUDE.md`, `COPILOT.md`, or similar files.
-- Merge tool-specific custom instructions into shared Markdown docs under `docs/agent-instructions/`.
-- Review existing agent instructions for contradictions, stale claims, tool-private details, and low-value rules.
+Two hard guardrails:
 
-Do not use this skill for git-diff sync audits unless the user explicitly asks for a manual review of current instruction files.
+1. **docs-only** — detailed instructions go under `docs/agent-instructions/`, not in `.pi/` (`.pi/skills/` holds skills, which teach workflow, not project docs) or any other tool-private location.
+2. No nested `AGENTS.md` files by default. Represent module boundaries through the root mini repo map and `docs/agent-instructions/architecture.md`. If the user explicitly asks for nested files, state this default and ask before deviating.
+
+Use standard Markdown only. Preserve an existing file's custom tag or plain-text syntax unless the user explicitly asks to convert.
 
 ## Core Principle
 
-Every retained instruction must change agent behavior.
-
-Keep instructions that prevent a specific mistake, reveal non-obvious project behavior, provide exact commands, or override a default assumption that would be wrong for this repository.
-
-Remove or rewrite instructions that are vague, generic, redundant, obvious from the codebase, outdated, or not actionable.
+Every retained instruction must be **load-bearing**; prune **no-op** instructions.
 
 ## Process
 
 ### Phase 1: Analyze Repository
 
-Inspect project files to identify:
+Inspect the repo to identify its purpose, languages/frameworks, package manager, dependency commands, build/run/lint/format/typecheck/test commands, CI/CD, architecture docs, current README and developer docs, existing `AGENTS.md`, and major module boundaries.
 
-- repository purpose and shape
-- languages and frameworks
-- package manager and dependency commands
-- build, run, lint, format, typecheck, and test commands
-- CI/CD workflows
-- architecture docs
-- current README and developer docs
-- current agent instruction files
-- major directories and module boundaries
+Common files to check: `README.md`, `AGENTS.md`, `package.json` / `pnpm-workspace.yaml` / lockfiles, `pyproject.toml`, `go.mod`, `Cargo.toml`, `Makefile` / `justfile`, `.github/workflows/`, Dockerfiles, existing `docs/`.
 
-Common files to check:
+Source every command from a repo file. If a command is unclear, write `Unknown; see <file>` or ask the user.
 
-- `README.md`
-- `AGENTS.md`, `CLAUDE.md`, `COPILOT.md`, `.cursorrules`, etc.
-- `package.json`, `pnpm-workspace.yaml`, `yarn.lock`, `package-lock.json`
-- `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle`
-- `Makefile`, `justfile`, build scripts
-- `.github/workflows/`, `.gitlab-ci.yml`
-- Dockerfiles and compose files
-- existing docs under `docs/`
-
-Never invent commands. Infer commands from repo files. If a command is unclear, write `Unknown; see <file>` or ask the user.
+**Completion:** every install/build/run/lint/test command is sourced from a repo file or marked `Unknown; see <file>`; the repo map names every top-level path with a purpose.
 
 ### Phase 2: Analyze Existing Instruction Files
 
-Read existing agent instruction files fully before editing.
+Read existing `AGENTS.md` fully before editing. Classify each instruction as: keep in root / move to `docs/agent-instructions/` / delete / resolve contradiction. Note custom syntax to preserve or confirm before converting.
 
-Identify:
-
-- instructions that belong in root
-- detailed instructions that should move to `docs/agent-instructions/`
-- repeated or contradictory rules
-- stale commands or paths
-- tool-private detailed docs that should move into shared docs
-- custom syntax that should be preserved or confirmed before conversion
+**Completion:** every existing instruction line is classified into one of the four buckets.
 
 ### Phase 3: Find Contradictions
 
-Identify conflicting instructions before editing.
+Identify conflicting instructions before editing: contradictory style guidelines, conflicting workflows, incompatible tool preferences, commands contradicted by current scripts, or the same detailed guidance placed in different locations.
 
-Look for:
-
-- contradictory style guidelines
-- conflicting workflow instructions
-- incompatible tool preferences
-- commands contradicted by current scripts
-- different locations for same detailed guidance
-
-For each contradiction, ask the user to resolve before proceeding:
+For each contradiction, ask the user before proceeding:
 
 ```markdown
 ## Contradiction Found
@@ -110,11 +85,11 @@ For each contradiction, ask the user to resolve before proceeding:
 **Question:** Which should take precedence, or should both be conditional?
 ```
 
+**Completion:** zero unresolved contradictions; each is either user-resolved or marked conditional.
+
 ### Phase 4: Separate Root Essentials From Details
 
-Root file keeps only information useful for nearly every agent task.
-
-Keep in root:
+The root file keeps only information useful for nearly every task:
 
 | Category | Example |
 |---|---|
@@ -125,58 +100,33 @@ Keep in root:
 | Critical rules | Universal high-priority rules |
 | Non-obvious setup | Required runtime, container, service, or package-manager constraints |
 
-Move out of root:
-
-- language-specific conventions
-- testing strategy details
-- code style details
-- architecture deep dives
-- deployment process
-- debugging notes
-- git workflow details
-- framework patterns
-- long examples
+Everything else moves to `docs/agent-instructions/`: language conventions, testing strategy, code style, architecture deep dives, deployment, debugging notes, git workflow, framework patterns, long examples.
 
 Use `references/agents-template.md` for the root file shape.
 
+**Completion:** root file contains only the six universal categories; every moved item has a destination file.
+
 ### Phase 5: Group Detailed Instructions
 
-Put detailed instructions under `docs/agent-instructions/`.
+Put detailed instructions under `docs/agent-instructions/`. Create only files that are relevant — no empty boilerplate.
 
-Create only files that are relevant. Do not create empty boilerplate files.
-
-Common topic files:
-
-| File | Use for |
-|---|---|
-| `overview.md` | Project purpose, domain, responsibilities |
-| `build-system.md` | Install, build, run, package, generated outputs |
-| `development-workflow.md` | Local loop, checks, PR expectations, common tasks |
-| `testing.md` | Test commands, frameworks, patterns, fixtures, coverage |
-| `code-style.md` | Project-specific formatting, naming, imports, structure |
-| `architecture.md` | Components, boundaries, dependencies, data flow |
-| `config-and-env.md` | Configuration files, env vars, local services |
-| `security.md` | Secrets, auth, permissions, validation, network safety |
-| `deployment.md` | CI/CD, packaging, release, environments |
-| `troubleshooting.md` | Known failures and fixes |
-
-Use `references/agent-instructions-template.md` for detailed docs.
+Common topic files: `overview.md`, `build-system.md`, `development-workflow.md`, `testing.md`, `code-style.md`, `architecture.md`, `config-and-env.md`, `security.md`, `deployment.md`, `troubleshooting.md`. Use `references/agent-instructions-template.md` for the topic-file shape.
 
 Grouping rules:
 
 1. Each file has a clear task trigger in `Read When`.
 2. Each file is self-contained for its topic.
-3. Prefer 3-8 detailed files unless project complexity needs more.
-4. Use descriptive lowercase filenames.
-5. Keep instructions actionable and project-specific.
-6. Avoid duplicating the same rule across files; link instead.
-7. Reuse existing `docs/agent-instructions/` files when present instead of creating duplicates.
+3. Prefer 3–8 detailed files unless project complexity needs more.
+4. Descriptive lowercase filenames.
+5. Instructions are actionable and project-specific.
+6. Link to a rule's home instead of restating it across files.
+7. Reuse existing `docs/agent-instructions/` files when present.
+
+**Completion:** every moved instruction lives in exactly one topic file; no rule duplicated across files.
 
 ### Phase 6: Build the Instruction Index
 
-Root `AGENTS.md` must include an instruction index that tells agents when to read each detailed file.
-
-Use this shape:
+Root `AGENTS.md` includes an instruction index telling agents when to read each detailed file:
 
 ```markdown
 ## Instruction Index
@@ -189,20 +139,13 @@ Read these only when task matches scope:
 | `docs/agent-instructions/architecture.md` | You change boundaries, data flow, APIs, storage, or module responsibilities | Components, dependencies, ownership |
 ```
 
-The index must point only to files under `docs/agent-instructions/`.
+The index points only to files under `docs/agent-instructions/`.
+
+**Completion:** every `docs/agent-instructions/` file has one index row with a task-trigger `Read when`.
 
 ### Phase 7: Prune Low-Value Instructions
 
-Delete or rewrite instructions when:
-
-| Criterion | Example | Action |
-|---|---|---|
-| Vague | "Write clean code" | Delete or replace with concrete rule |
-| Default behavior | "Do not introduce bugs" | Delete |
-| Redundant | "Use TypeScript" in TS-only repo | Delete unless non-obvious constraint exists |
-| Outdated | Deprecated command or path | Correct or delete |
-| Tool-private detail | Detailed docs in `.claude/` | Move to `docs/agent-instructions/` |
-| Not actionable | "Be thoughtful" | Delete |
+Apply the **load-bearing** test to each instruction. Delete or rewrite **no-op** instructions — see `references/prune-criteria.md` for the full criteria table and anti-patterns.
 
 If pruning many instructions, report notable removals:
 
@@ -211,91 +154,37 @@ If pruning many instructions, report notable removals:
 
 | Instruction | Reason |
 |---|---|
-| "Write clean, maintainable code" | Too vague to change behavior |
+| "Write clean, maintainable code" | no-op: too vague to change behavior |
 ```
+
+**Completion:** every retained instruction passes the load-bearing test; flagged deletions reported.
 
 ## Root `AGENTS.md` Requirements
 
-Root `AGENTS.md` must include:
+Root `AGENTS.md` includes: one-sentence project description, quick reference commands, mini repo map, instruction index table (`File`, `Read when`, `Contains`), and critical rules that apply to nearly every task.
 
-- one-sentence project description
-- quick reference commands
-- mini repo map
-- instruction index table with `File`, `Read when`, and `Contains`
-- critical rules that apply to nearly every task
+It keeps out long coding standards, full architecture explanations, full testing strategy, deployment runbooks, framework tutorials, and detailed tool-specific instructions — all of those go under `docs/agent-instructions/`.
 
-Root `AGENTS.md` must not include:
-
-- long coding standards
-- full architecture explanations
-- full testing strategy
-- deployment runbooks
-- framework tutorials
-- detailed tool-specific instructions
-
-## Detailed Instruction File Requirements
-
-Each file under `docs/agent-instructions/` should include:
-
-- `Read When` — task triggers for loading this file
-- `Purpose` — what the file helps the agent do
-- `Rules` — project-specific actionable rules
-- `Commands` — exact commands when relevant
-- `Key Paths` — exact paths when relevant
-- `Gotchas` — non-obvious failure modes
-- `Related Instructions` — links to adjacent topic files when useful
-
-Omit sections that do not apply.
+Use `references/agents-template.md` for the shape.
 
 ## Monorepo Handling
 
-Use docs-only progressive disclosure for monorepos.
-
-Do not create nested `AGENTS.md` files by default.
-
-Represent module/package information in:
-
-- root `Mini Repo Map`
-- root `Instruction Index`
-- `docs/agent-instructions/architecture.md`
-- `docs/agent-instructions/build-system.md`
-- other relevant topic files
-
-For module maps, keep root entries short and move detail to `docs/agent-instructions/architecture.md` or a dedicated topic file such as `docs/agent-instructions/modules.md`.
+Use **docs-only** progressive disclosure for monorepos. No nested `AGENTS.md` files by default. Represent module/package information in the root `Mini Repo Map`, root `Instruction Index`, `docs/agent-instructions/architecture.md`, and other relevant topic files. Keep root module entries short; move detail to `architecture.md` or a dedicated `docs/agent-instructions/modules.md`.
 
 ## Skill References
 
-If the project uses local skills, mention them only when they materially change agent behavior for this repo.
+Mention local skills only when they materially change agent behavior for this repo. Reference skills by name only — copy no skill instructions into `AGENTS.md` or `docs/agent-instructions/`. Reference a skill by local path only when that path is confirmed to exist.
 
-Do not copy full skill instructions into `AGENTS.md` or `docs/agent-instructions/`.
-
-Do not assume a local skill directory exists. If referencing a skill and no local path is clear, reference it by name only.
-
-## Verification Checklist
+## Verification
 
 After creating or refactoring:
 
-- [ ] Root agent file is concise and mostly points to detailed docs.
+- [ ] Root `AGENTS.md` is concise and points to detailed docs.
 - [ ] Root file includes quick commands, mini repo map, instruction index, and critical rules.
-- [ ] Instruction index has `File`, `Read when`, and `Contains` columns.
-- [ ] Detailed instructions live under `docs/agent-instructions/`.
-- [ ] No detailed instruction files were created under `.claude/`, `.pi/`, `.codex/`, `.cursor/`, or another tool-private folder.
-- [ ] No nested `AGENTS.md` files were created by default.
+- [ ] Instruction index has `File`, `Read when`, and `Contains` columns, all pointing into `docs/agent-instructions/`.
+- [ ] Detailed instructions live only under `docs/agent-instructions/` (nothing in `.pi/` or other tool-private locations).
+- [ ] No nested `AGENTS.md` files unless the user explicitly approved.
 - [ ] Commands are exact and current, or marked unknown.
-- [ ] Links from root to detailed docs work.
+- [ ] Root-to-docs links work.
 - [ ] Contradictions are resolved or surfaced to the user.
-- [ ] Every retained instruction is actionable, project-specific, and changes agent behavior.
-- [ ] Low-value generic instructions are pruned or rewritten.
-
-## Anti-Patterns
-
-| Avoid | Why | Use instead |
-|---|---|---|
-| Long root `AGENTS.md` | Wastes always-loaded context | Root summary plus instruction index |
-| Detailed docs in `.claude/` | Tool-private and not shared | `docs/agent-instructions/` |
-| Detailed docs in `.pi/skills/` | Skills teach workflow, not project docs | `docs/agent-instructions/` |
-| Nested `AGENTS.md` by default | Conflicts with docs-only model | Root mini map plus detailed docs |
-| Many empty topic files | Creates maintenance noise | Only create relevant files |
-| Vague rules | No operational value | Specific commands, paths, and rules |
-| Duplicating defaults | Wastes context | Only project-specific overrides |
-| Untested invented commands | Breaks agent workflows | Infer from repo files or mark unknown |
+- [ ] Every retained instruction is load-bearing; no-op instructions are pruned or rewritten.

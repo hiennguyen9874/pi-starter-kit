@@ -1,8 +1,20 @@
 # Root AGENTS.md Template
 
-Use this template for repository-root `AGENTS.md` or equivalent root agent instruction files.
+Use this template for the repository-root `AGENTS.md`.
 
 Keep this file concise. Move detailed instructions to `docs/agent-instructions/` and link them through the instruction index.
+
+## Required sections
+
+- One-sentence project description.
+- `Quick Reference` — install, run, test, build, full checks (exact command or `Unknown; see <file>`).
+- `Mini Repo Map` — top-level paths with a short purpose each.
+- `Instruction Index` — table with `File`, `Read when`, `Contains`, pointing only into `docs/agent-instructions/`.
+- `Critical Rules` — only universal, high-priority, project-specific rules that apply to nearly every task.
+
+Keep out of root: long coding standards, full architecture explanations, full testing strategy, deployment runbooks, framework tutorials, detailed tool-specific instructions.
+
+## Template
 
 ```markdown
 # AGENTS.md
@@ -49,7 +61,7 @@ Read these only when task matches scope:
 
 ## Notes
 
-- Keep only relevant instruction index rows. Do not create empty detailed files just to satisfy this template.
-- Use exact commands from repository files. Do not invent commands.
-- Keep mini repo map short; put detailed maps in `docs/agent-instructions/architecture.md` or another relevant topic file.
-- Critical rules must be project-specific and change agent behavior.
+- Keep only relevant instruction index rows. Create no empty detailed files just to satisfy this template.
+- Use exact commands sourced from repository files. Invent no commands.
+- Keep the mini repo map short; put detailed maps in `docs/agent-instructions/architecture.md` or another relevant topic file.
+- Critical rules must be project-specific and load-bearing.
