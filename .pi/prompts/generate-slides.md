@@ -13,4 +13,4 @@ Plan the deck first: inventory the source, map every item to slides, choose a na
 
 Use visual-first slides: diagrams, charts, tables, SVG accents, and images from `surf` only when they clarify the story. Vary compositions; three centered slides in a row is a smell.
 
-Write to `~/.agent/diagrams/` and open in the browser.
+Write to `./diagrams/` and open in the browser.

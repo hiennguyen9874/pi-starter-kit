@@ -32,4 +32,4 @@ For each proposed change, verify whether referenced files/functions/types exist,
 
 Use current-vs-planned visual language. Include responsive nav. Follow the skill’s Mermaid, overflow, and evidence rules.
 
-Write to `~/.agent/diagrams/` and open in browser.
+Write to `./diagrams/` and open in browser.
