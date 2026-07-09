@@ -3,7 +3,7 @@ skillsEnable:
   - context7-cli
   - systematic-debugging
   - pragmatic-principles
-  - api-design
+  - api-designer
   - backend-patterns
   - database-migrations
   - postgres-patterns

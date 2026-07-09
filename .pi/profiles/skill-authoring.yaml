@@ -2,11 +2,7 @@ skillsEnable:
   - grilling
   - writing-great-skills
   - pragmatic-principles
-promptsEnable:
-  - create-agent-workflow
-  - create-new-skill
-  - improve-prompt-system
-  - improve-skill-system
+promptsEnable: []
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
