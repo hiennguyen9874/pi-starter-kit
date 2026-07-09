@@ -1,6 +1,5 @@
 skillsEnable:
   - bootstrap-project-context
-  - interview-me
   - grilling
   - prompt-leverage
   - agent-md-refactor
