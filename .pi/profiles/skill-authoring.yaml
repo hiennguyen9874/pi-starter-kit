@@ -1,7 +1,6 @@
 skillsEnable:
   - grilling
   - writing-great-skills
-  - prompt-leverage
   - pragmatic-principles
 promptsEnable:
   - create-agent-workflow
