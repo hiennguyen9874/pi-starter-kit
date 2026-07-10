@@ -7,7 +7,7 @@ guidelines:
     defaultEnabled: true
   - name: repositoryInstructions
     path: repository-instructions.md
-    defaultEnabled: false
+    defaultEnabled: true
   - name: executionAndDelivery
     path: execution-policy.md
     defaultEnabled: true
