@@ -1,5 +1,6 @@
 skillsEnable:
   - pragmatic-principles
+  - agent-friendly-code
   - codebase-design
   - domain-modeling
   - grill-with-docs

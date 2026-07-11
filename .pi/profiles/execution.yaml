@@ -3,6 +3,7 @@ skillsEnable:
   - tdd
   - diagnosing-bugs
   - pragmatic-principles
+  - agent-friendly-code
   - handoff
 promptsDisable: ["*"]
 mcpServersEnable: []

@@ -2,6 +2,7 @@ skillsEnable:
   - grilling
   - handoff
   - pragmatic-principles
+  - agent-friendly-code
   - diagnosing-bugs
   - tdd
   - context7-cli
