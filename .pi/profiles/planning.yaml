@@ -1,13 +1,14 @@
 skillsEnable:
-  - grilling
-  - brainstorming
-  - spec-driven-development
-  - writing-plans
-  - prototype
   - pragmatic-principles
-promptsEnable:
-  - feature-design
-  - write-implementation-plan
+  - codebase-design
+  - domain-modeling
+  - grill-with-docs
+  - grilling
+  - to-spec
+  - to-tickets
+  - triage
+  - wayfinder
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

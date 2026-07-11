@@ -69,35 +69,5 @@
     "opencode/*-free",
     "opencode/*-free*",
     "tencent/hy3:free"
-  ],
-  "subagents": {
-    "agentOverrides": {
-      "scout": {
-        "disabled": false,
-        "model": "openai-codex/gpt-5.4-mini"
-      },
-      "planner": {
-        "disabled": true
-      },
-      "worker": {
-        "disabled": true
-      },
-      "reviewer": {
-        "disabled": true
-      },
-      "context-builder": {
-        "disabled": true
-      },
-      "researcher": {
-        "disabled": true
-      },
-      "delegate": {
-        "disabled": true
-      },
-      "oracle": {
-        "disabled": false,
-        "model": "openai-codex/gpt-5.5"
-      }
-    }
-  }
+  ]
 }

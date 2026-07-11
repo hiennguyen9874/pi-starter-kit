@@ -2,11 +2,10 @@ skillsEnable:
   - grilling
   - handoff
   - pragmatic-principles
-  - systematic-debugging
+  - diagnosing-bugs
   - git-commit
   - pi-goal
-promptsEnable:
-  - create-goal
+promptsDisable: ["*"]
 mcpServersEnable:
   - exa
 mcpServersDisable:

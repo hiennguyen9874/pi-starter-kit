@@ -1,9 +1,11 @@
 skillsEnable:
+  - ask-matt
   - code-review
   - codebase-design
   - diagnosing-bugs
   - domain-modeling
   - grill-with-docs
+  - grilling
   - implement
   - improve-codebase-architecture
   - prototype
@@ -11,14 +13,12 @@ skillsEnable:
   - resolving-merge-conflicts
   - setup-matt-pocock-skills
   - tdd
-  - to-issues
-  - to-prd
+  - to-spec
+  - to-tickets
   - triage
-  - grilling
+  - wayfinder
   - handoff
-  - bootstrap-project-context
-promptsEnable:
-  - project-next-step
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

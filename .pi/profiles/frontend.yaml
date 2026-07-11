@@ -1,7 +1,7 @@
 skillsEnable:
   - grilling
   - context7-cli
-  - systematic-debugging
+  - diagnosing-bugs
   - pragmatic-principles
   - frontend-skill
   - composition-patterns
@@ -12,12 +12,10 @@ skillsEnable:
   - web-design-guidelines
   - performance-optimization
   - source-driven-development
-  - test-driven-development
+  - tdd
   - coding-standards
   - code-simplification
 promptsEnable:
-  - debug-issue
-  - execute-plan-simple
   - frontend-design-direction
   - frontend-polish-pass
   - frontend-ui-audit

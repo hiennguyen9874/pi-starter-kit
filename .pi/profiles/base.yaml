@@ -2,13 +2,11 @@ skillsEnable:
   - grilling
   - handoff
   - pragmatic-principles
-  - systematic-debugging
-  - test-driven-development
+  - diagnosing-bugs
+  - tdd
   - context7-cli
   - git-commit
-promptsEnable:
-  - commit-work
-  - debug-issue
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

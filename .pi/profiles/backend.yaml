@@ -1,7 +1,7 @@
 skillsEnable:
   - grilling
   - context7-cli
-  - systematic-debugging
+  - diagnosing-bugs
   - pragmatic-principles
   - api-designer
   - backend-patterns
@@ -10,10 +10,8 @@ skillsEnable:
   - golang-patterns
   - golang-testing
   - source-driven-development
-  - test-driven-development
-promptsEnable:
-  - debug-issue
-  - execute-plan-simple
+  - tdd
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

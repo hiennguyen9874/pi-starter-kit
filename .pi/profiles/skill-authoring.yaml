@@ -2,7 +2,7 @@ skillsEnable:
   - grilling
   - writing-great-skills
   - pragmatic-principles
-promptsEnable: []
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

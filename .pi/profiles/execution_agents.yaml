@@ -1,21 +1,10 @@
 skillsEnable:
-  - executing-plans
-  - subagent-driven-development
-  - dispatching-parallel-agents
-  - test-driven-development
-  - systematic-debugging
-  - receiving-code-review
-  - verification-before-completion
+  - implement
+  - tdd
+  - diagnosing-bugs
   - pragmatic-principles
   - handoff
-  - finishing-a-development-branch
-promptsEnable:
-  - commit-work
-  - execute-plan-simple
-  - execute-plan-with-subagents
-  - execute-plan-with-subagents-async
-  - fix-review-issues
-  - verify-before-done
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -34,7 +23,8 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
-  - npm:pi-prompt-template-model
+  - npm:@gotgenes/pi-subagents
+packagesDisable:
   - npm:pi-subagents
+  - npm:pi-prompt-template-model
   - npm:pi-intercom
-packagesDisable: []

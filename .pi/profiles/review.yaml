@@ -1,9 +1,5 @@
 skillsEnable:
-  - spec-review
-  - code-quality-review
-  - requesting-code-review
-  - receiving-code-review
-  - verification-before-completion
+  - code-review
   - pragmatic-principles
 promptsEnable:
   - code-quality-review
@@ -27,5 +23,9 @@ extensionState:
       validation: true
       finalResponse: false
       planningDiscipline: false
-packagesEnable: []
-packagesDisable: []
+packagesEnable:
+  - npm:@gotgenes/pi-subagents
+packagesDisable:
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom

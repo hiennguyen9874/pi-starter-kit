@@ -3,6 +3,7 @@ skillsEnable:
   - handoff
   - context7-cli
   - defuddle
+  - research
 promptsDisable: ["*"]
 mcpServersEnable:
   - deepwiki
@@ -21,5 +22,6 @@ extensionState:
       validation: false
       finalResponse: false
       planningDiscipline: false
-packagesEnable: []
+packagesEnable:
+  - npm:pi-web-access
 packagesDisable: []

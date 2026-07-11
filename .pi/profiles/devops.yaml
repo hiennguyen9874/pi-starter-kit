@@ -1,14 +1,12 @@
 skillsEnable:
   - grilling
-  - systematic-debugging
+  - diagnosing-bugs
   - pragmatic-principles
   - docker-patterns
   - ci-cd-and-automation
   - git-workflow-and-versioning
   - verification-before-completion
-promptsEnable:
-  - debug-issue
-  - execute-plan-simple
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

@@ -1,17 +1,13 @@
 skillsEnable:
   - grilling
   - context7-cli
-  - systematic-debugging
+  - diagnosing-bugs
   - pragmatic-principles
   - source-driven-development
-  - test-driven-development
+  - tdd
   - developing-with-streamlit
   - use-datasets
-promptsEnable:
-  - debug-issue
-  - feature-design
-  - execute-plan-simple
-  - write-implementation-plan
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
