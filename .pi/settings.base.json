@@ -21,7 +21,8 @@
     "-npm:pi-tool-display",
     "-npm:context-mode",
     "-npm:pi-btw",
-    "-npm:pi-context"
+    "-npm:pi-context",
+    "npm:@spences10/pi-confirm-destructive"
   ],
   "extensions": [
     "./extensions/command-history/index.ts",

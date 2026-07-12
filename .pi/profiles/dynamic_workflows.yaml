@@ -1,0 +1,31 @@
+skillsEnable:
+  - grilling
+  - handoff
+  - pragmatic-principles
+  - agent-friendly-code
+  - diagnosing-bugs
+  - tdd
+  - context7-cli
+  - git-commit
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      executionAndDelivery: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: false
+packagesEnable:
+  - npm:@quintinshaw/pi-dynamic-workflows
+packagesDisable:
+  - npm:pi-dynamic-workflows
