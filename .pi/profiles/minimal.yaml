@@ -1,0 +1,23 @@
+skillsEnable: []
+skillsDisable:
+  - "*"
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionAndDelivery: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: false
+packagesEnable: []
+packagesDisable: []
