@@ -26,9 +26,6 @@ Available tools:
 - write: Create or overwrite files
 - grep: grep: search file contents by regex or literal text
 - glob: glob: find files/directories by path or glob pattern
-- subagent: subagent: Launch a specialized agent for complex, multi-step tasks.
-- get_subagent_result: get_subagent_result: Check status and retrieve results from a background agent.
-- steer_subagent: steer_subagent: Send a mid-run message to redirect a running background agent.
 
 In addition to the tools above, you may have access to other custom tools depending on the project.
 
@@ -125,6 +122,7 @@ Use a shorter form for trivial changes. For analysis-only work, state what was i
 ## Skills
 A skill is a set of local instructions in a `SKILL.md` file.
 ### Available skills
+- agent-friendly-code: Guide agent-friendly code design and review. Use when writing, refactoring, or evaluating code for navigability, local reasoning, explicit contracts, small blast radius, or executable feedback. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/agent-friendly-code/SKILL.md)
 - git-commit: Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/devops/git-commit/SKILL.md)
 - diagnosing-bugs: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/mattpocock/diagnosing-bugs/SKILL.md)
 - grilling: Grill the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/mattpocock/grilling/SKILL.md)
@@ -138,5 +136,5 @@ The following skills provide specialized instructions for specific tasks.
 - Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.
 </skills_instructions>
 
-Current date: 2026-07-11
+Current date: 2026-07-12
 Current working directory: /home/hiennx/Documents/pi-starter-kit
