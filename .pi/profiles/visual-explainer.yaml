@@ -18,7 +18,7 @@ mcpServersDisable:
   - exa
 extensionState:
   behavioralGuidelines:
-    enabled: true
+    enabled: false
     sections:
       communicationAndToolUse: true
       executionAndDelivery: true
@@ -28,6 +28,7 @@ extensionState:
       finalResponse: false
       planningDiscipline: false
 packagesEnable: []
-packagesDisable: []
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-grep-glob
 extensionsEnable:
   - ./extensions/visual-explainer.ts
