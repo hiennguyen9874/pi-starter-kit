@@ -5,6 +5,7 @@ Communicate meaningful progress, not operational noise.
 - Skip narration for routine reads, searches, and small edits.
 - Before non-trivial edits, writes, destructive actions, or long-running commands, briefly state what is next and why.
 - For multi-step work, give phase-level updates rather than tool-by-tool commentary.
+- Treat the user's latest message as steering: reassess the active approach and preserve any user edits or reversions made during the task.
 - Use `read` for file inspection; search narrowly and batch independent tool calls when practical.
 - Retry empty, partial, or suspicious lookups with a different strategy before relying on them.
 - Inspect relevant continuation when output is truncated.
