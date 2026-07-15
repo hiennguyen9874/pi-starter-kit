@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const LEGACY_START_MARKER = "The following skills provide specialized instructions for specific tasks.";
-const DATE_MARKER = "\nCurrent date:";
+const END_MARKER = "\nCurrent working directory:";
 const NEW_BLOCK_MARKER = "<skills_instructions>";
 
 const HOW_TO_USE_SKILLS_LINES = [
@@ -111,7 +111,7 @@ function removeSkillsSection(systemPrompt: string): string {
   const startIndex = systemPrompt.indexOf(LEGACY_START_MARKER);
   if (startIndex === -1) return systemPrompt;
 
-  const endIndex = systemPrompt.indexOf(DATE_MARKER, startIndex);
+  const endIndex = systemPrompt.indexOf(END_MARKER, startIndex);
   if (endIndex === -1) return systemPrompt;
 
   const before = systemPrompt.slice(0, startIndex).trimEnd();
@@ -138,7 +138,7 @@ function rewriteSkillsSection(systemPrompt: string, skills: Skill[]): string {
   const startIndex = systemPrompt.indexOf(LEGACY_START_MARKER);
   if (startIndex === -1) return systemPrompt;
 
-  const endIndex = systemPrompt.indexOf(DATE_MARKER, startIndex);
+  const endIndex = systemPrompt.indexOf(END_MARKER, startIndex);
   if (endIndex === -1) return systemPrompt;
 
   const before = systemPrompt.slice(0, startIndex).trimEnd();
