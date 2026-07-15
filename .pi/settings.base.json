@@ -3,12 +3,12 @@
     "-git:github.com/hiennguyen9874/pi-powerline-footer",
     "npm:@pi-archimedes/footer",
     "-npm:@juicesharp/rpiv-ask-user-question",
-    "git:github.com/hiennguyen9874/pi-edit",
+    "-git:github.com/hiennguyen9874/pi-edit",
     "git:github.com/hiennguyen9874/pi-shake",
-    "git:github.com/hiennguyen9874/pi-grep-glob",
+    "-git:github.com/hiennguyen9874/pi-grep-glob",
     "-git:github.com/hiennguyen9874/pi-ast-grep",
     "-git:github.com/hiennguyen9874/pi-hashline-edit",
-    "-npm:@ff-labs/pi-fff",
+    "npm:@ff-labs/pi-fff",
     "-npm:pi-context-prune",
     "-git:github.com/MasuRii/pi-rtk-optimizer",
     "-npm:pi-mcp-adapter",
@@ -41,7 +41,7 @@
     "-./extensions/disable-bash-tool.ts",
     "-./extensions/disable-edit-tools.ts",
     "-./extensions/disable-write-tool.ts",
-    "./extensions/enable-ls-tool.ts"
+    "-./extensions/enable-ls-tool.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
