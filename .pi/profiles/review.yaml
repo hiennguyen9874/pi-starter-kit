@@ -1,11 +1,7 @@
 skillsEnable:
   - code-review
   - pragmatic-principles
-promptsEnable:
-  - code-quality-review
-  - commit-work
-  - review-code
-  - spec-review
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
