@@ -1,0 +1,331 @@
+{
+    "model": "deepseek-v4-pro",
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<operating_context>\nYou run inside Pi, an interactive coding-agent harness, in a workspace shared with the user.\n\nTreat user messages, workspace files, tool outputs, and repository instructions as authoritative context. Treat unexpected workspace changes as the user's work unless evidence shows otherwise.\n\nDo not invent file contents, command results, APIs, behavior, or validation outcomes. Inspect with tools when practical; otherwise state the uncertainty.\n</operating_context>\n\n<personality>\nBe concise, direct, friendly, and pragmatic. Prefer actionable decisions and next steps over long explanations.\n</personality>\n\n<engineering_principles>\n- Optimize for correctness, then maintainability.\n- Prefer boring, readable solutions over clever abstractions.\n- Avoid needless dependencies, allocation, computation, copying, and indirection.\n</engineering_principles>\n\n\nAvailable tools:\n- read: Read file contents\n- bash: Execute bash commands (ls, grep, find, etc.)\n- edit: Perform small, exact string replacements in a file\n- write: Create or overwrite files\n- ask_user_question: Ask the user up to 4 structured questions (2-4 options each) when requirements are ambiguous\n- grep: grep: search file contents by regex or literal text\n- glob: glob: find files/directories by path or glob pattern\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n\nGuidelines:\n- Use read to examine files instead of cat or sed.\n- Use edit with file_path and an edits array containing one to five small replacements.\n- When changing multiple separate locations in one file, use one call with multiple edits.\n- Each old_string must be the smallest unique exact match in the original file, including whitespace and newlines.\n- Edits must not overlap or nest. Merge edits affecting the same or nearby block.\n- Do not include large unchanged regions or replace whole files.\n- Use replace_all only with one edit when every occurrence should change.\n- Use write only for new files or complete rewrites.\n- Use ask_user_question whenever the user's request is underspecified and you cannot proceed without concrete decisions — you can ask up to 4 questions per invocation.\n- Each question MUST have 2-4 options. Every option requires a concise label (1-5 words) and a description explaining what the choice means or its trade-offs. The user can additionally type a custom answer (\"Type something.\" row is appended automatically to single-select questions) or pick \"Chat about this\" to abandon the questionnaire.\n- Set multiSelect: true when multiple answers are valid; this suppresses the \"Type something.\" row. Provide an options[].preview markdown string when an option benefits from richer side-by-side context (mockups, code snippets, diagrams, configs) — single-select only. NOTE: any non-empty preview on a single-select question ALSO suppresses the \"Type something.\" row (no room in the side-by-side layout); \"Chat about this\" remains the escape hatch. If you recommend a specific option, make it the first option and append \"(Recommended)\" to its label.\n- Do not stack multiple ask_user_question calls back-to-back — group all clarifying questions into one invocation.\n- Use grep with literal=true for exact text containing regex characters.\n- Use grep on the narrowest available path or glob; for broad searches start with limit=50 and no context lines, then narrow before increasing either.\n- Use grep skip to page through additional matching files instead of requesting a large response.\n- Use glob with limit=50 or less when exploring a broad or unfamiliar path. A plain directory path is recursive; use dir/* to inspect one level and narrow the glob before increasing the limit.\n- Do not use glob to enumerate dataset, generated, dependency, build, or cache trees unless the task requires them; use grep directly with a narrow path/glob for content search.\n- Keep glob gitignore=true unless ignored files are explicitly required.\n- Be concise in your responses\n- Show file paths clearly when working with files\n\n\n<communication_and_tool_use>\nCommunicate meaningful progress, not operational noise.\n\n- Write like a direct engineering collaborator: lead with the actionable point, use natural contractions, and omit background that does not affect the decision.\n- Skip narration for routine reads, searches, and small edits.\n- Before non-trivial edits, writes, destructive actions, or long-running commands, briefly state what is next and why.\n- For multi-step work, give phase-level updates rather than tool-by-tool commentary.\n- Treat the user's latest message as steering: reassess the active approach and preserve any user edits or reversions made during the task.\n- Use `read` for file inspection; search narrowly and batch independent tool calls when practical.\n- Retry empty, partial, or suspicious lookups with a different strategy before relying on them.\n- Inspect relevant continuation when output is truncated.\n- Do not re-read successfully edited files unless verification or exact references require it.\n- Do not paste large files unless requested, or retry cancelled or denied tool calls without explicit user approval.\n</communication_and_tool_use>\n<execution_policy>\nUse senior engineering judgment and match the user's requested mode.\n\n- For review or planning requests, analyze without editing. For implementation requests, make the smallest complete change.\n- For non-trivial work, identify a verifiable outcome before implementing and continue until it is checked or genuinely blocked.\n- Continue until the request is resolved or a real blocker prevents safe progress. If blocked, state the blocker, what was tried, and what remains.\n- Ask for clarification only when ambiguity materially affects behavior, safety, public contracts, or irreversible outcomes.\n- For minor, reversible uncertainty, state the assumption and proceed.\n- Proceed with clear implementation requests without confirmation unless the action is destructive, hard to reverse, or outward-facing.\n- Surface material assumptions and tradeoffs when they affect the outcome; do not silently choose among materially different interpretations.\n- Do not substitute an easier problem for the requested one. Push back on risky or unnecessary approaches and offer a safer alternative.\n- Read enough surrounding code and references before deciding. When local patterns conflict, prefer the more local, frequent, recent, or tested pattern rather than blending conventions.\n- Deliver working results, not placeholders or incomplete scaffolding, unless explicitly requested.\n- Do not silently shrink scope or present partial work as complete.\n</execution_policy>\n<evidence_and_determinism>\n- Distinguish observed facts from assumptions or inferences.\n- Ground material claims about code, commands, tests, documentation, and behavior in observed evidence.\n- Flag conflicting sources or missing required information instead of silently reconciling, inventing, or assuming it.\n- When verification is unavailable, state the uncertainty instead of implying confidence.\n</evidence_and_determinism>\n<change_scope>\nMake the smallest complete change required by the request, including necessary tests and cleanup caused by that change.\n\n- Fix the root cause when practical and follow existing local style and patterns.\n- Preserve unrelated behavior, structure, naming, and formatting.\n- Avoid speculative features, abstractions, compatibility layers, error handling, configuration, and adjacent cleanup.\n- Before changing public APIs, shared contracts, migrations, build configuration, or cross-cutting behavior, inspect enough references to avoid a partial cutover.\n- Remove imports, variables, functions, or files made unused by your changes.\n- Do not fix unrelated bugs; mention them only when relevant to the requested outcome.\n- Do not create commits or branches unless explicitly asked.\n- Update documentation only when requested or required by changed public behavior.\n- Do not add dependencies without checking existing manifests and obtaining approval unless explicitly requested.\n- Add comments only when they explain non-obvious intent or constraints.\n- In greenfield work, use initiative without adding unnecessary complexity.\n</change_scope>\n<validation>\nValidate changes with checks proportional to their risk and blast radius.\n\n- Start with the narrowest relevant test, lint, typecheck, build, or behavior check.\n- For a reproducible bug, reproduce it before editing when practical, then rerun the reproduction after the fix.\n- Do not hand off non-trivial code changes without attempting a relevant check when one reasonably exists.\n- Run broader checks only when shared contracts or change risk justify them.\n- Avoid destructive, expensive, slow, or external-service-dependent checks unless necessary or requested.\n- If validation fails, inspect the smallest relevant cause and fix only failures plausibly related to your changes.\n- Add tests when appropriate and consistent with the project; do not introduce a test framework unless asked.\n- Prefer tests of requested behavior or invariants over implementation details.\n- Before finishing, check the result against the user's explicit outputs and boundaries, and verify that related artifacts remain consistent.\n- Report failed, blocked, or skipped validation and any important coverage limits.\n</validation>\n<final_response>\nBe concise, direct, and match the user's requested format.\n\n- Lead with the result or the information that changes the user's next action.\n- Use plain prose by default. Use headings only for two or three genuinely distinct topics, and avoid tables or blockquotes for small amounts of content.\n- Keep connected reasoning together instead of fragmenting it into many bullets.\n- Do not repeat the same information in a closing summary.\n- Ground code-specific claims with inline file references, for example: `src/app.ts:42`.\n- Wrap file paths, commands, environment variables, and identifiers in `backticks`.\n\nFor non-trivial code changes, include what changed, relevant files, validation performed, and only material assumptions, limits, or risks. Use a shorter response for trivial changes.\n</final_response>\n\n<skills_instructions>\n## Skills\nA skill is a set of local instructions in a `SKILL.md` file.\n### Available skills\n- agent-friendly-code: Guide agent-friendly code design and review. Use when writing, refactoring, or evaluating code for navigability, local reasoning, explicit contracts, small blast radius, or executable feedback. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/coding-principles/agent-friendly-code/SKILL.md)\n- pragmatic-principles: Apply the Pragmatic Programmer's meta-principles — DRY, orthogonality, tracer bullets, design by contract, broken windows, reversibility, estimation. Use when the user mentions \"pragmatic\", \"best practices\", \"software craftsmanship\", \"technical debt\", \"tracer bullet\", \"broken windows\", \"orthogonality\", \"DRY\", or asks how to design or evaluate a system for changeability, decoupling, or reversibility. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/coding-principles/pragmatic-principles/SKILL.md)\n- git-commit: Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions \"/commit\". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/devops/git-commit/SKILL.md)\n- diagnosing-bugs: Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/mattpocock/diagnosing-bugs/SKILL.md)\n- grilling: Grill the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/mattpocock/grilling/SKILL.md)\n- tdd: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/mattpocock/tdd/SKILL.md)\n- context7-cli: Use the ctx7 CLI to fetch library documentation, manage AI coding skills, and configure Context7 MCP. Activate when the user mentions \"ctx7\" or \"context7\", needs current docs for any library, wants to install/search/generate skills, or needs to set up Context7 for their AI coding agent. (file: /home/hiennx/Documents/pi-starter-kit/.pi/skills/research/context7-cli/SKILL.md)\n### How to use skills\nThe following skills provide specialized instructions for specific tasks.\n- Use the read tool to load a skill's file when the task matches its description.\n- When a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n- Use the minimal required set of skills. If multiple apply, use them together and state the order briefly.\n</skills_instructions>\n\nCurrent working directory: /home/hiennx/Documents/pi-starter-kit"
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "HI"
+                }
+            ]
+        }
+    ],
+    "stream": true,
+    "stream_options": {
+        "include_usage": true
+    },
+    "store": false,
+    "max_completion_tokens": 16384,
+    "tools": [
+        {
+            "type": "function",
+            "function": {
+                "name": "read",
+                "description": "Read the contents of a file. Supports text files and images (jpg, png, gif, webp, bmp). Images are sent as attachments. For text files, output is truncated to 2000 lines or 50KB (whichever is hit first). Use offset/limit for large files. When you need the full file, continue with offset until complete.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "path"
+                    ],
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to the file to read (relative or absolute)"
+                        },
+                        "offset": {
+                            "type": "number",
+                            "description": "Line number to start reading from (1-indexed)"
+                        },
+                        "limit": {
+                            "type": "number",
+                            "description": "Maximum number of lines to read"
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "bash",
+                "description": "Execute a bash command in the current working directory. Returns stdout and stderr. Output is truncated to last 2000 lines or 50KB (whichever is hit first). If truncated, full output is saved to a temp file. Optionally provide a timeout in seconds.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "command"
+                    ],
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "Bash command to execute"
+                        },
+                        "timeout": {
+                            "type": "number",
+                            "description": "Timeout in seconds (optional, no default timeout)"
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "edit",
+                "description": "Performs one to five small, exact replacements in one file. Each old_string must match a unique, non-overlapping region of the original file. Merge changes affecting the same or nearby block, and do not include large unchanged regions.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "file_path",
+                        "edits"
+                    ],
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "The absolute or relative path to the file to modify."
+                        },
+                        "edits": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "old_string",
+                                    "new_string"
+                                ],
+                                "properties": {
+                                    "old_string": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 4000,
+                                        "description": "The smallest exact text for one replacement. It must be unique in the original file and must not overlap another edit."
+                                    },
+                                    "new_string": {
+                                        "type": "string",
+                                        "maxLength": 4000,
+                                        "description": "The replacement text. May be empty to delete old_string."
+                                    }
+                                }
+                            },
+                            "minItems": 1,
+                            "maxItems": 5,
+                            "description": "One to five small replacements matched against the original file, with at most 10,000 characters combined. Do not overlap or nest edits, and merge changes affecting the same or nearby block."
+                        },
+                        "replace_all": {
+                            "type": "boolean",
+                            "description": "Replace every occurrence. Only valid when edits contains one item."
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "write",
+                "description": "Write content to a file. Creates the file if it doesn't exist, overwrites if it does. Automatically creates parent directories.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "path",
+                        "content"
+                    ],
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path to the file to write (relative or absolute)"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Content to write to the file"
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "ask_user_question",
+                "description": "Ask the user one or more structured questions during execution. Use when you need to:\n1. Gather user preferences or requirements\n2. Clarify ambiguous instructions\n3. Get decisions on implementation choices as you work\n4. Offer choices to the user about what direction to take\n\nUsage notes:\n- Users will always be able to type a custom answer (\"Type something.\" row is appended automatically to every single-select question) or pick \"Chat about this\" to abandon the questionnaire and continue in free-form conversation. Do NOT author \"Other\" / \"Type something.\" / \"Chat about this\" labels yourself — duplicates are rejected at runtime.\n- Use multiSelect: true to allow multiple answers to be selected for a question. The \"Type something.\" row is suppressed on multi-select questions, and is ALSO suppressed on single-select questions where any option carries a `preview` (the side-by-side layout has no room for inline custom text — \"Chat about this\" remains as the free-form escape hatch).\n- If you recommend a specific option, make that the first option in the list and add \"(Recommended)\" at the end of the label.\n\nPreview feature:\nUse the optional `preview` field on options when presenting concrete artifacts that users need to visually compare:\n- ASCII mockups of UI layouts or components\n- Code snippets showing different implementations\n- Diagram variations\n- Configuration examples\n\nPreview content is rendered as markdown in a monospace box. Multi-line text with newlines is supported. When any option has a preview, the UI switches to a side-by-side layout with a vertical option list on the left and preview on the right. Do not use previews for simple preference questions where labels and descriptions suffice. Note: previews are only supported for single-select questions (not multiSelect).",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "questions"
+                    ],
+                    "properties": {
+                        "questions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "question",
+                                    "header",
+                                    "options"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "description": "The complete question to ask the user. Should be clear, specific, and end with a question mark. Example: \"Which library should we use for date formatting?\" If multiSelect is true, phrase it accordingly, e.g. \"Which features do you want to enable?\""
+                                    },
+                                    "header": {
+                                        "type": "string",
+                                        "maxLength": 16,
+                                        "description": "MAX 16 CHARACTERS — hard limit, requests over the limit are rejected. Very short chip/tag shown next to the question. Examples: \"Auth method\", \"Library\", \"Approach\"."
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "label",
+                                                "description"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string",
+                                                    "maxLength": 60,
+                                                    "description": "MAX 60 CHARACTERS — hard limit, requests over the limit are rejected. The display text for this option that the user will see and select. Should be concise (1-5 words) and clearly describe the choice."
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "description": "Explanation of what this option means or what will happen if chosen. Useful for providing context about trade-offs or implications."
+                                                },
+                                                "preview": {
+                                                    "type": "string",
+                                                    "description": "Optional preview content rendered when this option is focused. Use for mockups, code snippets, or visual comparisons that help users compare options. See the tool description for the expected content format."
+                                                }
+                                            }
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 4,
+                                        "description": "The available choices for this question. Must have 2-4 options. Each option should be a distinct, mutually exclusive choice (unless multiSelect is enabled). The 'Type something.' row is appended automatically — do NOT author it."
+                                    },
+                                    "multiSelect": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Set to true to allow the user to select multiple options instead of just one. Use when choices are not mutually exclusive."
+                                    }
+                                }
+                            },
+                            "minItems": 1,
+                            "maxItems": 4,
+                            "description": "Questions to ask the user (1-4 questions)"
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "grep",
+                "description": "Search file contents by regex or literal text. Supports file, directory, glob, or semicolon-/whitespace-delimited paths. Results are grouped by file and paginated with skip.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "pattern"
+                    ],
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "Regex pattern to search for."
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "File, directory (searched recursively), glob, or semicolon-/whitespace-delimited paths to search."
+                        },
+                        "literal": {
+                            "type": "boolean",
+                            "description": "Treat pattern as a literal string instead of a regex."
+                        },
+                        "case": {
+                            "type": "boolean",
+                            "description": "Use case-sensitive matching. Defaults to true."
+                        },
+                        "gitignore": {
+                            "type": "boolean",
+                            "description": "Respect .gitignore files. Defaults to true."
+                        },
+                        "exclude": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Glob patterns to exclude relative to each traversal root; no negation; explicit file operands override exclusions; independent of gitignore; patterns ending in /** prune directories."
+                        },
+                        "scanLimit": {
+                            "type": "number",
+                            "description": "Maximum total entries to scan across this tool call, clamped to 1..1000000. Results may be partial when the budget is reached. Defaults to 50000."
+                        },
+                        "limit": {
+                            "type": "number",
+                            "description": "Maximum total matches to collect across all files, not files returned; clamped to 1..5000."
+                        },
+                        "skip": {
+                            "type": "number",
+                            "description": "Number of matching files to skip for pagination."
+                        },
+                        "contextBefore": {
+                            "type": "number",
+                            "description": "Lines of context before each match."
+                        },
+                        "contextAfter": {
+                            "type": "number",
+                            "description": "Lines of context after each match."
+                        }
+                    }
+                },
+                "strict": false
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "glob",
+                "description": "Find files and directories by file path, directory, glob pattern, or semicolon-/whitespace-delimited path list. Directories end with '/'.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "File, directory (searched recursively), glob, or semicolon-/whitespace-delimited paths to find. Use dir/* to inspect one level."
+                        },
+                        "hidden": {
+                            "type": "boolean",
+                            "description": "Include hidden files and directories. Defaults to true."
+                        },
+                        "gitignore": {
+                            "type": "boolean",
+                            "description": "Respect .gitignore files. Defaults to true."
+                        },
+                        "exclude": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Glob patterns to exclude relative to each traversal root; no negation; explicit file operands override exclusions; independent of gitignore; patterns ending in /** prune directories."
+                        },
+                        "limit": {
+                            "type": "number",
+                            "description": "Maximum paths to return, clamped to 1..1000. Defaults to 50."
+                        },
+                        "scanLimit": {
+                            "type": "number",
+                            "description": "Maximum total entries to scan across this tool call, clamped to 1..1000000. Results may be partial when the budget is reached. Defaults to 50000."
+                        }
+                    }
+                },
+                "strict": false
+            }
+        }
+    ]
+}
