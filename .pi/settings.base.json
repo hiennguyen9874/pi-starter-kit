@@ -42,7 +42,8 @@
     "-./extensions/disable-bash-tool.ts",
     "-./extensions/disable-edit-tools.ts",
     "-./extensions/disable-write-tool.ts",
-    "-./extensions/enable-ls-tool.ts"
+    "-./extensions/enable-ls-tool.ts",
+    "./extensions/system-prompt-appender.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,

@@ -1,0 +1,28 @@
+direction: right
+
+classes: {
+  service: {
+    style: {
+      border-radius: 8
+      shadow: true
+    }
+  }
+}
+
+users: Users {shape: person}
+
+platform: Production {
+  gateway: API Gateway {class: service}
+  api: Orders API {class: service}
+  queue: Jobs {shape: queue}
+  worker: Worker {class: service}
+  db: Orders {shape: cylinder}
+
+  gateway -> api: route
+  api -> db: read/write
+  api -> queue: publish
+  queue -> worker: consume
+  worker -> db: update
+}
+
+users -> platform.gateway: HTTPS

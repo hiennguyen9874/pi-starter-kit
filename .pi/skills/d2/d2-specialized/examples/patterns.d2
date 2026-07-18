@@ -1,0 +1,43 @@
+# Sequence diagram
+checkout: {
+  shape: sequence_diagram
+  customer
+  api
+  database
+  customer -> api: Place order
+  api -> database: Insert order
+  api <- database: Created
+  customer <- api: Confirmation
+}
+
+# SQL ERD
+users: {
+  shape: sql_table
+  id: uuid {constraint: primary_key}
+  email: varchar {constraint: unique}
+}
+orders: {
+  shape: sql_table
+  id: uuid {constraint: primary_key}
+  user_id: uuid {constraint: foreign_key}
+}
+orders.user_id -> users.id
+
+# UML class
+OrderService: {
+  shape: class
+  -repository: OrderRepository
+  +create(userId UUID): Order
+  +cancel(orderId UUID)
+}
+
+# Grid
+status-board: {
+  grid-columns: 2
+  grid-rows: 2
+  grid-gap: 8
+  queued: Queued
+  running: Running
+  succeeded: Succeeded
+  failed: Failed
+}

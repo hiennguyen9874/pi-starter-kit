@@ -3,8 +3,7 @@ skillsEnable:
   - tikz-flowchart
   - tikz-build
   - tikz-write
-skillsDisable:
-  - "*"
+skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
@@ -25,3 +24,5 @@ extensionState:
       planningDiscipline: false
 packagesEnable: []
 packagesDisable: []
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts

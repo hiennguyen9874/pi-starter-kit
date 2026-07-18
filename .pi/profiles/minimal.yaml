@@ -1,6 +1,9 @@
-skillsEnable: []
-skillsDisable:
-  - "*"
+skillsEnable:
+  - d2-compose
+  - d2-render
+  - d2-specialized
+  - d2-write
+skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
@@ -21,3 +24,5 @@ extensionState:
       planningDiscipline: false
 packagesEnable: []
 packagesDisable: []
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts

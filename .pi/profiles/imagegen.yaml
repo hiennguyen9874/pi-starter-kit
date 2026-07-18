@@ -22,3 +22,5 @@ extensionState:
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-codex-image-gen
 packagesDisable: []
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts
