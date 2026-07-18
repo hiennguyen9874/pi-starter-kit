@@ -2,7 +2,7 @@
   "packages": [
     "-git:github.com/hiennguyen9874/pi-powerline-footer",
     "npm:@pi-archimedes/footer",
-    "npm:@juicesharp/rpiv-ask-user-question",
+    "git:github.com/hiennguyen9874/pi-ask-user",
     "-git:github.com/hiennguyen9874/pi-edit",
     "git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input",
     "git:github.com/hiennguyen9874/pi-shake",

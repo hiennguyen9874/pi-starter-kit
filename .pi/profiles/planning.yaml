@@ -28,5 +28,5 @@ extensionState:
       finalResponse: false
       planningDiscipline: true
 packagesEnable:
-  - npm:@juicesharp/rpiv-ask-user-question
+  - git:github.com/hiennguyen9874/pi-ask-user
 packagesDisable: []

@@ -90,7 +90,7 @@ test("syncProfileResources overlays package and extension entries from the activ
         packages: [
           "npm:pi-powerline-footer",
           "npm:pi-cache-graph",
-          "npm:@juicesharp/rpiv-ask-user-question",
+          "git:github.com/hiennguyen9874/pi-ask-user",
           "git:github.com/MasuRii/pi-rtk-optimizer",
           "-npm:pi-web-access",
         ],
@@ -116,7 +116,7 @@ test("syncProfileResources overlays package and extension entries from the activ
   assert.deepEqual(firstSettings.packages, [
     "-npm:pi-powerline-footer",
     "-npm:pi-cache-graph",
-    "npm:@juicesharp/rpiv-ask-user-question",
+    "git:github.com/hiennguyen9874/pi-ask-user",
     "git:github.com/MasuRii/pi-rtk-optimizer",
     "npm:pi-web-access",
   ]);
@@ -135,7 +135,7 @@ test("syncProfileResources overlays package and extension entries from the activ
   assert.deepEqual(secondSettings.packages, [
     "npm:pi-powerline-footer",
     "npm:pi-cache-graph",
-    "npm:@juicesharp/rpiv-ask-user-question",
+    "git:github.com/hiennguyen9874/pi-ask-user",
     "git:github.com/MasuRii/pi-rtk-optimizer",
     "-npm:pi-web-access",
   ]);
