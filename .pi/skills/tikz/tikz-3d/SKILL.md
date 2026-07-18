@@ -1,7 +1,6 @@
 ---
 name: tikz-3d
 description: Create projected 3D TikZ figures, tensor boxes, spatial geometry, and PGFPlots 3D data plots.
-disable-model-invocation: true
 ---
 
 # TikZ 3D

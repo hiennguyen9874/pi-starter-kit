@@ -3,6 +3,9 @@ skillsEnable:
   - tikz-flowchart
   - tikz-build
   - tikz-write
+  - tikz-3d
+  - tikz-layout
+  - tikz-debug
 skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []
@@ -23,6 +26,8 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable: []
-packagesDisable: []
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
