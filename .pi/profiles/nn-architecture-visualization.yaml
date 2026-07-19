@@ -1,8 +1,9 @@
-skillsEnable: []
-skillsDisable:
-  - "*"
+skillsEnable:
+  - nn-architecture-visualization
+skillsDisable: []
 promptsEnable:
-  - create-nn-architecture-image
+  - create-nn-architecture-visualize
+promptsDisable: []
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -11,7 +12,7 @@ mcpServersDisable:
   - exa
 extensionState:
   behavioralGuidelines:
-    enabled: false
+    enabled: true
     sections:
       communicationAndToolUse: true
       executionAndDelivery: true
@@ -20,8 +21,9 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: false
-packagesEnable:
-  - git:github.com/hiennguyen9874/pi-codex-image-gen
-packagesDisable: []
-extensionsDisable:
+packagesEnable: []
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsEnable:
   - ./extensions/system-prompt-appender.ts
