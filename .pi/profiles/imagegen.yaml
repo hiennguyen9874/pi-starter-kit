@@ -22,6 +22,8 @@ extensionState:
       planningDiscipline: false
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-codex-image-gen
-packagesDisable: []
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts

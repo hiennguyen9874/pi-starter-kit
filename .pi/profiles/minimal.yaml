@@ -1,9 +1,5 @@
-skillsEnable:
-  - d2-compose
-  - d2-render
-  - d2-specialized
-  - d2-write
-skillsDisable: []
+skillsEnable: []
+skillsDisable: ["*"]
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
