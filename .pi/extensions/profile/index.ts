@@ -474,9 +474,9 @@ export default function profileExtension(pi: ExtensionAPI): void {
 
   pi.on("session_start", async (event, ctx) => {
     const syncOnly = pi.getFlag("sync-profile-system") === true;
-    const syncResult = syncBaseSystemResources(ctx.cwd);
 
     if (syncOnly) {
+      const syncResult = syncBaseSystemResources(ctx.cwd);
       const lines = [
         "Synced profile system resources from base files.",
         `settings.json: ${syncResult.settingsChanged ? "updated" : "unchanged"}`,
@@ -486,9 +486,12 @@ export default function profileExtension(pi: ExtensionAPI): void {
       process.exit(0);
     }
 
-    if (syncResult.settingsChanged || syncResult.mcpChanged) {
-      ctx.ui.notify("Synced profile system resources from base files", "info");
-    }
+    const syncUnprofiledBaseResources = () => {
+      const syncResult = syncBaseSystemResources(ctx.cwd);
+      if (syncResult.settingsChanged || syncResult.mcpChanged) {
+        ctx.ui.notify("Synced profile system resources from base files", "info");
+      }
+    };
 
     const loaded = loadProfilesConfig(ctx.cwd);
     state.profiles = loaded.config?.profiles ?? {};
@@ -510,6 +513,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     if (loaded.error) {
       ctx.ui.notify(`Failed to load profiles: ${loaded.error}`, "warning");
       setActiveProfile(undefined, ctx);
+      syncUnprofiledBaseResources();
       return;
     }
 
@@ -537,6 +541,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     if (selection.error) {
       ctx.ui.notify(selection.error, "warning");
       setActiveProfile(undefined, ctx);
+      syncUnprofiledBaseResources();
       return;
     }
 
@@ -552,7 +557,10 @@ export default function profileExtension(pi: ExtensionAPI): void {
           event.reason === "startup" ? "warning" : "info",
         );
       }
+      return;
     }
+
+    syncUnprofiledBaseResources();
   });
 
   pi.on("turn_start", async (_event, ctx) => {
