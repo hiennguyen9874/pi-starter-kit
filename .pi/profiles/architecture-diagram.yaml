@@ -1,11 +1,7 @@
 skillsEnable:
-  - visual-explainer
-promptsEnable:
-  - generate-slides
-  - generate-visual-plan
-  - generate-web-diagram
-  - project-recap
-  - plan-review
+  - architecture-diagram
+  - fireworks-tech-graph
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
@@ -26,5 +22,5 @@ extensionState:
 packagesEnable: []
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-grep-glob
-extensionsEnable:
+extensionsDisable:
   - ./extensions/visual-explainer.ts
