@@ -1,7 +1,10 @@
 {
   "packages": [
     "-git:github.com/hiennguyen9874/pi-powerline-footer",
-    "npm:@pi-archimedes/footer",
+    "-npm:@pi-archimedes/footer",
+    "-npm:@ogulcancelik/pi-minimal-footer",
+    "-npm:@narumitw/pi-statusline",
+    "npm:@xynogen/pix-footer",
     "git:github.com/hiennguyen9874/pi-ask-user",
     "-git:github.com/hiennguyen9874/pi-edit",
     "git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input",
