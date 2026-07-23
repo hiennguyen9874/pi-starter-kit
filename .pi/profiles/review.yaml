@@ -19,9 +19,14 @@ extensionState:
       validation: true
       finalResponse: false
       planningDiscipline: false
-packagesEnable:
-  - npm:@gotgenes/pi-subagents
+packagesEnable: []
 packagesDisable:
+  - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
+extra:
+  override:
+    defaultProvider: openai-codex
+    defaultModel: gpt-5.6-sol
+    defaultThinkingLevel: medium

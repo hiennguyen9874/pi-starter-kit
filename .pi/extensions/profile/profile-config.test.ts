@@ -101,6 +101,43 @@ test("loads package and extension profile fields from YAML files", () => {
   });
 });
 
+test("loads schema-free settings overrides from profile YAML", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "profiles", "focused.yaml"),
+    [
+      "extra:",
+      "  override:",
+      "    defaultModel: gpt-5.4",
+      "    compaction:",
+      "      reserveTokens: 8192",
+      "    extensionState:",
+      "      arbitraryExtensionSetting: true",
+    ].join("\n"),
+  );
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.error, undefined);
+  assert.deepEqual(result.config?.profiles.focused.extra, {
+    override: {
+      defaultModel: "gpt-5.4",
+      compaction: { reserveTokens: 8192 },
+      extensionState: { arbitraryExtensionSetting: true },
+    },
+  });
+});
+
+test("rejects non-object settings override in YAML file", () => {
+  const root = createRoot();
+  writeFileSync(join(root, ".pi", "profiles", "broken.yaml"), "extra:\n  override: default-model\n");
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.config, undefined);
+  assert.match(result.error ?? "", /extra\.override.*object/i);
+});
+
 test("rejects invalid behavioral guideline section in YAML file", () => {
   const root = createRoot();
   writeFileSync(

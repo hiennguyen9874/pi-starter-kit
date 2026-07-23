@@ -101,6 +101,18 @@ function validateBehavioralGuidelinesConfig(
   return result;
 }
 
+function validateProfileExtra(name: string, value: unknown): { override?: Record<string, unknown> } {
+  if (!isObject(value)) {
+    throw new Error(`Profile "${name}" field "extra" must be an object`);
+  }
+
+  if (value.override !== undefined && !isObject(value.override)) {
+    throw new Error(`Profile "${name}" field "extra.override" must be an object`);
+  }
+
+  return value.override === undefined ? {} : { override: value.override };
+}
+
 function validateProfileExtensionState(
   name: string,
   value: unknown,
@@ -149,6 +161,10 @@ function validateProfileDefinition(
 
   if (profile.extensionState !== undefined) {
     result.extensionState = validateProfileExtensionState(name, profile.extensionState, behavioralGuidelineSectionNameSet);
+  }
+
+  if (profile.extra !== undefined) {
+    result.extra = validateProfileExtra(name, profile.extra);
   }
 
   return result;

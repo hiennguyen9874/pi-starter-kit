@@ -5,6 +5,7 @@ skillsEnable:
   - diagnosing-bugs
   - domain-modeling
   - grill-with-docs
+  - batch-grill-me
   - grilling
   - implement
   - improve-codebase-architecture

@@ -146,6 +146,48 @@ test("syncProfileResources overlays package and extension entries from the activ
   ]);
 });
 
+test("syncProfileResources deep-merges schema-free profile settings overrides", () => {
+  const root = createRoot();
+  writeFileSync(
+    join(root, ".pi", "settings.base.json"),
+    JSON.stringify(
+      {
+        defaultProvider: "anthropic",
+        defaultModel: "claude-sonnet-4-5",
+        compaction: { enabled: true, reserveTokens: 16384 },
+        enabledModels: ["claude-*"],
+      },
+      null,
+      2,
+    ),
+  );
+
+  syncProfileResources(root, "focused", {
+    extra: {
+      override: {
+        defaultModel: "gpt-5.4",
+        compaction: { reserveTokens: 8192 },
+        enabledModels: ["gpt-5.4"],
+        extensionState: { arbitraryExtensionSetting: true },
+      },
+    },
+  });
+
+  const settings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+
+  assert.equal(settings.defaultProvider, "anthropic");
+  assert.equal(settings.defaultModel, "gpt-5.4");
+  assert.deepEqual(settings.compaction, { enabled: true, reserveTokens: 8192 });
+  assert.deepEqual(settings.enabledModels, ["gpt-5.4"]);
+  assert.deepEqual(settings.extensionState, { arbitraryExtensionSetting: true });
+
+  syncProfileResources(root, "base", {});
+  const resetSettings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+  assert.equal(resetSettings.defaultModel, "claude-sonnet-4-5");
+  assert.deepEqual(resetSettings.compaction, { enabled: true, reserveTokens: 16384 });
+  assert.equal(resetSettings.extensionState, undefined);
+});
+
 test("syncProfileResources filters mcp.json from baseline when switching profiles", () => {
   const root = createRoot();
   writeFileSync(

@@ -74,6 +74,22 @@ function readJsonObject(path: string): JsonObject | undefined {
   }
 }
 
+function mergeSettingsOverride(settings: JsonObject, override: Record<string, unknown> | undefined): JsonObject {
+  if (!override) {
+    return settings;
+  }
+
+  const merged: JsonObject = { ...settings };
+  for (const [key, overrideValue] of Object.entries(override)) {
+    const baseValue = merged[key];
+    merged[key] = isObject(baseValue) && isObject(overrideValue)
+      ? mergeSettingsOverride(baseValue, overrideValue)
+      : overrideValue;
+  }
+
+  return merged;
+}
+
 function writeJsonObject(path: string, value: JsonObject): boolean {
   mkdirSync(dirname(path), { recursive: true });
   const nextContent = `${JSON.stringify(value, null, 2)}\n`;
@@ -438,7 +454,10 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
     previousManagedExtensionEntries,
     nextManagedExtensionEntries,
   );
-  const settingsChanged = writeJsonObject(settingsPath, nextSettings);
+  const settingsChanged = writeJsonObject(
+    settingsPath,
+    mergeSettingsOverride(nextSettings, profile.extra?.override),
+  );
 
   const mcpBaseline = readJsonObject(getMcpBasePath(cwd)) ?? readJsonObject(getMcpPath(cwd));
   let mcpChanged = false;

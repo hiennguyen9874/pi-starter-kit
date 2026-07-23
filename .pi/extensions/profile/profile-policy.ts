@@ -6,6 +6,10 @@ export interface ProfileExtensionState {
   behavioralGuidelines?: BehavioralGuidelinesConfig;
 }
 
+export interface ProfileExtra {
+  override?: Record<string, unknown>;
+}
+
 export interface ProfileDefinition {
   skillsEnable?: string[];
   skillsDisable?: string[];
@@ -18,6 +22,7 @@ export interface ProfileDefinition {
   extensionsEnable?: string[];
   extensionsDisable?: string[];
   extensionState?: ProfileExtensionState;
+  extra?: ProfileExtra;
 }
 
 export interface ProfilePolicy {
