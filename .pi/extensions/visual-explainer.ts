@@ -1,6 +1,5 @@
 import { existsSync, lstatSync, mkdirSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AgentToolResult, ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
@@ -267,7 +266,7 @@ async function renderVisualExplanation(params: VisualExplainerParams, signal?: A
   const filename = outputFilename(params.filename);
   assertHtmlDocument(params.html);
 
-  const outputDir = join(homedir(), ".agent", "diagrams");
+  const outputDir = join(process.cwd(), "diagrams");
   const outputPath = join(outputDir, filename);
   mkdirSync(outputDir, { recursive: true });
   if (lstatSync(outputDir).isSymbolicLink()) throw new Error(`${outputDir} must not be a symlink`);

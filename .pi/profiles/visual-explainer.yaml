@@ -25,6 +25,11 @@ extensionState:
       planningDiscipline: false
 packagesEnable: []
 packagesDisable:
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
   - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-ask-user
 extensionsEnable:
   - ./extensions/visual-explainer.ts
