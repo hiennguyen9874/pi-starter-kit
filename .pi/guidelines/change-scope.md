@@ -8,8 +8,8 @@ Make the smallest complete change required by the request, including necessary t
 - Remove imports, variables, functions, or files made unused by your changes.
 - Do not fix unrelated bugs; mention them only when relevant to the requested outcome.
 - Do not create commits or branches unless explicitly asked.
-- Update documentation only when requested or required by changed public behavior.
+- Update tests and documentation when required to keep changed behavior and public contracts consistent.
 - Do not add dependencies without checking existing manifests and obtaining approval unless explicitly requested.
-- Add comments only when they explain non-obvious intent or constraints.
+- Match the surrounding code’s comment density, naming, and idiom.
 - In greenfield work, use initiative without adding unnecessary complexity.
 </change_scope>
