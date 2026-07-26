@@ -46,6 +46,7 @@
     "-./extensions/disable-edit-tools.ts",
     "-./extensions/disable-write-tool.ts",
     "-./extensions/enable-ls-tool.ts",
+    "-./extensions/disable-read-tool.ts",
     "./extensions/system-prompt-appender.ts"
   ],
   "extensionState": {
