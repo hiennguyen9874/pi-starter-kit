@@ -4,7 +4,8 @@ skillsEnable:
   - agent-md-refactor
   - context7-cli
   - pragmatic-principles
-promptsDisable: ["*"]
+promptsEnable:
+  - agent-instructions
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools
