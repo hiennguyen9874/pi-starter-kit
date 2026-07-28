@@ -1,6 +1,6 @@
 ---
 name: pragmatic-principles
-description: Apply the Pragmatic Programmer's meta-principles — DRY, orthogonality, tracer bullets, design by contract, broken windows, reversibility, estimation. Use when the user mentions "pragmatic", "best practices", "software craftsmanship", "technical debt", "tracer bullet", "broken windows", "orthogonality", "DRY", or asks how to design or evaluate a system for changeability, decoupling, or reversibility.
+description: Apply pragmatic principles to code and system decisions. Use when implementing, reviewing, or refactoring raises a material tradeoff involving duplicated knowledge, coupling or change blast radius, contracts or invariants, an uncertain end-to-end path, technical debt, reversibility, or estimation; when the user names DRY, orthogonality, tracer bullets, design by contract, broken windows, or software craftsmanship; or when another skill identifies one of these tradeoffs.
 ---
 
 # Pragmatic Principles

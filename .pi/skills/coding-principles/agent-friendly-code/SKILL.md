@@ -1,6 +1,6 @@
 ---
 name: agent-friendly-code
-description: Guide agent-friendly code design and review. Use when writing, refactoring, or evaluating code for navigability, local reasoning, explicit contracts, small blast radius, or executable feedback.
+description: Audit and design agent-friendly codebases. Use when the user asks to make a repository easier for coding agents to navigate, understand, change, or verify; requests an agent-readiness review; or needs code organization, discoverability, local reasoning, or executable feedback optimized for unfamiliar agents.
 ---
 
 # Agent-Friendly Code
