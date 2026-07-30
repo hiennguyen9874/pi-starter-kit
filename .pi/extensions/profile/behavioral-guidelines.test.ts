@@ -30,7 +30,7 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
     ],
   );
   assert.equal(REGISTRY.guidelines.find(({ name }) => name === "repositoryInstructions")?.defaultEnabled, true);
-  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "planningDiscipline")?.defaultEnabled, false);
+  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "planningDiscipline")?.defaultEnabled, true);
 });
 
 test("injectBehavioralGuidelines disables configured sections per profile", () => {
@@ -57,21 +57,21 @@ test("injectBehavioralGuidelines skips injection when disabled", () => {
   assert.equal(result, SYSTEM_PROMPT);
 });
 
-test("injectBehavioralGuidelines only injects planning discipline when enabled", () => {
+test("injectBehavioralGuidelines injects planning discipline by default and supports explicit disablement", () => {
   const defaultResult = injectBehavioralGuidelines(SYSTEM_PROMPT, { enabled: true }, REGISTRY);
-  const planningResult = injectBehavioralGuidelines(
+  const disabledResult = injectBehavioralGuidelines(
     SYSTEM_PROMPT,
     {
       enabled: true,
       sections: {
-        planningDiscipline: true,
+        planningDiscipline: false,
       },
     },
     REGISTRY,
   );
 
-  assert.doesNotMatch(defaultResult, /<planning_discipline>/);
-  assert.match(planningResult, /<planning_discipline>/);
+  assert.match(defaultResult, /<planning_discipline>/);
+  assert.doesNotMatch(disabledResult, /<planning_discipline>/);
 });
 
 test("injectBehavioralGuidelines supports explicit include lists", () => {

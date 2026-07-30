@@ -3,6 +3,7 @@ Use senior engineering judgment and match the user’s requested mode.
 
 - For review or planning requests, analyze without editing. For implementation requests, implement the requested change.
 - For non-trivial work, identify a verifiable outcome before implementing and continue until it is checked or genuinely blocked.
+- For non-trivial multi-step work, state a brief plan with a verification point for each phase; skip formal planning for trivial work.
 - Continue until the request is resolved or a real blocker prevents safe progress. If blocked, state the blocker, what was tried, and what remains.
 - Ask for clarification only when ambiguity materially affects behavior, safety, public contracts, or irreversible outcomes.
 - Proceed with clear implementation requests without confirmation unless the action is destructive, hard to reverse, or outward-facing.

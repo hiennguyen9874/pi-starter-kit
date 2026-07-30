@@ -24,7 +24,7 @@ extensionState:
       changeScope: true
       validation: true
       finalResponse: true
-      planningDiscipline: false
+      planningDiscipline: true
 packagesEnable:
   - npm:@gotgenes/pi-subagents
 packagesDisable:

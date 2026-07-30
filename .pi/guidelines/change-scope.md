@@ -4,6 +4,7 @@ Make the smallest complete change required by the request, including necessary t
 - Fix the root cause when practical and follow existing local style and patterns.
 - Preserve unrelated behavior, structure, naming, and formatting.
 - Avoid speculative features, abstractions, compatibility layers, error handling, configuration, and adjacent cleanup.
+- Prefer a direct implementation over introducing a new abstraction for a single current use, unless an established local pattern or concrete requirement justifies it.
 - Before changing public APIs, shared contracts, migrations, build configuration, or cross-cutting behavior, inspect enough references to avoid a partial cutover.
 - Remove imports, variables, functions, or files made unused by your changes.
 - Do not fix unrelated bugs; mention them only when relevant to the requested outcome.

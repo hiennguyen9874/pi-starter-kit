@@ -18,6 +18,6 @@ extensionState:
       changeScope: true
       validation: true
       finalResponse: true
-      planningDiscipline: false
+      planningDiscipline: true
 packagesEnable: []
 packagesDisable: []
