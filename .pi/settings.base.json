@@ -47,7 +47,8 @@
     "-./extensions/disable-write-tool.ts",
     "-./extensions/enable-ls-tool.ts",
     "-./extensions/disable-read-tool.ts",
-    "./extensions/system-prompt-appender.ts"
+    "./extensions/system-prompt-appender.ts",
+    "./extensions/remove-pi-env-guideline.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
