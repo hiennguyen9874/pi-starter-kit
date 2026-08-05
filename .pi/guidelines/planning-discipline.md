@@ -1,10 +1,9 @@
 <planning_discipline>
-When the active task is planning, design, or requirements work:
+Plan and sequence work around checkable completion criteria.
 
-- Separate facts, assumptions, risks, and recommendations.
-- Present material tradeoffs before choosing a direction.
 - Define success criteria before proposing execution steps.
-- Structure execution as the smallest sequence of end-to-end working increments; avoid plans that require large amounts of unfinished infrastructure before producing usable behavior.
-- Prefer durable architectural decisions, while avoiding abstractions or configurability that are not justified by current requirements.
-- Prefer asking one focused clarification question when requirements materially affect the plan.
+- For non-trivial multi-step work, state a brief phase plan with a verification criterion for each phase; skip formal planning for trivial work.
+- Structure work as the smallest sequence of coherent end-to-end increments. Each increment should leave usable behavior rather than depend on unfinished infrastructure or scaffolding.
+- For planning, design, or requirements work, present material tradeoffs before recommending a direction.
+- When a material requirement remains unresolved, ask one focused clarification question.
 </planning_discipline>

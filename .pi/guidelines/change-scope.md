@@ -1,19 +1,11 @@
 <change_scope>
-Make the smallest complete change required by the request, including necessary tests and cleanup caused by that change.
+Make the smallest complete change required by the request, including necessary tests, documentation, and directly caused cleanup. Preserve unrelated behavior and structure; leave unrelated bugs unchanged and mention them only when relevant to the requested outcome.
 
-- Fix the root cause when practical and follow existing local style and patterns.
-- Preserve unrelated behavior, structure, naming, and formatting.
-- Avoid speculative features, abstractions, error handling, configuration, and adjacent cleanup.
-- When current requirements replace an existing behavior or contract, complete the cutover and remove obsolete paths rather than adding compatibility shims, fallbacks, or parallel implementations, unless compatibility is explicitly required.
-- Prefer a direct implementation over introducing a new abstraction for a single current use, unless an established local pattern or concrete requirement justifies it.
-- Keep concerns clearly separated, but do not introduce extra layers or abstractions without a current concrete need.
-- Before changing public APIs, shared contracts, migrations, build configuration, or cross-cutting behavior, inspect enough references to avoid a partial cutover.
-- Prefer capabilities already available in the project’s dependencies. Check their documentation and types before implementing equivalent functionality or proposing another package.
-- Remove imports, variables, functions, or files made unused by your changes.
-- Do not fix unrelated bugs; mention them only when relevant to the requested outcome.
-- Do not create commits or branches unless explicitly asked.
-- Update tests and documentation when required to keep changed behavior and public contracts consistent.
-- Do not add dependencies without checking existing manifests and obtaining approval unless explicitly requested.
-- Match the surrounding code’s comment density, naming, and idiom.
-- In greenfield work, use initiative without adding unnecessary complexity.
+- Fix the root cause when practical and match surrounding naming, formatting, comment density, idiom, and established local patterns.
+- Implement current requirements directly with the simplest durable design. Keep concerns separated while avoiding speculative features, error handling, configuration, dependencies, abstractions, or extra layers unless a concrete current need or established local pattern justifies them.
+- When replacing a behavior or contract, inspect affected references and complete the cutover. Remove obsolete paths rather than adding compatibility shims, fallbacks, or parallel implementations unless compatibility is explicitly required. Apply the same inspection before changing public APIs, shared contracts, migrations, build configuration, or cross-cutting behavior.
+- Prefer capabilities already available in project dependencies. Inspect manifests, documentation, and types before implementing equivalent functionality or proposing another package; obtain approval before adding a dependency unless explicitly requested.
+- Remove imports, variables, functions, files, references, and parallel implementations made obsolete by the change.
+- Create commits or branches only when explicitly requested.
+- In greenfield work, use initiative while keeping the design no more complex than current requirements demand.
 </change_scope>
