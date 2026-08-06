@@ -22,7 +22,7 @@ extensionState:
     enabled: true
     sections:
       communicationAndToolUse: true
-      executionAndDelivery: true
+      executionPolicy: true
       evidenceDiscipline: true
       changeScope: true
       validation: true

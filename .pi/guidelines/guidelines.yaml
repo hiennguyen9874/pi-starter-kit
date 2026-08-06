@@ -8,7 +8,7 @@ guidelines:
   - name: repositoryInstructions
     path: repository-instructions.md
     defaultEnabled: false
-  - name: executionAndDelivery
+  - name: executionPolicy
     path: execution-policy.md
     defaultEnabled: true
   - name: evidenceDiscipline

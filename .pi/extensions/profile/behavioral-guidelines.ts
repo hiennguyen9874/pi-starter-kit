@@ -6,7 +6,7 @@ import { parse as parseYaml } from "yaml";
 export const FALLBACK_BEHAVIORAL_GUIDELINE_SECTION_NAMES = [
   "communicationAndToolUse",
   "repositoryInstructions",
-  "executionAndDelivery",
+  "executionPolicy",
   "evidenceDiscipline",
   "planningDiscipline",
   "changeScope",

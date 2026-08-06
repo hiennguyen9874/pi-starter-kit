@@ -13,7 +13,7 @@ extensionState:
     enabled: false
     sections:
       communicationAndToolUse: true
-      executionAndDelivery: true
+      executionPolicy: true
       evidenceDiscipline: true
       changeScope: false
       validation: false

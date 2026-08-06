@@ -21,7 +21,7 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
     [
       "communicationAndToolUse",
       "repositoryInstructions",
-      "executionAndDelivery",
+      "executionPolicy",
       "evidenceDiscipline",
       "planningDiscipline",
       "changeScope",
