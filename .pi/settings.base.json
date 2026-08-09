@@ -74,7 +74,7 @@
   "observational-memory": {
     "observeAfterTokens": 10000,
     "reflectAfterTokens": 20000,
-    "compactAfterTokens": 81000,
+    "compactAfterTokens": 120000,
     "compactAfterTokensMode": "calibrated",
     "compactAfterTokensRatio": 0.68,
     "observationsPoolMaxTokens": 20000,
