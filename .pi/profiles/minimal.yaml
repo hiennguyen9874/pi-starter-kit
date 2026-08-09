@@ -22,5 +22,6 @@ packagesEnable: []
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
