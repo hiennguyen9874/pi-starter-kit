@@ -82,7 +82,7 @@
     "agentMaxTurns": 16,
     "model": {
       "provider": "openai-codex",
-      "id": "gpt-5.6-lunax",
+      "id": "gpt-5.6-luna",
       "thinking": "medium"
     },
     "showWorkerNotifications": true,
