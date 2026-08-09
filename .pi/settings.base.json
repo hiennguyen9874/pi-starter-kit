@@ -1,18 +1,12 @@
 {
   "packages": [
-    "-git:github.com/hiennguyen9874/pi-powerline-footer",
-    "-npm:@pi-archimedes/footer",
-    "-npm:@ogulcancelik/pi-minimal-footer",
-    "-npm:@narumitw/pi-statusline",
     "npm:@xynogen/pix-footer",
     "git:github.com/hiennguyen9874/pi-ask-user",
-    "-git:github.com/hiennguyen9874/pi-edit",
     "git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input",
-    "git:github.com/hiennguyen9874/pi-shake",
+    "-git:github.com/hiennguyen9874/pi-shake",
     "git:github.com/hiennguyen9874/pi-grep-glob",
+    "npm:pi-observational-memory",
     "-git:github.com/hiennguyen9874/pi-ast-grep",
-    "-git:github.com/hiennguyen9874/pi-hashline-edit",
-    "-npm:@ff-labs/pi-fff",
     "-npm:pi-context-prune",
     "-git:github.com/MasuRii/pi-rtk-optimizer",
     "-npm:pi-mcp-adapter",
@@ -21,11 +15,8 @@
     "-git:github.com/hiennguyen9874/pi-goal",
     "-git:github.com/davebcn87/pi-autoresearch",
     "-npm:pi-intercom",
-    "-npm:pi-cache-graph",
-    "-npm:pi-tool-display",
     "-npm:context-mode",
     "-npm:pi-btw",
-    "-npm:pi-context",
     "npm:@spences10/pi-confirm-destructive"
   ],
   "extensions": [
@@ -67,10 +58,6 @@
       "find-skills"
     ]
   },
-  "piEdit": {
-    "fuzzyMatch": true,
-    "fuzzyThreshold": 0.95
-  },
   "enabledModels": [
     "openai-codex/*",
     "opencode-go/*",
@@ -79,5 +66,27 @@
     "tencent/hy3:free"
   ],
   "showCacheMissNotices": true,
-  "hideThinkingBlock": false
+  "hideThinkingBlock": false,
+  "piEdit": {
+    "fuzzyMatch": true,
+    "fuzzyThreshold": 0.95
+  },
+  "observational-memory": {
+    "observeAfterTokens": 10000,
+    "reflectAfterTokens": 20000,
+    "compactAfterTokens": 81000,
+    "compactAfterTokensMode": "calibrated",
+    "compactAfterTokensRatio": 0.68,
+    "observationsPoolMaxTokens": 20000,
+    "observationsPoolTargetTokens": 10000,
+    "agentMaxTurns": 16,
+    "model": {
+      "provider": "openai-codex",
+      "id": "gpt-5.6-lunax",
+      "thinking": "medium"
+    },
+    "showWorkerNotifications": true,
+    "passive": false,
+    "debugLog": false
+  }
 }
