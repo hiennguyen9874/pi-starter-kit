@@ -1,6 +1,6 @@
-skillsEnable: []
-skillsDisable:
-  - "*"
+skillsEnable:
+  - gpt-image
+skillsDisable: []
 promptsEnable:
   - create-nn-architecture-image
 mcpServersEnable: []
