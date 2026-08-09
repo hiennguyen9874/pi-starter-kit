@@ -1,40 +1,27 @@
 ---
 name: pragmatic-principles
-description: Apply pragmatic principles to code and system decisions. Use when implementing, reviewing, or refactoring raises a material tradeoff involving duplicated knowledge, coupling or change blast radius, contracts or invariants, an uncertain end-to-end path, technical debt, reversibility, or estimation; when the user names DRY, orthogonality, tracer bullets, design by contract, broken windows, or software craftsmanship; or when another skill identifies one of these tradeoffs.
+description: Apply pragmatic coding decisions. Use when a task has a material DRY, orthogonality, contract/assertion, tracer-bullet/prototype, reversibility, or broken-window tradeoff; use estimation only when the user explicitly requests a duration, cost, or schedule.
 ---
 
 # Pragmatic Principles
 
-Meta-principles from Hunt & Thomas' *The Pragmatic Programmer* for systems that are easy to change, easy to understand, and easy to trust. This is reference: scan the seven entries, apply the one the situation names, and reach the linked file only when you need depth.
+Apply the relevant principle as a decision tool, not as a slogan.
 
-## The Seven Principles
+## Process
 
-**DRY** — every piece of *knowledge* has a single, unambiguous, authoritative representation. DRY is about knowledge and intent, not textual similarity: two identical blocks serving different business rules are not duplication. Comments that restate code violate DRY — explain *why*, not *what*. → [references/dry-orthogonality.md](references/dry-orthogonality.md) for the four duplication types and how to detect violations.
+1. Identify the material tradeoffs required to complete the requested task and open only the matching references below. The step is complete when each relevant tradeoff maps to a branch.
+2. State the concrete repository evidence: the duplicated knowledge, coupling, uncertainty, assumption, defect, decision, or estimate at issue. The step is complete when the claim is specific enough to test.
+3. Make the smallest in-scope change that addresses the root issue. Record an alternative only when the choice is consequential or non-obvious.
+4. Run the branch's verification and relevant project checks. The step is complete when each in-scope issue is fixed and each unresolved risk is reported without expanding the task.
 
-**Orthogonality** — a change in one component does not affect others. Ask "if I dramatically change the requirements behind this function, how many modules are affected?" — the answer should be one. Global state couples everyone to everyone; eliminate it. → [references/dry-orthogonality.md](references/dry-orthogonality.md) for the change-impact test, layered architecture, and the helicopter analogy.
+## Branches
 
-**Tracer bullets** — a thin but complete end-to-end slice (UI → API → DB) that you *keep*, versus a prototype you *throw away*. Use a tracer when requirements are vague or the architecture is unproven; if it misses, adjust and fire again. Never let a prototype become production code. → [references/tracer-bullets.md](references/tracer-bullets.md).
-
-**Design by contract** — preconditions (caller's responsibility), postconditions (the routine's guarantee), invariants (always true). When a contract is violated, crash early and loudly — dead programs tell no lies. Use assertions for what should never happen, error handling for what might. → [references/contracts-assertions.md](references/contracts-assertions.md).
-
-**Broken windows** — one unrepaired bad design, wrong decision, or "fix it later" hack starts the rot; entropy accelerates once neglect shows. Fix a broken window immediately, or board it up (a tracked TODO, a disabled feature, a stub). The first hack is the most expensive — it gives permission for all the rest. → [references/broken-windows.md](references/broken-windows.md).
-
-**Reversibility** — there are no final decisions. Build so changing the database, framework, or vendor is proportional to the scope of change, not a rewrite. Abstract third-party APIs behind your own interfaces; the forking-road test: could you switch Postgres → DynamoDB in a week? Add flexibility only with concrete evidence you'll need it — YAGNI applies to abstraction too. → [references/reversibility.md](references/reversibility.md).
-
-**Estimation** — give ranges with confidence ("1–3 weeks"), not single points. PERT = (Optimistic + 4×Most Likely + Pessimistic) / 6; decompose into components and sum for accuracy; keep an estimation log and calibrate against actuals. Manage learning like a portfolio: invest regularly, diversify, rebalance. → [references/estimation-portfolio.md](references/estimation-portfolio.md).
-
-## Quick Diagnostic
-
-Seven questions — each "no" names the failing principle and its fix.
-
-| Question | Failing principle | Fix |
-|---|---|---|
-| Can I change the database without touching business logic? | Orthogonality | Introduce a repository/adapter layer |
-| Is every business rule defined in exactly one place? | DRY | Find the authoritative source; remove duplicates |
-| Do I have an end-to-end slice working? | Tracer bullets | Build one vertical slice before expanding |
-| Are preconditions and invariants enforced at boundaries? | Design by contract | Add guards/assertions; crash on violation |
-| Would a new developer call this codebase "clean"? | Broken windows | Fix or board up the worst window now |
-| Can I roll back this deployment in under 5 minutes? | Reversibility | Add feature flags or blue-green deploys |
-| Do my estimates include ranges and confidence? | Estimation | Switch to PERT or range-based estimates |
-
-Count "yes" answers out of 7. State the score, name the failing rows, and give the fix from the table.
+| Branch | Reach when | Governing question | Reference |
+|---|---|---|---|
+| **DRY** | One fact or rule has multiple representations | Must these representations change together? | [DRY and orthogonality](references/dry-orthogonality.md) |
+| **Orthogonality** | A local change affects unrelated components | Which effect crosses a responsibility boundary? | [DRY and orthogonality](references/dry-orthogonality.md) |
+| **Tracer bullets** | The whole system's path or target is uncertain | What is the thinnest retained end-to-end path? | [Tracer bullets and prototypes](references/tracer-bullets.md) |
+| **Contracts** | Correctness depends on implicit assumptions or impossible states | What must callers provide, routines guarantee, and state preserve? | [Contracts and assertions](references/contracts-assertions.md) |
+| **Broken windows** | The requested change would preserve, create, or spread a concrete defect | What must be repaired on the task's change path? | [Broken windows](references/broken-windows.md) |
+| **Reversibility** | A volatile choice may become expensive to change | Which detail should sit behind a stable boundary or in metadata? | [Reversibility](references/reversibility.md) |
+| **Estimation** | The user explicitly asks for duration, cost, or schedule | What accuracy is useful, and what model supports it? | [Estimation](references/estimation-portfolio.md) |
