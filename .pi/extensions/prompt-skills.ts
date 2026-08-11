@@ -4,44 +4,53 @@ import { join, resolve } from "node:path";
 
 import type { ExtensionAPI, Skill } from "@earendil-works/pi-coding-agent";
 
+type SkillPosition = "before" | "after";
+
 interface PromptMetadata {
   skills: string[];
+  skillPosition: SkillPosition;
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
-const TRUNCATE_LINES = 10;
+const MESSAGE_TYPE = "prompt-skills";
+
+interface ActiveSkillMessage {
+  content: string;
+  position: SkillPosition;
+}
 
 export default function (pi: ExtensionAPI) {
-  let pendingPromptSkills: string[] = [];
+  let pendingPromptMetadata: PromptMetadata = emptyPromptMetadata();
+  let activeSkillMessage: ActiveSkillMessage | undefined;
 
   pi.on("input", async (event, ctx) => {
     if (event.source === "extension") return { action: "continue" };
 
     const command = parsePromptCommand(event.text);
     if (!command) {
-      pendingPromptSkills = [];
+      pendingPromptMetadata = emptyPromptMetadata();
       return { action: "continue" };
     }
 
     const promptPath = findPromptPath(ctx.cwd, command);
     if (!promptPath) {
-      pendingPromptSkills = [];
+      pendingPromptMetadata = emptyPromptMetadata();
       return { action: "continue" };
     }
 
-    pendingPromptSkills = readPromptMetadata(promptPath).skills;
+    pendingPromptMetadata = readPromptMetadata(promptPath);
     return { action: "continue" };
   });
 
   pi.on("before_agent_start", async (event, ctx) => {
-    const skillNames = pendingPromptSkills;
-    pendingPromptSkills = [];
+    const { skills: skillNames, skillPosition } = pendingPromptMetadata;
+    pendingPromptMetadata = emptyPromptMetadata();
+    activeSkillMessage = undefined;
 
     if (skillNames.length === 0) return;
 
     const skillIndex = indexLoadedSkills(event.systemPromptOptions.skills ?? []);
     const loadedFull: string[] = [];
-    const loadedDisplay: string[] = [];
     const missing: string[] = [];
 
     for (const skillName of skillNames) {
@@ -53,7 +62,6 @@ export default function (pi: ExtensionAPI) {
 
       const content = stripFrontmatter(readFileSync(skill.filePath, "utf8"));
       loadedFull.push(formatSkill(skill.name, skill.filePath, content));
-      loadedDisplay.push(formatSkill(skill.name, skill.filePath, truncateLines(content, TRUNCATE_LINES)));
     }
 
     if (loadedFull.length === 0 && missing.length === 0) return;
@@ -67,19 +75,45 @@ export default function (pi: ExtensionAPI) {
       missing.length > 0 ? "warning" : "info",
     );
 
-    const header = "Prompt-declared skills loaded before executing prompt. Follow these skill instructions when relevant.";
-    const fullSkillsContent = loadedFull.join("\n\n---\n\n");
-    const displayContent = `${header}\n\n${loadedDisplay.join("\n\n---\n\n")}${missingText}`;
+    const header = `Prompt-declared skills loaded ${skillPosition} the user prompt. Follow these skill instructions when relevant.`;
+    activeSkillMessage = {
+      content: `${header}\n\n${loadedFull.join("\n\n---\n\n")}${missingText}`,
+      position: skillPosition,
+    };
+  });
+
+  pi.on("context", async (event) => {
+    if (!activeSkillMessage) return;
+
+    // Context changes affect only provider input: they do not alter the system prompt
+    // or persist the skill message in session history.
+    const messages = event.messages.filter(
+      (message) => !(message.role === "custom" && message.customType === MESSAGE_TYPE),
+    );
+    const userIndex = findLastUserMessageIndex(messages);
+    if (userIndex === -1) return;
+
+    const insertAt = activeSkillMessage.position === "before" ? userIndex : userIndex + 1;
+    const skillMessage = {
+      role: "custom" as const,
+      customType: MESSAGE_TYPE,
+      content: activeSkillMessage.content,
+      display: false,
+      details: { position: activeSkillMessage.position },
+      timestamp: Date.now(),
+    };
 
     return {
-      systemPrompt: event.systemPrompt + "\n\n" + header + "\n\n" + fullSkillsContent,
-      message: {
-        customType: "prompt-skills",
-        display: true,
-        content: displayContent,
-        details: { loaded: skillNames.filter((name) => !missing.includes(name)), missing },
-      },
+      messages: [
+        ...messages.slice(0, insertAt),
+        skillMessage,
+        ...messages.slice(insertAt),
+      ],
     };
+  });
+
+  pi.on("agent_settled", async () => {
+    activeSkillMessage = undefined;
   });
 }
 
@@ -101,12 +135,26 @@ function findPromptPath(cwd: string, command: string): string | undefined {
   return candidates.find((path) => existsSync(path));
 }
 
+function emptyPromptMetadata(): PromptMetadata {
+  return { skills: [], skillPosition: "before" };
+}
+
 function readPromptMetadata(promptPath: string): PromptMetadata {
   const text = readFileSync(promptPath, "utf8");
   const match = text.match(FRONTMATTER_RE);
-  if (!match) return { skills: [] };
+  if (!match) return emptyPromptMetadata();
 
-  return { skills: parseSkills(match[1]) };
+  return {
+    skills: parseSkills(match[1]),
+    skillPosition: parseSkillPosition(match[1]),
+  };
+}
+
+function parseSkillPosition(frontmatter: string): SkillPosition {
+  const match = frontmatter.match(/^skills-position\s*:\s*(.+?)\s*$/m);
+  if (!match) return "before";
+
+  return cleanSkillName(match[1]).toLowerCase() === "after" ? "after" : "before";
 }
 
 function parseSkills(frontmatter: string): string[] {
@@ -165,10 +213,11 @@ function formatSkill(name: string, path: string, content: string): string {
   return `<skill name="${escapeXml(name)}" path="${escapeXml(resolve(path))}">\n${content}\n</skill>`;
 }
 
-function truncateLines(content: string, maxLines: number): string {
-  const lines = content.split("\n");
-  if (lines.length <= maxLines) return content;
-  return lines.slice(0, maxLines).join("\n") + "\n...";
+function findLastUserMessageIndex(messages: ReadonlyArray<{ role: string }>): number {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index].role === "user") return index;
+  }
+  return -1;
 }
 
 function escapeXml(value: string): string {
