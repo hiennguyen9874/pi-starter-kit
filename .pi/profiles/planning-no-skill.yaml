@@ -1,0 +1,24 @@
+skillsEnable: []
+skillsDisable: ["*"]
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: true
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-observational-memory
+packagesDisable: []
