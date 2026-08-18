@@ -20,4 +20,7 @@ extensionState:
       finalResponse: true
       planningDiscipline: true
 packagesEnable: []
-packagesDisable: []
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
