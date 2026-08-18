@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const GUIDELINES_HEADER = "Guidelines:";
-const PI_ENV_GUIDELINE = "- Inspect PI_* environment variables for current model and session details.";
+const PI_ENV_GUIDELINE = "- You can inspect PI_* environment variables for current model and session details.";
 
 /** Remove the PI environment inspection instruction only from the Guidelines section. */
 export function removePiEnvGuideline(systemPrompt: string): string {
