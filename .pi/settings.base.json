@@ -62,8 +62,7 @@
     "openai-codex/*",
     "opencode-go/*",
     "opencode/*-free",
-    "opencode/*-free*",
-    "tencent/hy3:free"
+    "opencode/*-free*"
   ],
   "showCacheMissNotices": true,
   "hideThinkingBlock": false,
