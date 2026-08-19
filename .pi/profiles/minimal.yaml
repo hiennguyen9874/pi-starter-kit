@@ -21,10 +21,10 @@ extensionState:
 packagesEnable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-grep-glob
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
-  - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:pi-observational-memory
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
@@ -36,4 +36,4 @@ extra:
   override:
     extensionState:
       piDocumentationEnabled: false
-      projectContextRewriterDisableProjectContext: false
+      projectContextRewriterDisableProjectContext: true
