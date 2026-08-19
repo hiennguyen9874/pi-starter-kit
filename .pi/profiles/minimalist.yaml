@@ -30,8 +30,13 @@ packagesDisable:
   - npm:pi-observational-memory
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
-  - ./extensions/disable-write-tool.ts
-  - ./extensions/disable-read-tool.ts
-extensionsEnable:
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
+      projectContextRewriterDisableProjectContext: false
