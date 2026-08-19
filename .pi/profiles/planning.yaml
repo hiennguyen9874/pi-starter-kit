@@ -12,10 +12,10 @@ skillsEnable:
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki
-  - exa
 extensionState:
   behavioralGuidelines:
     enabled: true
@@ -29,4 +29,5 @@ extensionState:
       planningDiscipline: true
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-observational-memory
 packagesDisable: []

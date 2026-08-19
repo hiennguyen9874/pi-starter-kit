@@ -8,10 +8,10 @@ promptsEnable:
   - plan-review
 mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki
-  - exa
 extensionState:
   behavioralGuidelines:
     enabled: false

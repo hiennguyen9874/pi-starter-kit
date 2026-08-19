@@ -8,10 +8,10 @@ promptsEnable:
   - agent-instructions
 mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki
-  - exa
 extensionState:
   behavioralGuidelines:
     enabled: true

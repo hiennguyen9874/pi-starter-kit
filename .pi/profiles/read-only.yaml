@@ -3,10 +3,10 @@ skillsDisable: ["*"]
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki
-  - exa
 extensionState:
   behavioralGuidelines:
     enabled: false
@@ -27,9 +27,11 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-shake
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@spences10/pi-confirm-destructive
-extensionsDisable: []
-extensionsEnable:
+  - npm:pi-observational-memory
+extensionsDisable:
   - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-read-tool.ts
+extensionsEnable:
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
   - ./extensions/disable-write-tool.ts

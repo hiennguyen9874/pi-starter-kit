@@ -19,8 +19,15 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: true
-packagesEnable: []
+packagesEnable:
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - npm:pi-observational-memory
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
