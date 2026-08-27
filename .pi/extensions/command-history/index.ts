@@ -162,7 +162,7 @@ export default async function (pi: ExtensionAPI) {
 	class HistoryEditor extends CustomEditor {
 		handleInput(data: string): void {
 			if (
-				matchesKey(data, "ctrl+up") ||
+				matchesKey(data, "ctrl+shift+up") ||
 				(matchesKey(data, "up") && !this.getText().includes("\n"))
 			) {
 				if (applyHistoryNavigation("previous", () => this.getText(), (text) => this.setText(text))) {
@@ -171,7 +171,7 @@ export default async function (pi: ExtensionAPI) {
 			}
 
 			if (
-				matchesKey(data, "ctrl+down") ||
+				matchesKey(data, "ctrl+shift+down") ||
 				(matchesKey(data, "down") && !this.getText().includes("\n"))
 			) {
 				if (applyHistoryNavigation("next", () => this.getText(), (text) => this.setText(text))) {
@@ -205,7 +205,7 @@ export default async function (pi: ExtensionAPI) {
 		return { action: "continue" as const };
 	});
 
-	pi.registerShortcut("ctrl+up", {
+	pi.registerShortcut("ctrl+shift+up", {
 		description: "Previous command from folder history",
 		handler: (ctx) => {
 			applyHistoryNavigation(
@@ -216,7 +216,7 @@ export default async function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerShortcut("ctrl+down", {
+	pi.registerShortcut("ctrl+shift+down", {
 		description: "Next command from folder history",
 		handler: (ctx) => {
 			applyHistoryNavigation(
