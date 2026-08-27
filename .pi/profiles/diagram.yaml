@@ -1,0 +1,43 @@
+skillsEnable:
+  - archify
+  - architecture-diagram
+  - diagram-design
+  - fireworks-tech-graph
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+packagesEnable:
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-grep-glob
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+  - ./extensions/visual-explainer.ts
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
+      projectContextRewriterDisableProjectContext: false
