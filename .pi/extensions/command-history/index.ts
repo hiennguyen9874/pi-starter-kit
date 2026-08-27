@@ -5,6 +5,11 @@ import { join } from "node:path";
 
 const HISTORY_DIR = join(homedir(), ".pi", "folder-history");
 const MAX_HISTORY = 500;
+const HISTORY_PICKER_MAX_ROWS = 12;
+const HISTORY_PICKER_CHROME_ROWS = 6;
+// Avoid pi's fullscreen transcript navigation bindings (ctrl+shift+up/down).
+const HISTORY_PREVIOUS_KEY = "alt+shift+up";
+const HISTORY_NEXT_KEY = "alt+shift+down";
 
 type HistoryEntry = {
 	cwd: string;
@@ -131,7 +136,10 @@ export function navigateHistory(
 }
 
 export default async function (pi: ExtensionAPI) {
-	const [{ CustomEditor }, { matchesKey }] = await Promise.all([
+	const [
+		{ CustomEditor, DynamicBorder },
+		{ Container, SelectList, Text, matchesKey },
+	] = await Promise.all([
 		import("@earendil-works/pi-coding-agent"),
 		import("@earendil-works/pi-tui"),
 	]);
@@ -162,7 +170,7 @@ export default async function (pi: ExtensionAPI) {
 	class HistoryEditor extends CustomEditor {
 		handleInput(data: string): void {
 			if (
-				matchesKey(data, "ctrl+shift+up") ||
+				matchesKey(data, HISTORY_PREVIOUS_KEY) ||
 				(matchesKey(data, "up") && !this.getText().includes("\n"))
 			) {
 				if (applyHistoryNavigation("previous", () => this.getText(), (text) => this.setText(text))) {
@@ -171,7 +179,7 @@ export default async function (pi: ExtensionAPI) {
 			}
 
 			if (
-				matchesKey(data, "ctrl+shift+down") ||
+				matchesKey(data, HISTORY_NEXT_KEY) ||
 				(matchesKey(data, "down") && !this.getText().includes("\n"))
 			) {
 				if (applyHistoryNavigation("next", () => this.getText(), (text) => this.setText(text))) {
@@ -205,7 +213,7 @@ export default async function (pi: ExtensionAPI) {
 		return { action: "continue" as const };
 	});
 
-	pi.registerShortcut("ctrl+shift+up", {
+	pi.registerShortcut(HISTORY_PREVIOUS_KEY, {
 		description: "Previous command from folder history",
 		handler: (ctx) => {
 			applyHistoryNavigation(
@@ -216,7 +224,7 @@ export default async function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerShortcut("ctrl+shift+down", {
+	pi.registerShortcut(HISTORY_NEXT_KEY, {
 		description: "Next command from folder history",
 		handler: (ctx) => {
 			applyHistoryNavigation(
@@ -236,14 +244,59 @@ export default async function (pi: ExtensionAPI) {
 		const reversed = [...entries].reverse();
 		const labels = reversed.map((entry) => {
 			const prefix = entry.isSlash ? "slash" : "text";
-			return `[${prefix}] ${entry.text}`;
+			// Keep every item on one visual row. The original text is restored on selection.
+			return `[${prefix}] ${entry.text.replace(/\s+/g, " ")}`;
 		});
 
-		const picked = await ctx.ui.select("Select history to restore", labels);
-		if (!picked) return;
-		const selectedIndex = labels.indexOf(picked);
-		if (selectedIndex < 0) return;
+		let selectedIndex: number | undefined;
+		if (ctx.mode === "tui") {
+			selectedIndex = await ctx.ui.custom<number | undefined>((tui, theme, _keybindings, done) => {
+				const items = labels.map((label, index) => ({ value: String(index), label }));
+				const availableRows = Math.max(1, tui.terminal.rows - HISTORY_PICKER_CHROME_ROWS);
+				const visibleRows = Math.min(items.length, HISTORY_PICKER_MAX_ROWS, availableRows);
+				const container = new Container();
+
+				container.addChild(new DynamicBorder((text: string) => theme.fg("accent", text)));
+				container.addChild(
+					new Text(
+						theme.fg("accent", theme.bold(`Command History (${entries.length})`)),
+						1,
+						0,
+					),
+				);
+
+				const selectList = new SelectList(items, visibleRows, {
+					selectedPrefix: (text: string) => theme.fg("accent", text),
+					selectedText: (text: string) => theme.fg("accent", text),
+					description: (text: string) => theme.fg("muted", text),
+					scrollInfo: (text: string) => theme.fg("dim", text),
+					noMatch: (text: string) => theme.fg("warning", text),
+				});
+				selectList.onSelect = (item) => done(Number(item.value));
+				selectList.onCancel = () => done(undefined);
+				container.addChild(selectList);
+				container.addChild(
+					new Text(theme.fg("dim", "↑↓ navigate • enter restore • esc cancel"), 1, 0),
+				);
+				container.addChild(new DynamicBorder((text: string) => theme.fg("accent", text)));
+
+				return {
+					render: (width: number) => container.render(width),
+					invalidate: () => container.invalidate(),
+					handleInput: (data: string) => {
+						selectList.handleInput(data);
+						tui.requestRender();
+					},
+				};
+			});
+		} else {
+			const picked = await ctx.ui.select("Select history to restore", labels);
+			if (picked) selectedIndex = labels.indexOf(picked);
+		}
+
+		if (selectedIndex === undefined || selectedIndex < 0) return;
 		const selected = reversed[selectedIndex];
+		if (!selected) return;
 		ctx.ui.setEditorText(selected.text);
 
 		if (selected.isSlash && selected.commandName) {
