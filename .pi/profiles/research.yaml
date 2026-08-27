@@ -24,4 +24,5 @@ extensionState:
       planningDiscipline: false
 packagesEnable:
   - npm:pi-web-access
-packagesDisable: []
+packagesDisable:
+  - git:github.com/linearuncle/pi-openai-web-search
