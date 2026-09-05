@@ -1,7 +1,7 @@
 skillsEnable: []
 skillsDisable:
-  - "*"
-promptsDisable: ["*"]
+  - '*'
+promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
   - exa
@@ -22,10 +22,10 @@ extensionState:
 packagesEnable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - npm:pi-observational-memory
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
-  - npm:pi-observational-memory
 extensionsDisable:
   - ./extensions/disable-write-tool.ts
   - ./extensions/disable-read-tool.ts

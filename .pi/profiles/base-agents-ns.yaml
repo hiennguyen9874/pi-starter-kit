@@ -1,13 +1,7 @@
-skillsEnable:
-  - grilling
-  - handoff
-  - pragmatic-principles
-  - agent-friendly-code
-  - diagnosing-bugs
-  - tdd
-  - context7-cli
-  - git-commit
-promptsDisable: ["*"]
+skillsEnable: []
+skillsDisable:
+  - '*'
+promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
   - exa
@@ -27,7 +21,17 @@ extensionState:
       planningDiscipline: true
 packagesEnable:
   - npm:@gotgenes/pi-subagents
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - npm:pi-observational-memory
 packagesDisable:
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts

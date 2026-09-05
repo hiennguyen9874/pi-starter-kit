@@ -4,9 +4,10 @@ skillsEnable:
   - codebase-design
   - diagnosing-bugs
   - domain-modeling
+  - grill-me
   - grill-with-docs
-  - batch-grill-me
   - grilling
+  - handoff
   - implement
   - improve-codebase-architecture
   - prototype
@@ -14,11 +15,15 @@ skillsEnable:
   - resolving-merge-conflicts
   - setup-matt-pocock-skills
   - tdd
+  - teach
+  - to-questionnaire
   - to-spec
   - to-tickets
   - triage
+  - wait-what
   - wayfinder
-  - handoff
+  - wizard
+  - writing-for-agents
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
