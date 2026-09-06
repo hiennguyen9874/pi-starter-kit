@@ -1,8 +1,8 @@
 skillsEnable:
-  - pragmatic-principles
+  - code-review
   - codebase-design
-  - improve-codebase-architecture
-  - ponytail
+  - domain-modeling
+  - pragmatic-principles
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
@@ -12,25 +12,22 @@ mcpServersDisable:
   - deepwiki
 extensionState:
   behavioralGuidelines:
-    enabled: false
+    enabled: true
     sections:
       communicationAndToolUse: true
       executionPolicy: true
       evidenceDiscipline: true
       changeScope: true
       validation: true
-      finalResponse: true
+      finalResponse: false
       planningDiscipline: false
-packagesEnable:
-  - npm:@spences10/pi-confirm-destructive
-  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
-  - git:github.com/hiennguyen9874/pi-ask-user
+packagesEnable: []
 packagesDisable:
   - npm:@gotgenes/pi-subagents
-  - npm:pi-observational-memory
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
 extensionsDisable:
   - ./extensions/disable-write-tool.ts

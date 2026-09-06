@@ -1,8 +1,12 @@
 skillsEnable:
+  - implement
+  - tdd
+  - diagnosing-bugs
   - pragmatic-principles
+  - agent-friendly-code
+  - handoff
   - codebase-design
-  - improve-codebase-architecture
-  - ponytail
+  - code-review
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
@@ -12,7 +16,7 @@ mcpServersDisable:
   - deepwiki
 extensionState:
   behavioralGuidelines:
-    enabled: false
+    enabled: true
     sections:
       communicationAndToolUse: true
       executionPolicy: true
@@ -24,13 +28,13 @@ extensionState:
 packagesEnable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
-  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-observational-memory
 packagesDisable:
   - npm:@gotgenes/pi-subagents
-  - npm:pi-observational-memory
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
 extensionsDisable:
   - ./extensions/disable-write-tool.ts
@@ -39,6 +43,6 @@ extensionsDisable:
   - ./extensions/disable-edit-tools.ts
 extra:
   override:
-    defaultProvider: openai-codex
-    defaultModel: gpt-5.6-sol
-    defaultThinkingLevel: medium
+    defaultProvider: opencode-go
+    defaultModel: muse-spark-1.3-contributor
+    defaultThinkingLevel: xhigh
