@@ -3,6 +3,8 @@ skillsEnable:
   - codebase-design
   - improve-codebase-architecture
   - ponytail
+  - grilling
+  - domain-modeling
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
