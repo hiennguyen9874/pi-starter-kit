@@ -9,7 +9,7 @@ skillsEnable:
   - to-tickets
   - triage
   - wayfinder
-promptsDisable: ["*"]
+promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
   - exa

@@ -1,9 +1,9 @@
 skillsEnable:
   - pragmatic-principles
   - codebase-design
-  - domain-modeling
   - improve-codebase-architecture
-promptsDisable: ["*"]
+  - ponytail
+promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
   - exa
@@ -12,7 +12,7 @@ mcpServersDisable:
   - deepwiki
 extensionState:
   behavioralGuidelines:
-    enabled: true
+    enabled: false
     sections:
       communicationAndToolUse: true
       executionPolicy: true
@@ -22,8 +22,23 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-ask-user
   - npm:@gotgenes/pi-subagents
 packagesDisable:
+  - npm:pi-observational-memory
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+extra:
+  override:
+    defaultProvider: openai-codex
+    defaultModel: gpt-6-astra
+    defaultThinkingLevel: medium
