@@ -62,7 +62,9 @@
     "openai-codex/*",
     "opencode-go/*",
     "opencode/*-free",
-    "opencode/*-free*"
+    "opencode/*-free*",
+    "commandcode/*",
+    "commandcode/*/*"
   ],
   "showCacheMissNotices": true,
   "hideThinkingBlock": false,
