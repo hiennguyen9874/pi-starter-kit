@@ -38,5 +38,5 @@ extensionsDisable:
 extra:
   override:
     defaultProvider: opencode-go
-    defaultModel: muse-spark-1.3-contributor
-    defaultThinkingLevel: xhigh
+    defaultModel: glm-5.3-flash
+    defaultThinkingLevel: max
