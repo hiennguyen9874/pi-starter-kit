@@ -1,0 +1,33 @@
+skillsEnable:
+  - pragmatic-principles
+  - agent-friendly-code
+  - codebase-design
+  - domain-modeling
+  - grill-with-docs
+  - grilling
+  - to-spec
+  - to-tickets
+  - triage
+  - wayfinder
+promptsDisable: ['*']
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: true
+      finalResponse: false
+      planningDiscipline: true
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-observational-memory
+packagesDisable: []

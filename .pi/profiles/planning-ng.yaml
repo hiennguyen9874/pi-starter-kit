@@ -7,7 +7,7 @@ mcpServersEnable: []
 mcpServersDisable: ['*']
 extensionState:
   behavioralGuidelines:
-    enabled: true
+    enabled: false
     sections:
       communicationAndToolUse: true
       executionPolicy: true
