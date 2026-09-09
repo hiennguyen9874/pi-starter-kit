@@ -1,0 +1,46 @@
+skillsEnable:
+  - ask-matt
+  - code-review
+  - codebase-design
+  - diagnosing-bugs
+  - domain-modeling
+  - grill-me
+  - grill-with-docs
+  - grilling
+  - handoff
+  - implement
+  - improve-codebase-architecture
+  - prototype
+  - research
+  - resolving-merge-conflicts
+  - setup-matt-pocock-skills
+  - tdd
+  - teach
+  - to-questionnaire
+  - to-spec
+  - to-tickets
+  - triage
+  - wait-what
+  - wayfinder
+  - wizard
+  - writing-for-agents
+promptsDisable: ['*']
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: true
+packagesEnable: []
+packagesDisable: []

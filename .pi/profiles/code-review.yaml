@@ -20,7 +20,8 @@ extensionState:
       validation: true
       finalResponse: false
       planningDiscipline: false
-packagesEnable: []
+packagesEnable:
+  - npm:pi-observational-memory
 packagesDisable:
   - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
