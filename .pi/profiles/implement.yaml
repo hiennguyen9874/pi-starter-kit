@@ -1,11 +1,6 @@
 skillsEnable:
-  - implement
   - tdd
-  - pragmatic-principles
-  - agent-friendly-code
-  - handoff
-  - codebase-design
-  - code-review
+  - ponytail
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
