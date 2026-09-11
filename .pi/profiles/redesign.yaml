@@ -1,0 +1,48 @@
+skillsEnable:
+  # - gpt-image
+  - brandkit
+  - design-taste-frontend
+  - gpt-taste
+  - high-end-visual-design
+  - image-to-code
+  - imagegen-frontend-web
+  - industrial-brutalist-ui
+  - minimalist-ui
+  - redesign-existing-projects
+  - stitch-design-taste
+promptsEnable: []
+promptsDisable: ['*']
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: false
+packagesEnable: []
+packagesDisable:
+  - npm:pi-agent-browser-native
+  - npm:pi-mcp-adapter
+  - git:github.com/hiennguyen9874/pi-codex-image-gen
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:pi-observational-memory
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
