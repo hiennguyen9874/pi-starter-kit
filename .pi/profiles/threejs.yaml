@@ -9,6 +9,7 @@ skillsEnable:
   - threejs-postprocessing
   - threejs-shaders
   - threejs-textures
+  - 3dviz-pro-max
 skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []

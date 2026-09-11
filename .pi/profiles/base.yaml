@@ -1,13 +1,14 @@
 skillsEnable:
   - grilling
   - handoff
+  - show-me
+  - i-have-adhd
   - pragmatic-principles
   - agent-friendly-code
   - diagnosing-bugs
   - tdd
   - context7-cli
   - git-commit
-  - handoff
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:

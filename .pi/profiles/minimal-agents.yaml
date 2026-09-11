@@ -1,5 +1,7 @@
 skillsEnable:
   - handoff
+  - show-me
+  - i-have-adhd
 skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []

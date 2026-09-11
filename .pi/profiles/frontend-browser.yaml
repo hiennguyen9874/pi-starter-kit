@@ -17,6 +17,8 @@ skillsEnable:
   - shadcn
   - pick-ui-library
   - handoff
+  - show-me
+  - i-have-adhd
 promptsEnable: []
 promptsDisable: ['*']
 mcpServersEnable: []

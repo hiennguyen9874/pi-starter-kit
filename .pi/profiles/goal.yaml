@@ -1,6 +1,8 @@
 skillsEnable:
   - grilling
   - handoff
+  - show-me
+  - i-have-adhd
   - pragmatic-principles
   - diagnosing-bugs
   - git-commit
