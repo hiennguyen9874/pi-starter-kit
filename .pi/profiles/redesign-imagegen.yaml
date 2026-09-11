@@ -28,8 +28,11 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: false
-packagesEnable: []
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-codex-image-gen
 packagesDisable:
+  - npm:pi-agent-browser-native
+  - npm:pi-mcp-adapter
   - git:github.com/hiennguyen9874/pi-codex-image-gen
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake

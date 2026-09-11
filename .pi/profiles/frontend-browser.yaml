@@ -1,15 +1,22 @@
 skillsEnable:
-  - gpt-image
-  - brandkit
+  # - gpt-image
+  # - brandkit
   - design-taste-frontend
-  - gpt-taste
-  - high-end-visual-design
-  - image-to-code
-  - imagegen-frontend-web
-  - industrial-brutalist-ui
-  - minimalist-ui
+  # - gpt-taste
+  # - image-to-code
+  # - imagegen-frontend-web
+  # - high-end-visual-design
+  # - industrial-brutalist-ui
+  # - minimalist-ui
   - redesign-existing-projects
-  - stitch-design-taste
+  # - stitch-design-taste
+  - composition-patterns
+  - react-best-practices
+  - react-view-transitions
+  - web-design-guidelines
+  - shadcn
+  - pick-ui-library
+promptsEnable: []
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
@@ -19,7 +26,7 @@ mcpServersDisable:
   - exa
 extensionState:
   behavioralGuidelines:
-    enabled: false
+    enabled: true
     sections:
       communicationAndToolUse: true
       executionPolicy: true
@@ -28,23 +35,21 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: false
-packagesEnable: []
+packagesEnable:
+  - npm:pi-agent-browser-native
+  - npm:pi-observational-memory
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
 packagesDisable:
+  - npm:pi-mcp-adapter
   - git:github.com/hiennguyen9874/pi-codex-image-gen
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - npm:@spences10/pi-confirm-destructive
-  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
-  - git:github.com/hiennguyen9874/pi-grep-glob
-  - npm:pi-observational-memory
-extensionsDisable:
+extensionsEnable:
   - ./extensions/system-prompt-appender.ts
+extensionsDisable:
   - ./extensions/disable-write-tool.ts
   - ./extensions/disable-read-tool.ts
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
-extra:
-  override:
-    extensionState:
-      piDocumentationEnabled: false
-      projectContextRewriterDisableProjectContext: false

@@ -37,6 +37,12 @@ extensionsDisable:
   - ./extensions/disable-edit-tools.ts
 extra:
   override:
-    defaultProvider: opencode-go
-    defaultModel: glm-5.3-flash
-    defaultThinkingLevel: max
+    # defaultProvider: openrouter
+    # defaultModel: '@preset/pi-glm-5-3-flash'
+    # defaultThinkingLevel: max
+    # defaultProvider: openai-codex
+    # defaultModel: gpt-5.6-sol
+    # defaultThinkingLevel: medium
+    # defaultProvider: opencode-go
+    # defaultModel: deepseek-flash
+    # defaultThinkingLevel: max

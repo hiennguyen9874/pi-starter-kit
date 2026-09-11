@@ -1,33 +1,26 @@
 skillsEnable:
-  - grilling
-  - context7-cli
-  - diagnosing-bugs
-  - pragmatic-principles
-  - frontend-skill
+  # - gpt-image
+  # - brandkit
+  - design-taste-frontend
+  # - gpt-taste
+  # - image-to-code
+  # - imagegen-frontend-web
+  # - high-end-visual-design
+  # - industrial-brutalist-ui
+  # - minimalist-ui
+  - redesign-existing-projects
+  # - stitch-design-taste
   - composition-patterns
   - react-best-practices
   - react-view-transitions
-  - shadcn-best-practices
-  - ui-ux-pro-max
   - web-design-guidelines
-  - performance-optimization
-  - source-driven-development
-  - tdd
-  - coding-standards
-  - code-simplification
-promptsEnable:
-  - frontend-design-direction
-  - frontend-polish-pass
-  - frontend-ui-audit
-  - interface-design-direction
-  - interface-polish-pass
-  - react-component-api-refactor
-  - react-performance-pass
-  - react-view-transitions-build
-  - shadcn-ui-build
-mcpServersEnable:
-  - chrome-devtools
+  - shadcn
+  - pick-ui-library
+promptsEnable: []
+promptsDisable: ['*']
+mcpServersEnable: []
 mcpServersDisable:
+  - chrome-devtools
   - context-mode
   - deepwiki
   - exa
@@ -43,5 +36,20 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
+  - npm:pi-observational-memory
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+packagesDisable:
+  - npm:pi-agent-browser-native
   - npm:pi-mcp-adapter
-packagesDisable: []
+  - git:github.com/hiennguyen9874/pi-codex-image-gen
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:@spences10/pi-confirm-destructive
+extensionsEnable:
+  - ./extensions/system-prompt-appender.ts
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
