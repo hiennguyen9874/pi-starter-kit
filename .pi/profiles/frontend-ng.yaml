@@ -16,6 +16,7 @@ skillsEnable:
   - web-design-guidelines
   - shadcn
   - pick-ui-library
+  - handoff
 promptsEnable: []
 promptsDisable: ['*']
 mcpServersEnable: []

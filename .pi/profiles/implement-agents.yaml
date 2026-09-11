@@ -1,6 +1,7 @@
 skillsEnable:
   - tdd
   - ponytail
+  - handoff
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:

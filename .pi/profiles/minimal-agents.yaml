@@ -1,5 +1,6 @@
-skillsEnable: []
-skillsDisable: ["*"]
+skillsEnable:
+  - handoff
+skillsDisable: []
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:

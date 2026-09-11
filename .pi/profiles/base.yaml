@@ -7,6 +7,7 @@ skillsEnable:
   - tdd
   - context7-cli
   - git-commit
+  - handoff
 promptsDisable: ['*']
 mcpServersEnable: []
 mcpServersDisable:
