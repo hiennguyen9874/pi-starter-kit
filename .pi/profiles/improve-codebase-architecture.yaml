@@ -39,8 +39,3 @@ extensionsDisable:
   - ./extensions/disable-read-tool.ts
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
-extra:
-  override:
-    defaultProvider: openai-codex
-    defaultModel: gpt-5.6-sol
-    defaultThinkingLevel: medium
