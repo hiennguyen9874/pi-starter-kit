@@ -258,27 +258,45 @@ function buildManagedSettingEntries(defaultEntries: string[], enabled: string[] 
   return entries;
 }
 
+function resourceMatches(set: Set<string>, name: string, overrideEntry: string): boolean {
+  return set.has(name) || set.has(overrideEntry);
+}
+
+function normalizeResourceSet(values: string[] = []): Set<string> {
+  return new Set(values.map(resourceName));
+}
+
 function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): string[] {
-  const enabledSet = new Set(profile.skillsEnable ?? []);
-  const disabledSet = new Set(profile.skillsDisable ?? []);
+  const enabledSet = normalizeResourceSet(profile.skillsEnable);
+  const disabledSet = normalizeResourceSet(profile.skillsDisable);
   const enableAll = enabledSet.has(PROFILE_WILDCARD);
   const disableAll = disabledSet.has(PROFILE_WILDCARD);
 
   return dedupeSorted(
     loadProjectSkillResources(cwd)
-      .filter((skill) => disableAll || disabledSet.has(skill.name) || (!enableAll && enabledSet.size > 0 && !enabledSet.has(skill.name)))
+      .filter(
+        (skill) =>
+          disableAll ||
+          resourceMatches(disabledSet, skill.name, skill.overrideEntry) ||
+          (!enableAll && enabledSet.size > 0 && !resourceMatches(enabledSet, skill.name, skill.overrideEntry)),
+      )
       .map((skill) => `-${skill.overrideEntry}`),
   );
 }
 function buildManagedPromptEntries(cwd: string, profile: ProfileDefinition): string[] {
-  const enabledSet = new Set(profile.promptsEnable ?? []);
-  const disabledSet = new Set(profile.promptsDisable ?? []);
+  const enabledSet = normalizeResourceSet(profile.promptsEnable);
+  const disabledSet = normalizeResourceSet(profile.promptsDisable);
   const enableAll = enabledSet.has(PROFILE_WILDCARD);
   const disableAll = disabledSet.has(PROFILE_WILDCARD);
 
   return dedupeSorted(
     loadProjectPromptResources(cwd)
-      .filter((prompt) => disableAll || disabledSet.has(prompt.name) || (!enableAll && enabledSet.size > 0 && !enabledSet.has(prompt.name)))
+      .filter(
+        (prompt) =>
+          disableAll ||
+          resourceMatches(disabledSet, prompt.name, prompt.overrideEntry) ||
+          (!enableAll && enabledSet.size > 0 && !resourceMatches(enabledSet, prompt.name, prompt.overrideEntry)),
+      )
       .map((prompt) => `-${prompt.overrideEntry}`),
   );
 }

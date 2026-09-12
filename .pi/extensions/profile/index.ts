@@ -162,15 +162,19 @@ export function validateProfileReferences(
   const shouldValidatePrompts = knownPromptSet.size > 0;
 
   if (shouldValidateSkills) {
-    for (const skill of [...(profile.skillsEnable ?? []), ...(profile.skillsDisable ?? [])]) {
-      if (skill !== PROFILE_WILDCARD && !knownSkillSet.has(skill)) {
+    for (const raw of [...(profile.skillsEnable ?? []), ...(profile.skillsDisable ?? [])]) {
+      const skill = raw.startsWith("-") ? raw.slice(1) : raw;
+      // Path-based entries (e.g. "skills/taste-skill/image-to-code") disambiguate
+      // same-name skills by overrideEntry; they are validated at sync time, not here.
+      if (skill !== PROFILE_WILDCARD && !skill.includes("/") && !knownSkillSet.has(skill)) {
         warnings.push(`Unknown skill: ${skill}`);
       }
     }
   }
   if (shouldValidatePrompts) {
-    for (const prompt of [...(profile.promptsEnable ?? []), ...(profile.promptsDisable ?? [])]) {
-      if (prompt !== PROFILE_WILDCARD && !knownPromptSet.has(prompt)) {
+    for (const raw of [...(profile.promptsEnable ?? []), ...(profile.promptsDisable ?? [])]) {
+      const prompt = raw.startsWith("-") ? raw.slice(1) : raw;
+      if (prompt !== PROFILE_WILDCARD && !prompt.includes("/") && !knownPromptSet.has(prompt)) {
         warnings.push(`Unknown prompt: ${prompt}`);
       }
     }

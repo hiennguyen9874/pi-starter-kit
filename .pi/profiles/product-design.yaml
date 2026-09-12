@@ -1,0 +1,50 @@
+skillsEnable:
+  - design-qa
+  - get-context
+  - ideate
+  - image-to-code
+  - product-design-router
+# Path-based disable wins over name-based enable above.
+# Both product-design and taste-skill declare `name: image-to-code`,
+# so enabling by name alone keeps both loaded -> pi core reports
+# `[Skill conflicts] "image-to-code" collision`. This disables only
+# the taste-skill copy by its overrideEntry path.
+skillsDisable:
+  - skills/taste-skill/image-to-code
+promptsEnable: []
+promptsDisable: ['*']
+mcpServersEnable: []
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: false
+packagesEnable:
+  - npm:pi-observational-memory
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-agent-browser-native
+  - git:github.com/hiennguyen9874/pi-codex-image-gen
+packagesDisable:
+  - npm:pi-mcp-adapter
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:@spences10/pi-confirm-destructive
+extensionsEnable:
+  - ./extensions/system-prompt-appender.ts
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
