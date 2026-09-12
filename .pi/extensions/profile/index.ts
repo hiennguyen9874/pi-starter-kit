@@ -10,7 +10,12 @@ import {
   type BehavioralGuidelineRegistry,
 } from "./behavioral-guidelines.ts";
 import { loadProfilesConfig } from "./profile-config.ts";
-import { getKnownSkillNames, summarizeProfile } from "./profile-discovery.ts";
+import {
+  getKnownSkillNames,
+  getKnownSkillNamesFromLoadedSkills,
+  mergeKnownSkillNames,
+  summarizeProfile,
+} from "./profile-discovery.ts";
 import { createProfilePolicy, PROFILE_WILDCARD, type ProfileDefinition, type ProfilePolicy } from "./profile-policy.ts";
 import {
   loadProfileKnownMcpServerNames,
@@ -280,6 +285,46 @@ function notifyValidationWarnings(
   }
 }
 
+/**
+ * Notify only prompt/MCP warnings at `session_start` / profile-switch time.
+ *
+ * Skill validation is deferred to `before_agent_start` where the full
+ * loaded-skills list (`event.systemPromptOptions.skills`, same source as
+ * `prompt-skills.ts` and `skills-instructions-rewriter.ts`) is available.
+ * `pi.getCommands()` + `.pi/skills` scan at `session_start` misses
+ * extension/package-provided skills such as `gpt-image` from
+ * `pi-codex-image-gen` (`.pi/git/...`), causing false
+ * `Unknown skill: gpt-image` warnings for profiles like `imagegen`.
+ */
+function notifyNonSkillValidationWarnings(
+  ctx: ExtensionContext,
+  profileName: string,
+  profile: ProfileDefinition,
+  knownSkills: string[],
+  knownPrompts: string[],
+  knownServers: string[],
+): void {
+  const warnings = validateProfileReferences(profile, knownSkills, knownPrompts, knownServers).filter(
+    (warning) => !warning.startsWith("Unknown skill:"),
+  );
+  if (warnings.length > 0) {
+    ctx.ui.notify(`Profile "${profileName}" warnings:\n${warnings.join("\n")}`, "warning");
+  }
+}
+
+function readLoadedSkillNamesFromCommandContext(ctx: unknown): string[] {
+  try {
+    const getOptions = (ctx as { getSystemPromptOptions?: () => { skills?: unknown } })?.getSystemPromptOptions;
+    if (typeof getOptions !== "function") {
+      return [];
+    }
+    const skills = (getOptions.call(ctx) as { skills?: unknown })?.skills;
+    return getKnownSkillNamesFromLoadedSkills(skills as Parameters<typeof getKnownSkillNamesFromLoadedSkills>[0]);
+  } catch {
+    return [];
+  }
+}
+
 export default function profileExtension(pi: ExtensionAPI): void {
   const state: {
     profiles: Record<string, ProfileDefinition>;
@@ -292,6 +337,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     warnedAboutDirectMcpTools: boolean;
     warnedAboutMissingGuidelinesMarker: boolean;
     resourcesRequireReload: boolean;
+    lastSkillValidationKey?: string;
     behavioralGuidelineRegistry?: BehavioralGuidelineRegistry;
   } = {
     profiles: {},
@@ -301,6 +347,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     warnedAboutDirectMcpTools: false,
     warnedAboutMissingGuidelinesMarker: false,
     resourcesRequireReload: false,
+    lastSkillValidationKey: undefined,
   };
 
   function setActiveProfile(name: string | undefined, ctx: ExtensionContext): void {
@@ -323,8 +370,11 @@ export default function profileExtension(pi: ExtensionAPI): void {
     state.knownSkills = [...new Set([...state.knownSkills, ...getKnownSkillNames(pi.getCommands())])].sort((a, b) =>
       a.localeCompare(b),
     );
+    state.lastSkillValidationKey = undefined;
     updateStatus(ctx, name);
-    notifyValidationWarnings(ctx, name, profile, state.knownSkills, state.knownPrompts, state.knownMcpServers);
+    // Defer skill warnings to before_agent_start (full loaded-skills list).
+    // Warn about prompts/MCP immediately since those known-lists are complete.
+    notifyNonSkillValidationWarnings(ctx, name, profile, state.knownSkills, state.knownPrompts, state.knownMcpServers);
   }
 
   function persistProfileState(cwd?: string): void {
@@ -363,6 +413,14 @@ export default function profileExtension(pi: ExtensionAPI): void {
 
       if (input) {
         if (input === "explain") {
+          // Command context exposes the full loaded-skills list (including
+          // extension/package skills like gpt-image). Merge it so explain
+          // does not false-positive on skills missing from the
+          // session_start snapshot.
+          const loadedSkillNames = readLoadedSkillNamesFromCommandContext(ctx);
+          if (loadedSkillNames.length > 0) {
+            state.knownSkills = mergeKnownSkillNames(state.knownSkills, loadedSkillNames);
+          }
           ctx.ui.notify(
             buildProfileExplanation({
               activeProfileName: state.activeProfileName,
@@ -507,6 +565,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     state.warnedAboutDirectMcpTools = false;
     state.warnedAboutMissingGuidelinesMarker = false;
     state.resourcesRequireReload = false;
+    state.lastSkillValidationKey = undefined;
 
     const loadedGuidelines = loadBehavioralGuidelineRegistry(ctx.cwd);
     state.behavioralGuidelineRegistry = loadedGuidelines.registry;
@@ -622,6 +681,31 @@ export default function profileExtension(pi: ExtensionAPI): void {
   pi.on("before_agent_start", async (event, ctx) => {
     if (!state.activeProfile) {
       return;
+    }
+
+    // Merge the fully-loaded skills list (project + extension/package skills).
+    // Same source as prompt-skills.ts (`event.systemPromptOptions.skills`)
+    // and skills-instructions-rewriter.ts. This is the only list that
+    // includes extension-provided skills like `gpt-image`.
+    const loadedSkillNames = getKnownSkillNamesFromLoadedSkills(event.systemPromptOptions.skills ?? []);
+    if (loadedSkillNames.length > 0) {
+      state.knownSkills = mergeKnownSkillNames(state.knownSkills, loadedSkillNames);
+    }
+
+    // Full validation (including skills) now that the complete skills list
+    // is available. Dedupe so we warn once per profile+warnings, not every turn.
+    const warnings = validateProfileReferences(
+      state.activeProfile,
+      state.knownSkills,
+      state.knownPrompts,
+      state.knownMcpServers,
+    );
+    const validationKey = `${state.activeProfileName}\0${warnings.join("\0")}`;
+    if (warnings.length > 0 && state.lastSkillValidationKey !== validationKey) {
+      state.lastSkillValidationKey = validationKey;
+      ctx.ui.notify(`Profile "${state.activeProfileName}" warnings:\n${warnings.join("\n")}`, "warning");
+    } else if (warnings.length === 0) {
+      state.lastSkillValidationKey = validationKey;
     }
 
     const behavioralGuidelines = state.activeProfile.extensionState?.behavioralGuidelines;

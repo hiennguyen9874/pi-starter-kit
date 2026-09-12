@@ -1,11 +1,16 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import type { Skill } from "@earendil-works/pi-coding-agent";
 import type { ProfileDefinition } from "./profile-policy.ts";
 
 interface CommandLike {
   name?: string;
   source?: string;
+}
+
+interface LoadedSkillLike {
+  name?: unknown;
 }
 
 export function getKnownSkillNames(commands: CommandLike[]): string[] {
@@ -15,6 +20,35 @@ export function getKnownSkillNames(commands: CommandLike[]): string[] {
     })
     .map((command) => command.name)
     .sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Extract known skill names from pi's fully-loaded skills list
+ * (`event.systemPromptOptions.skills` in `before_agent_start`, or
+ * `ctx.getSystemPromptOptions().skills` in command handlers).
+ *
+ * Unlike `loadProfileKnownSkillNames` (which only scans `.pi/skills`) and
+ * `getKnownSkillNames(pi.getCommands())` (which may be incomplete at
+ * `session_start`), this list includes extension/package-provided skills
+ * such as `gpt-image` from `pi-codex-image-gen` (`.pi/git/...`).
+ *
+ * Same source used by `prompt-skills.ts` and
+ * `skills-instructions-rewriter.ts`.
+ */
+export function getKnownSkillNamesFromLoadedSkills(skills: ReadonlyArray<LoadedSkillLike | Skill> | undefined): string[] {
+  if (!Array.isArray(skills)) {
+    return [];
+  }
+
+  return [...new Set(
+    skills
+      .map((skill) => (typeof skill?.name === "string" ? skill.name.trim() : ""))
+      .filter((name): name is string => name.length > 0),
+  )].sort((a, b) => a.localeCompare(b));
+}
+
+export function mergeKnownSkillNames(...lists: string[][]): string[] {
+  return [...new Set(lists.flat())].sort((a, b) => a.localeCompare(b));
 }
 
 export function loadKnownMcpServerNames(cwd: string): string[] {
