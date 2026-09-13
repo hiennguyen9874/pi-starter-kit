@@ -4,11 +4,6 @@ skillsEnable:
   - ideate
   - image-to-code
   - product-design-router
-# Path-based disable wins over name-based enable above.
-# Both product-design and taste-skill declare `name: image-to-code`,
-# so enabling by name alone keeps both loaded -> pi core reports
-# `[Skill conflicts] "image-to-code" collision`. This disables only
-# the taste-skill copy by its overrideEntry path.
 skillsDisable:
   - skills/taste-skill/image-to-code
 promptsEnable: []

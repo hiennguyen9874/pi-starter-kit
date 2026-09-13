@@ -1,11 +1,11 @@
 skillsEnable:
-  - grilling
+  - find-docs
+  - context7-cli
+  - research
   - handoff
   - show-me
   - i-have-adhd
-  - context7-cli
   - defuddle
-  - research
 promptsDisable: ["*"]
 mcpServersEnable:
   - deepwiki
