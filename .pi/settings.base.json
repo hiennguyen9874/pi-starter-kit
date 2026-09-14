@@ -89,5 +89,14 @@
     "showWorkerNotifications": true,
     "passive": false,
     "debugLog": false
+  },
+  "piCodexImageGen": {
+    "mode": "minimal",
+    "defaults": {
+      "model": "gpt-image-2.5-flare",
+      "quality": "auto",
+      "size": "auto",
+      "background": "auto"
+    }
   }
 }
