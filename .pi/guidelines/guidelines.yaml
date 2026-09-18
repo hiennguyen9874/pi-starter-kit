@@ -26,3 +26,27 @@ guidelines:
   - name: finalResponse
     path: final-response.md
     defaultEnabled: true
+  - name: communicationAndToolUseMinimal
+    path: communication-and-tool-use.minimal.md
+    defaultEnabled: false
+  - name: repositoryInstructionsMinimal
+    path: repository-instructions.minimal.md
+    defaultEnabled: false
+  - name: executionPolicyMinimal
+    path: execution-policy.minimal.md
+    defaultEnabled: false
+  - name: evidenceDisciplineMinimal
+    path: evidence-discipline.minimal.md
+    defaultEnabled: false
+  - name: planningDisciplineMinimal
+    path: planning-discipline.minimal.md
+    defaultEnabled: false
+  - name: changeScopeMinimal
+    path: change-scope.minimal.md
+    defaultEnabled: false
+  - name: validationMinimal
+    path: validation.minimal.md
+    defaultEnabled: false
+  - name: finalResponseMinimal
+    path: final-response.minimal.md
+    defaultEnabled: false
