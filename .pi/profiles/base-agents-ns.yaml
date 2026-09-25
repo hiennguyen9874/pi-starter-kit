@@ -23,8 +23,8 @@ packagesEnable:
   - npm:@gotgenes/pi-subagents
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
-packagesDisable:
   - npm:pi-observational-memory
+packagesDisable:
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom

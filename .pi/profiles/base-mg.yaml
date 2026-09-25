@@ -33,8 +33,8 @@ extensionState:
 packagesEnable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
-packagesDisable:
   - npm:pi-observational-memory
+packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
 extensionsDisable:
