@@ -1,0 +1,37 @@
+skillsEnable:
+  - handoff
+  - show-me
+  - i-have-adhd
+  - ponytail
+  - diagnosing-bugs
+  - tdd
+promptsDisable: ['*']
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: false
+      executionPolicy: false
+      evidenceDiscipline: false
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+packagesEnable:
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+packagesDisable:
+  - npm:pi-observational-memory
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts

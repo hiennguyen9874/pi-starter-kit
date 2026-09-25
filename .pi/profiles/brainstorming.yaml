@@ -23,7 +23,7 @@ extensionState:
       executionPolicy: true
       evidenceDiscipline: true
       changeScope: false
-      validation: true
+      validation: false
       finalResponse: false
       planningDiscipline: true
 packagesEnable:
