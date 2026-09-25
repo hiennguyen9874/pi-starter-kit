@@ -1,15 +1,11 @@
 <validation>
 Validate changes with checks proportional to their risk and blast radius.
 
-- Discover the repository’s canonical validation commands from its scripts, configuration, and instructions. Start with the narrowest relevant check, then broaden according to risk, shared contracts, and repository guidance.
-- For a reproducible bug, establish a red reproduction before editing when practical, then rerun it after the fix.
-- Do not hand off non-trivial code changes without attempting a relevant check when one reasonably exists.
-- Exercise the implicated happy, error, negative, edge, and boundary paths. Resolve ambiguous boundary behavior from the request and established contract.
-- Treat self-authored tests and throwaway checks as supporting evidence, not the sole definition of correctness. Reconcile them with existing tests, callers, types, and observed behavior before changing production code to satisfy them.
-- Treat a related failing test as unresolved evidence. Investigate it rather than narrowing, disabling, or weakening the test or implementation to manufacture a passing run; fix only causes plausibly related to the work.
+- Discover canonical checks in repository instructions, scripts, and configuration. Start with a narrow relevant check; broaden for risk and shared contracts. Reserve the full E2E suite for the end of development, not each edit.
+- Prefer black-box/E2E tests for complex behavior. Use realistic medium- or high-complexity scenarios, not just the simplest success case; cover implicated error, negative, edge, and boundary paths. Resolve ambiguous boundaries from the request and established contract. Make E2E runs leave a verifiable, repeatable artifact (for example, a saved trace or result with reproduction steps).
+- For a reproducible bug, establish a red reproduction before editing when practical and rerun it after the fix. Add a regression test only if existing behavior tests leave a real gap.
+- Reach for isolated tests only when E2E cannot adequately cover a failure mode: list the ways the isolated system could fail and write the test before implementation, not afterward. Keep tests that catch real bugs E2E misses; avoid assertions that mirror the implementation or merely detect a code change.
+- Treat self-authored tests and throwaway checks as supporting evidence, not the sole definition of correctness. Reconcile them with existing tests, callers, types, and observed behavior before changing production code to satisfy them. Investigate related failures rather than weakening tests or behavior to manufacture a passing run; fix only causes plausibly related to the work.
 - For UI changes, preserve the design system and verify relevant interactions, accessibility, responsive layouts, and loading, empty, and error states. Use browser checks when available; report verification limits.
-- Before finishing, check every explicit user output and boundary and verify that related artifacts remain consistent.
-- For a cutover, verify that obsolete references and implementations are gone.
-- Review the final diff and account for every changed line as requested work or cleanup directly caused by it.
-- Report failed, blocked, or skipped checks and material coverage limits.
+- Before handoff, attempt a relevant check for non-trivial code changes when one reasonably exists. Confirm every explicit user output and boundary, check related artifacts for consistency, and verify obsolete references and implementations are gone after a cutover. Review the final diff; account for every changed line as requested work or directly caused cleanup. Report failed, blocked, or skipped checks and material coverage limits.
 </validation>
