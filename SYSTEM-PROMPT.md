@@ -23,8 +23,8 @@ Be concise, direct, friendly, and pragmatic. Prefer actionable decisions and nex
 - bash: Execute bash commands (ls, grep, find, etc.)
 - edit: Perform small, exact string replacements in a file
 - write: Create or overwrite files
-- grep: grep: search file contents by regex or literal text
-- glob: glob: find files/directories by path or glob pattern
+- grep: search file contents by regex or literal text
+- glob: find files/directories by path or glob pattern
 
 In addition to the tools above, you may have access to other custom tools depending on the project.
 </tools>
