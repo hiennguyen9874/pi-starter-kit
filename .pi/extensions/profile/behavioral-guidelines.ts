@@ -43,8 +43,12 @@ export interface LoadBehavioralGuidelineRegistryResult {
   error?: string;
 }
 
-const PRIMARY_MARKER = "\nPi documentation (read only";
-const FALLBACK_MARKER = "\n<project_context>\n";
+const PRIMARY_MARKER = /(?:^|\n)<docs>/;
+const FALLBACK_MARKER = /(?:^|\n)<project_context>/;
+
+function findInsertionMarkerIndex(systemPrompt: string): number {
+  return systemPrompt.match(PRIMARY_MARKER)?.index ?? systemPrompt.match(FALLBACK_MARKER)?.index ?? -1;
+}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -180,8 +184,7 @@ function injectGuidelines(
   const guidelines = getEnabledGuidelines(registry, config, systemPrompt);
   if (!guidelines) return systemPrompt;
 
-  let markerIndex = systemPrompt.indexOf(PRIMARY_MARKER);
-  if (markerIndex === -1) markerIndex = systemPrompt.indexOf(FALLBACK_MARKER);
+  const markerIndex = findInsertionMarkerIndex(systemPrompt);
   if (markerIndex === -1) {
     return `${systemPrompt}\n${guidelines}`;
   }
@@ -190,7 +193,7 @@ function injectGuidelines(
 }
 
 export function hasBehavioralGuidelinesInsertionMarker(systemPrompt: string): boolean {
-  return systemPrompt.includes(PRIMARY_MARKER) || systemPrompt.includes(FALLBACK_MARKER);
+  return PRIMARY_MARKER.test(systemPrompt) || FALLBACK_MARKER.test(systemPrompt);
 }
 
 export function injectBehavioralGuidelines(

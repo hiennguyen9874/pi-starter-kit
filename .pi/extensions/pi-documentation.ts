@@ -2,8 +2,8 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import * as fs from "fs";
 import * as path from "path";
 
-const PI_DOCS_MARKER = "\nPi documentation (read only";
-const SECTION_BOUNDARIES = ["\n\n<project_context>", "\n\nThe following skills", "\nCurrent date:", "\nCurrent working directory:"];
+const PI_DOCS_MARKER = "Pi documentation (read only";
+const PI_DOCS_TAG = "docs";
 
 let enabled = false;
 let initialized = false;
@@ -39,23 +39,53 @@ function writeEnabled(value: boolean): void {
 	}
 }
 
-function findSectionEnd(systemPrompt: string, startIndex: number): number {
-	let sectionEnd = -1;
-	for (const boundary of SECTION_BOUNDARIES) {
-		const index = systemPrompt.indexOf(boundary, startIndex + 1);
-		if (index !== -1 && (sectionEnd === -1 || index < sectionEnd)) sectionEnd = index;
+function findXmlSection(systemPrompt: string, tagName: string, marker: string): { start: number; end: number } | undefined {
+	const markerIndex = systemPrompt.indexOf(marker);
+	if (markerIndex === -1) return undefined;
+
+	const tagPattern = /<\/?([A-Za-z][\w:.-]*)(?:\s[^<>]*?)?\s*\/?>/g;
+	const stack: Array<{ name: string; start: number }> = [];
+	let match: RegExpExecArray | null;
+
+	while ((match = tagPattern.exec(systemPrompt)) && match.index < markerIndex) {
+		const rawTag = match[0];
+		const name = match[1];
+		if (rawTag.startsWith("</")) {
+			if (stack[stack.length - 1]?.name === name) stack.pop();
+		} else if (!/\/\s*>$/.test(rawTag)) {
+			stack.push({ name, start: match.index });
+		}
 	}
-	return sectionEnd;
+
+	let section = -1;
+	for (let index = stack.length - 1; index >= 0; index--) {
+		if (stack[index].name === tagName) {
+			section = stack[index].start;
+			break;
+		}
+	}
+	if (section === -1) return undefined;
+
+	let depth = 0;
+	tagPattern.lastIndex = section;
+	while ((match = tagPattern.exec(systemPrompt))) {
+		if (match[1] !== tagName) continue;
+		if (match[0].startsWith("</")) {
+			if (--depth === 0) return { start: section, end: tagPattern.lastIndex };
+		} else if (!/\/\s*>$/.test(match[0])) {
+			depth++;
+		}
+	}
+	return undefined;
 }
 
-function removePiDocumentation(systemPrompt: string): string {
-	const startIndex = systemPrompt.indexOf(PI_DOCS_MARKER);
-	if (startIndex === -1) return systemPrompt;
+export function removePiDocumentation(systemPrompt: string): string {
+	const section = findXmlSection(systemPrompt, PI_DOCS_TAG, PI_DOCS_MARKER);
+	if (!section) return systemPrompt;
 
-	const sectionEnd = findSectionEnd(systemPrompt, startIndex);
-	if (sectionEnd === -1) return systemPrompt.slice(0, startIndex).trimEnd();
-
-	return `${systemPrompt.slice(0, startIndex).trimEnd()}${systemPrompt.slice(sectionEnd)}`;
+	const prefix = systemPrompt.slice(0, section.start).trimEnd();
+	const suffix = systemPrompt.slice(section.end);
+	return suffix.trim() ? `${prefix}${suffix}` : prefix;
 }
 
 function updateStatus(ctx: any): void {
@@ -81,7 +111,7 @@ export default function piDocumentationExtension(pi: ExtensionAPI) {
 		}
 		if (enabled) return undefined;
 
-		if (!event.systemPrompt.includes(PI_DOCS_MARKER) && !warnedMissingSection) {
+		if (!findXmlSection(event.systemPrompt, PI_DOCS_TAG, PI_DOCS_MARKER) && !warnedMissingSection) {
 			warnedMissingSection = true;
 			if (ctx.hasUI) {
 				ctx.ui.notify("Pi documentation section not found", "warning");

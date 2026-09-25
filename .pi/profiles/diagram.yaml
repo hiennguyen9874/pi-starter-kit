@@ -30,6 +30,7 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-shake
   - npm:pi-observational-memory
 extensionsDisable:
+  - ./extensions/disable-project-context.ts
   - ./extensions/system-prompt-appender.ts
   - ./extensions/disable-write-tool.ts
   - ./extensions/disable-read-tool.ts
@@ -40,4 +41,3 @@ extra:
   override:
     extensionState:
       piDocumentationEnabled: false
-      projectContextRewriterDisableProjectContext: false

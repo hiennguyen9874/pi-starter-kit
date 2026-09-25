@@ -26,7 +26,8 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - git:github.com/hiennguyen9874/pi-grep-glob
-extensionsEnable: []
+extensionsEnable:
+  - ./extensions/disable-project-context.ts
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
   - ./extensions/disable-write-tool.ts
@@ -37,4 +38,3 @@ extra:
   override:
     extensionState:
       piDocumentationEnabled: false
-      projectContextRewriterDisableProjectContext: false

@@ -4,6 +4,8 @@ import * as path from "path";
 
 const FIRST_LINE_MARKER = "You are an expert coding assistant";
 const TOOLS_MARKER = "\nAvailable tools";
+const LEGACY_APPENDER_BLOCK = /<system-prompt-appender>([\s\S]*?)<\/system-prompt-appender>/;
+const XML_SECTION_START = /<(?![!?/])([A-Za-z_][\w:.-]*)(?:\s[^<>]*?)?>/;
 const DEFAULT_PROMPT_PATH = "system-prompt.md";
 
 interface SystemPromptAppenderConfig {
@@ -53,7 +55,26 @@ function readPromptFile(promptPath: string): string | undefined {
 
 export function appendSystemPromptSection(systemPrompt: string, promptSection: string): string {
   const section = promptSection.trim();
-  if (!section || systemPrompt.includes(section)) return systemPrompt;
+  const existingBlock = LEGACY_APPENDER_BLOCK.exec(systemPrompt);
+
+  if (!section) {
+    return existingBlock
+      ? systemPrompt.replace(LEGACY_APPENDER_BLOCK, "").replace(/\n{3,}/g, "\n\n")
+      : systemPrompt;
+  }
+  if (existingBlock?.[1].trim() === section) {
+    return systemPrompt.replace(LEGACY_APPENDER_BLOCK, section);
+  }
+  if (!existingBlock && systemPrompt.includes(section)) return systemPrompt;
+  if (existingBlock) return systemPrompt.replace(LEGACY_APPENDER_BLOCK, section);
+
+  // Native prompts have an untagged introduction followed by XML section elements.
+  const xmlSection = XML_SECTION_START.exec(systemPrompt);
+  if (xmlSection?.index !== undefined) {
+    const beforeSection = systemPrompt.slice(0, xmlSection.index).trimEnd();
+    const afterSection = systemPrompt.slice(xmlSection.index);
+    return `${beforeSection}${beforeSection ? "\n\n" : ""}${section}\n\n${afterSection}`;
+  }
 
   const lines = systemPrompt.split("\n");
   const firstLineIndex = lines.findIndex((line) => line.includes(FIRST_LINE_MARKER));
@@ -85,7 +106,8 @@ export default function systemPromptAppenderExtension(pi: ExtensionAPI) {
       if (ctx.hasUI) {
         ctx.ui.notify(`System prompt appender file not found or empty: ${config.promptPath}`, "warning");
       }
-      return undefined;
+      const systemPrompt = appendSystemPromptSection(event.systemPrompt, "");
+      return systemPrompt === event.systemPrompt ? undefined : { systemPrompt };
     }
 
     const systemPrompt = appendSystemPromptSection(event.systemPrompt, promptSection);

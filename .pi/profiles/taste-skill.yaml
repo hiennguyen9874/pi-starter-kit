@@ -47,4 +47,3 @@ extra:
   override:
     extensionState:
       piDocumentationEnabled: false
-      projectContextRewriterDisableProjectContext: false

@@ -1,13 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { injectBehavioralGuidelines, loadBehavioralGuidelineRegistry } from "./behavioral-guidelines.ts";
+import {
+  hasBehavioralGuidelinesInsertionMarker,
+  injectBehavioralGuidelines,
+  loadBehavioralGuidelineRegistry,
+} from "./behavioral-guidelines.ts";
 
 const SYSTEM_PROMPT = [
-  "You are an AI assistant.",
-  "Available tools:",
+  "<tools>",
   "- read",
+  "</tools>",
+  "<rules>",
+  "Be helpful.",
+  "</rules>",
+  "<docs>",
   "Pi documentation (read only when needed)",
+  "</docs>",
 ].join("\n");
 
 const REGISTRY = loadBehavioralGuidelineRegistry(process.cwd()).registry;
@@ -27,9 +36,17 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
       "changeScope",
       "validation",
       "finalResponse",
+      "communicationAndToolUseMinimal",
+      "repositoryInstructionsMinimal",
+      "executionPolicyMinimal",
+      "evidenceDisciplineMinimal",
+      "planningDisciplineMinimal",
+      "changeScopeMinimal",
+      "validationMinimal",
+      "finalResponseMinimal",
     ],
   );
-  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "repositoryInstructions")?.defaultEnabled, true);
+  assert.equal(REGISTRY.guidelines.find(({ name }) => name === "repositoryInstructions")?.defaultEnabled, false);
   assert.equal(REGISTRY.guidelines.find(({ name }) => name === "planningDiscipline")?.defaultEnabled, true);
 });
 
@@ -71,7 +88,18 @@ test("injectBehavioralGuidelines injects planning discipline by default and supp
   );
 
   assert.match(defaultResult, /<planning_discipline>/);
+  assert.ok(defaultResult.indexOf("<planning_discipline>") < defaultResult.indexOf("<docs>"));
   assert.doesNotMatch(disabledResult, /<planning_discipline>/);
+});
+
+test("XML insertion markers support docs and project_context sections", () => {
+  const fallbackPrompt = "<rules>Be helpful.</rules>\n<project_context>Project details</project_context>";
+
+  assert.equal(hasBehavioralGuidelinesInsertionMarker(SYSTEM_PROMPT), true);
+  assert.equal(hasBehavioralGuidelinesInsertionMarker(fallbackPrompt), true);
+
+  const result = injectBehavioralGuidelines(fallbackPrompt, { enabled: true }, REGISTRY);
+  assert.ok(result.indexOf("<communication_and_tool_use>") < result.indexOf("<project_context>"));
 });
 
 test("injectBehavioralGuidelines supports explicit include lists", () => {

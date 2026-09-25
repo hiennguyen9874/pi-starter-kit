@@ -27,7 +27,7 @@
     "./extensions/inline-bash.ts",
     "./extensions/profile/index.ts",
     "./extensions/pi-documentation.ts",
-    "./extensions/project-context-rewriter.ts",
+    "-./extensions/disable-project-context.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
     "./extensions/save-last-response.ts",
@@ -39,13 +39,11 @@
     "-./extensions/enable-ls-tool.ts",
     "-./extensions/disable-read-tool.ts",
     "./extensions/system-prompt-appender.ts",
-    "./extensions/remove-pi-env-guideline.ts"
+    "./extensions/remove-pi-env-guideline.ts",
+    "./extensions/disable-om-recall-tool.ts"
   ],
   "extensionState": {
     "piDocumentationEnabled": false,
-    "projectContextRewriterDisableProjectContext": false,
-    "skillsInstructionsRewriterEnabled": true,
-    "skillsInstructionsRewriterDisableSkills": false,
     "systemPromptAppenderEnabled": true,
     "systemPromptAppenderPromptPath": "system-prompt.md",
     "skillsInstructionsRewriterDisabledSkillFilters": [
