@@ -2,7 +2,7 @@
 display_name: Explore
 description: Fast codebase exploration agent (read-only)
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-luna
+model: openai-codex/gpt-6-luna
 thinking: high
 prompt_mode: replace
 ---

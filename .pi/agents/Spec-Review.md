@@ -1,7 +1,7 @@
 ---
 display_name: Spec Review
 description: Spec alignment review — verifies implemented code matches requirements, plan, and acceptance criteria. Use when checking completeness, scope creep, or architectural deviation after implementation.
-model: openai-codex/gpt-5.6-sol
+model: openai-codex/gpt-6-sol
 thinking: medium
 prompt_mode: replace
 ---
