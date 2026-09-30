@@ -2,17 +2,21 @@
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "exposure": "codemode-deferred"
     },
     "context-mode": {
       "command": "context-mode",
-      "lifecycle": "keep-alive"
+      "lifecycle": "keep-alive",
+      "exposure": "codemode-deferred"
     },
     "deepwiki": {
-      "url": "https://mcp.deepwiki.com/mcp"
+      "url": "https://mcp.deepwiki.com/mcp",
+      "exposure": "codemode-deferred"
     },
     "exa": {
-      "url": "https://mcp.exa.ai/mcp"
+      "url": "https://mcp.exa.ai/mcp",
+      "exposure": "codemode-deferred"
     }
   }
 }

@@ -25,6 +25,5 @@ extensionState:
       finalResponse: false
       planningDiscipline: false
 packagesEnable:
-  - npm:pi-mcp-adapter
   - git:github.com/davebcn87/pi-autoresearch
 packagesDisable: []

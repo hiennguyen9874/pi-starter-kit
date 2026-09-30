@@ -9,7 +9,6 @@
     "-git:github.com/hiennguyen9874/pi-ast-grep",
     "-npm:pi-context-prune",
     "-git:github.com/MasuRii/pi-rtk-optimizer",
-    "-npm:pi-mcp-adapter",
     "-npm:pi-prompt-template-model",
     "-npm:pi-subagents",
     "-git:github.com/hiennguyen9874/pi-goal",
@@ -66,7 +65,8 @@
     "commandcode/*",
     "commandcode/*/*",
     "anthropic/*",
-    "-anthropic/*"
+    "-anthropic/*",
+    "cliproxyapi/*"
   ],
   "showCacheMissNotices": true,
   "hideThinkingBlock": false,

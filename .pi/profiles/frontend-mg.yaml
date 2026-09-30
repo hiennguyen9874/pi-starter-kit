@@ -51,7 +51,6 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
 packagesDisable:
   - npm:pi-agent-browser-native
-  - npm:pi-mcp-adapter
   - git:github.com/hiennguyen9874/pi-codex-image-gen
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake

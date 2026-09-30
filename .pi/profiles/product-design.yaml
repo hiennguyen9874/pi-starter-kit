@@ -33,7 +33,6 @@ packagesEnable:
   - npm:pi-agent-browser-native
   - git:github.com/hiennguyen9874/pi-codex-image-gen
 packagesDisable:
-  - npm:pi-mcp-adapter
   - git:github.com/hiennguyen9874/pi-shake
   - npm:@spences10/pi-confirm-destructive
 extensionsEnable:

@@ -1,15 +1,18 @@
 skillsEnable:
+  - find-docs
+  - context7-cli
+  - research
   - handoff
   - show-me
   - i-have-adhd
-skillsDisable: []
+  - defuddle
 promptsDisable: ["*"]
-mcpServersEnable: []
-mcpServersDisable:
+mcpServersEnable:
+  - deepwiki
   - exa
+mcpServersDisable:
   - chrome-devtools
   - context-mode
-  - deepwiki
 extensionState:
   behavioralGuidelines:
     enabled: false
@@ -17,20 +20,20 @@ extensionState:
       communicationAndToolUse: true
       executionPolicy: true
       evidenceDiscipline: true
-      changeScope: true
-      validation: true
-      finalResponse: true
+      changeScope: false
+      validation: false
+      finalResponse: false
       planningDiscipline: false
 packagesEnable: []
 packagesDisable:
-  - git:github.com/hiennguyen9874/pi-notebook-mode@feat/single-edit-nested-tool
-  - npm:@howaboua/pi-codex-conversion
+  - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
   - git:github.com/hiennguyen9874/pi-grep-glob
-  - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - npm:pi-observational-memory
+  - npm:pi-web-access
+  - git:github.com/linearuncle/pi-openai-web-search
 extensionsDisable:
   - ./extensions/disable-project-context.ts
   - ./extensions/system-prompt-appender.ts
@@ -42,8 +45,3 @@ extra:
   override:
     extensionState:
       piDocumentationEnabled: false
-    defaultTools:
-      - "+codemode"
-    codemode:
-      mode: "on"
-      inlineBudget": 3000

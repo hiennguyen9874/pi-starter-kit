@@ -26,6 +26,5 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
-  - npm:pi-mcp-adapter
   - git:github.com/hiennguyen9874/pi-goal
 packagesDisable: []
