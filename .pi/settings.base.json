@@ -84,8 +84,8 @@
     "observationsPoolTargetTokens": 10000,
     "agentMaxTurns": 16,
     "model": {
-      "provider": "openai-codex",
-      "id": "gpt-6-luna",
+      "provider": "opencode-go",
+      "id": "deepseek-v4.1-flash",
       "thinking": "high"
     },
     "showWorkerNotifications": true,
@@ -103,8 +103,5 @@
   },
   "warnings": {
     "anthropicExtraUsage": false
-  },
-  "defaultProvider": "anthropic",
-  "defaultModel": "claude-sonnet-5-5",
-  "defaultThinkingLevel": "medium"
+  }
 }
