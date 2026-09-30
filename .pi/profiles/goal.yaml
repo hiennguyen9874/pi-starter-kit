@@ -8,9 +8,9 @@ skillsEnable:
   - git-commit
   - pi-goal
 promptsDisable: ["*"]
-mcpServersEnable:
-  - exa
+mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki

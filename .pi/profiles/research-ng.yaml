@@ -35,12 +35,17 @@ packagesDisable:
   - npm:pi-web-access
   - git:github.com/linearuncle/pi-openai-web-search
 extensionsDisable:
+  - builtin:codemode
+  - builtin:llama.cpp
   - ./extensions/disable-project-context.ts
   - ./extensions/system-prompt-appender.ts
   - ./extensions/disable-write-tool.ts
   - ./extensions/disable-read-tool.ts
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - builtin:mcp
+  - builtin:tool-search
 extra:
   override:
     extensionState:

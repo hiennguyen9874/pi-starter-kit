@@ -21,6 +21,10 @@
     "npm:@gotgenes/pi-anthropic-auth"
   ],
   "extensions": [
+    "-builtin:mcp",
+    "-builtin:codemode",
+    "-builtin:tool-search",
+    "-builtin:llama.cpp",
     "./extensions/command-history/index.ts",
     "./extensions/permission-gate.ts",
     "-./extensions/confirm-destructive.ts",
@@ -65,7 +69,6 @@
     "commandcode/*",
     "commandcode/*/*",
     "anthropic/*",
-    "-anthropic/*",
     "cliproxyapi/*"
   ],
   "showCacheMissNotices": true,

@@ -7,9 +7,9 @@ skillsEnable:
   - diagnosing-bugs
   - git-commit
 promptsDisable: ["*"]
-mcpServersEnable:
-  - exa
+mcpServersEnable: []
 mcpServersDisable:
+  - exa
   - chrome-devtools
   - context-mode
   - deepwiki

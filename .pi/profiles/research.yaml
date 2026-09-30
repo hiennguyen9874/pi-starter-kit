@@ -26,5 +26,27 @@ extensionState:
       planningDiscipline: false
 packagesEnable: []
 packagesDisable:
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
   - npm:pi-web-access
   - git:github.com/linearuncle/pi-openai-web-search
+extensionsDisable:
+  - builtin:codemode
+  - builtin:llama.cpp
+  - ./extensions/disable-project-context.ts
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - builtin:mcp
+  - builtin:tool-search
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false

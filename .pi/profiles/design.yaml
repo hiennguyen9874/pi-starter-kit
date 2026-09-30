@@ -15,9 +15,9 @@ promptsEnable:
   - interface-design-direction
   - interface-polish-pass
   - react-view-transitions-build
-mcpServersEnable:
-  - chrome-devtools
+mcpServersEnable: []
 mcpServersDisable:
+  - chrome-devtools
   - context-mode
   - deepwiki
   - exa
