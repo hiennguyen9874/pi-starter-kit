@@ -43,6 +43,9 @@ extra:
     extensionState:
       piDocumentationEnabled: false
     defaultTools:
+      # - "+find"
+      # - "+grep"
+      # - "+ls"
       - "+codemode"
     codemode:
       mode: "on"
