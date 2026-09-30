@@ -17,7 +17,9 @@
     "-npm:pi-intercom",
     "-npm:context-mode",
     "-npm:pi-btw",
-    "npm:@spences10/pi-confirm-destructive"
+    "npm:@spences10/pi-confirm-destructive",
+    "npm:pi-commandcode-provider",
+    "npm:@gotgenes/pi-anthropic-auth"
   ],
   "extensions": [
     "./extensions/command-history/index.ts",
@@ -62,7 +64,9 @@
     "opencode/*-free",
     "opencode/*-free*",
     "commandcode/*",
-    "commandcode/*/*"
+    "commandcode/*/*",
+    "anthropic/*",
+    "-anthropic/*"
   ],
   "showCacheMissNotices": true,
   "hideThinkingBlock": false,
@@ -96,5 +100,11 @@
       "size": "auto",
       "background": "auto"
     }
-  }
+  },
+  "warnings": {
+    "anthropicExtraUsage": false
+  },
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5-5",
+  "defaultThinkingLevel": "medium"
 }
