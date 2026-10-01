@@ -6,6 +6,7 @@ skillsEnable:
   - show-me
   - i-have-adhd
   - defuddle
+  - huggingface-papers
 promptsDisable: ["*"]
 mcpServersEnable:
   - deepwiki
@@ -24,7 +25,8 @@ extensionState:
       validation: false
       finalResponse: false
       planningDiscipline: false
-packagesEnable: []
+packagesEnable:
+  - npm:pi-web-access
 packagesDisable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
@@ -32,7 +34,6 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - npm:pi-observational-memory
-  - npm:pi-web-access
   - git:github.com/linearuncle/pi-openai-web-search
 extensionsDisable:
   - builtin:codemode
