@@ -69,7 +69,8 @@
     "commandcode/*",
     "commandcode/*/*",
     "anthropic/*",
-    "cliproxyapi/*"
+    "cliproxyapi/*",
+    "openai/*"
   ],
   "showCacheMissNotices": true,
   "hideThinkingBlock": false,
