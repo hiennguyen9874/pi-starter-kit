@@ -8,6 +8,7 @@ extensions: false
 model: opencode-go/deepseek-v4.1-flash
 thinking: high
 include_system_prompt: false
+extensions: [pi-commandcode-provider, pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS

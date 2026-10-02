@@ -4,10 +4,10 @@ display_name: Standards Review
 description: Code quality review — evaluates correctness, maintainability, simplicity, and test strength of the implementation. Use when spec alignment is already known and the code needs a correctness and maintainability pass.
 tools: [read, bash, grep, find, ls]
 skills: false
-extensions: false
 model: openai-codex/gpt-6.1-sol
 thinking: medium
 include_system_prompt: false
+extensions: [pi-commandcode-provider, pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS
