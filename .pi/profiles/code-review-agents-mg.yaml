@@ -28,9 +28,10 @@ extensionState:
       finalResponseMinimal: false
       planningDisciplineMinimal: false
 packagesEnable:
-  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
   - npm:pi-observational-memory
 packagesDisable:
+  - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom

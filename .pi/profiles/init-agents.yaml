@@ -1,8 +1,7 @@
-skillsEnable:
-  - code-review
-  - codebase-design
-  - pragmatic-principles
-promptsDisable: ['*']
+skillsEnable: []
+skillsDisable: ["*"]
+promptsEnable:
+  - agent-instructions
 mcpServersEnable: []
 mcpServersDisable:
   - exa
@@ -11,27 +10,19 @@ mcpServersDisable:
   - deepwiki
 extensionState:
   behavioralGuidelines:
-    enabled: true
+    enabled: false
     sections:
       communicationAndToolUse: true
       executionPolicy: true
       evidenceDiscipline: true
       changeScope: true
       validation: true
-      finalResponse: false
+      finalResponse: true
       planningDiscipline: false
 packagesEnable:
   - npm:pi-subagents-lite
-  - npm:pi-observational-memory
 packagesDisable:
   - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
-  - git:github.com/hiennguyen9874/pi-ask-user
-  - git:github.com/hiennguyen9874/pi-shake
-extensionsDisable:
-  - ./extensions/disable-write-tool.ts
-  - ./extensions/disable-read-tool.ts
-  - ./extensions/disable-bash-tool.ts
-  - ./extensions/disable-edit-tools.ts

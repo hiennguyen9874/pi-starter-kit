@@ -25,8 +25,9 @@ packagesEnable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
   - git:github.com/hiennguyen9874/pi-grep-glob
-  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
 packagesDisable:
+  - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom

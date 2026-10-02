@@ -11,6 +11,8 @@
     "-git:github.com/MasuRii/pi-rtk-optimizer",
     "-npm:pi-prompt-template-model",
     "-npm:pi-subagents",
+    "-npm:@gotgenes/pi-subagents",
+    "-npm:pi-subagents-lite",
     "-git:github.com/hiennguyen9874/pi-goal",
     "-git:github.com/davebcn87/pi-autoresearch",
     "-npm:pi-intercom",

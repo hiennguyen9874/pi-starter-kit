@@ -51,6 +51,7 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-ask-user
 packagesDisable:
   - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom

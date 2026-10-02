@@ -22,6 +22,7 @@ packagesDisable:
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
   - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom

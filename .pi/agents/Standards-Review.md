@@ -1,9 +1,13 @@
 ---
+name: Standards-Review
 display_name: Standards Review
 description: Code quality review — evaluates correctness, maintainability, simplicity, and test strength of the implementation. Use when spec alignment is already known and the code needs a correctness and maintainability pass.
-model: openai-codex/gpt-6-sol
+tools: [read, bash, grep, find, ls]
+skills: false
+extensions: false
+model: openai-codex/gpt-6.1-sol
 thinking: medium
-prompt_mode: replace
+include_system_prompt: false
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS

@@ -20,8 +20,9 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
-  - npm:@gotgenes/pi-subagents
 packagesDisable:
+  - npm:pi-subagents-lite
+  - npm:@gotgenes/pi-subagents
   - npm:pi-subagents
   - npm:pi-prompt-template-model
   - npm:pi-intercom
