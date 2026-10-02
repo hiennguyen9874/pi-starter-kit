@@ -38,14 +38,17 @@ extensionsDisable:
   - ./extensions/disable-read-tool.ts
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - builtin:codemode
+  - builtin:tool-search
 extra:
   override:
     extensionState:
       piDocumentationEnabled: false
     defaultTools:
-      # - "+find"
-      # - "+grep"
-      # - "+ls"
+      - "+find"
+      - "+grep"
+      - "+ls"
       - "+codemode"
     codemode:
       mode: "on"
