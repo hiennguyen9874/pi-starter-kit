@@ -19,7 +19,7 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: false
-packagesEnable:
+packagesEnable: []
 packagesDisable:
   - npm:pi-subagents-lite
   - npm:@gotgenes/pi-subagents
