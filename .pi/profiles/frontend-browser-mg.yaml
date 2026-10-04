@@ -49,7 +49,7 @@ packagesEnable:
   - npm:pi-agent-browser-native
   - npm:pi-observational-memory
   - git:github.com/hiennguyen9874/pi-grep-glob
-  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - npm:@hiennguyen9874/pi-multi-edit
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-codex-image-gen
   - git:github.com/hiennguyen9874/pi-ask-user

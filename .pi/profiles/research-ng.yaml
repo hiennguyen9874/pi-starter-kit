@@ -29,7 +29,7 @@ packagesEnable:
   - npm:pi-web-access
 packagesDisable:
   - npm:@spences10/pi-confirm-destructive
-  - git:github.com/hiennguyen9874/pi-edit@feat/multi-edit-input
+  - npm:@hiennguyen9874/pi-multi-edit
   - git:github.com/hiennguyen9874/pi-grep-glob
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
