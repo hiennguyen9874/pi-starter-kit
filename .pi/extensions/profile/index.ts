@@ -491,7 +491,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
           invalidate: () => container.invalidate(),
           handleInput: (data) => {
             // Printable characters: accumulate filter
-            if (data.length === 1 && data.match(/[a-zA-Z0-9_-]/)) {
+            if (data.length === 1 && data.match(/[a-zA-Z0-9_\/-]/)) {
               filter += data;
               selectList.setFilter(filter);
               tui.requestRender();

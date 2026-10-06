@@ -1,6 +1,5 @@
 {
   "packages": [
-    "npm:pi-commandcode-provider",
     "npm:@gotgenes/pi-anthropic-auth",
     "npm:@xynogen/pix-footer",
     "npm:@spences10/pi-confirm-destructive",
@@ -69,8 +68,6 @@
     "opencode-go/*",
     "opencode/*-free",
     "opencode/*-free*",
-    "commandcode/*",
-    "commandcode/*/*",
     "anthropic/*",
     "cliproxyapi/*",
     "openai/*"

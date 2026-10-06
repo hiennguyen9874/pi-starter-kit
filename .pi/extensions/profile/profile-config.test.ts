@@ -239,3 +239,21 @@ test("loads prompt profile fields from YAML files", () => {
     promptsDisable: ["generate-slides"],
   });
 });
+
+test("loads profiles from one level of group subfolders", () => {
+  const root = createRoot();
+  writeFileSync(join(root, ".pi", "profiles", "base.yaml"), "skillsEnable:\n  - base\n");
+  mkdirSync(join(root, ".pi", "profiles", "review"));
+  writeFileSync(join(root, ".pi", "profiles", "review", "api.yaml"), "skillsEnable:\n  - api\n");
+  writeFileSync(join(root, ".pi", "profiles", "review", "_draft.yaml"), "skillsEnable:\n  - draft\n");
+  mkdirSync(join(root, ".pi", "profiles", "review", "nested"));
+  writeFileSync(join(root, ".pi", "profiles", "review", "nested", "deep.yaml"), "skillsEnable:\n  - deep\n");
+  mkdirSync(join(root, ".pi", "profiles", "_hidden"));
+  writeFileSync(join(root, ".pi", "profiles", "_hidden", "x.yaml"), "skillsEnable:\n  - x\n");
+
+  const result = loadProfilesConfig(root);
+
+  assert.equal(result.error, undefined);
+  assert.deepEqual(Object.keys(result.config?.profiles ?? {}).sort(), ["base", "review/api"]);
+  assert.deepEqual(result.config?.profiles["review/api"].skillsEnable, ["api"]);
+});

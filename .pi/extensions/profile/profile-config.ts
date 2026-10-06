@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, type Dirent } from "node:fs";
 import { join } from "node:path";
 
 import { parse as parseYaml } from "yaml";
@@ -198,6 +198,49 @@ function isProfileYamlFile(name: string): boolean {
   return name.endsWith(".yaml") && !name.startsWith(".") && !name.startsWith("_");
 }
 
+function isProfileGroupDir(name: string): boolean {
+  return !name.startsWith(".") && !name.startsWith("_");
+}
+
+/**
+ * Collect profile YAML files from `profilesDir` and its direct subfolders (one level only).
+ * Top-level `a.yaml` -> profile "a"; `<group>/a.yaml` -> profile "<group>/a".
+ */
+function collectProfileFiles(profilesDir: string, errors: string[]): Array<{ profileName: string; filePath: string }> {
+  const readEntries = (dir: string): Dirent[] | undefined => {
+    try {
+      return readdirSync(dir, { withFileTypes: true });
+    } catch (error) {
+      errors.push(`Failed to read profiles directory ${dir}: ${error instanceof Error ? error.message : String(error)}`);
+      return undefined;
+    }
+  };
+
+  const files: Array<{ profileName: string; filePath: string }> = [];
+  const topEntries = readEntries(profilesDir);
+  if (!topEntries) {
+    return files;
+  }
+
+  for (const entry of topEntries) {
+    if (entry.isFile() && isProfileYamlFile(entry.name)) {
+      files.push({ profileName: entry.name.slice(0, -5), filePath: join(profilesDir, entry.name) });
+      continue;
+    }
+
+    if (entry.isDirectory() && isProfileGroupDir(entry.name)) {
+      const groupDir = join(profilesDir, entry.name);
+      for (const child of readEntries(groupDir) ?? []) {
+        if (child.isFile() && isProfileYamlFile(child.name)) {
+          files.push({ profileName: `${entry.name}/${child.name.slice(0, -5)}`, filePath: join(groupDir, child.name) });
+        }
+      }
+    }
+  }
+
+  return files.sort((a, b) => a.profileName.localeCompare(b.profileName));
+}
+
 function loadProfilesFromDirectory(profilesDir: string, behavioralGuidelineSectionNameSet: Set<string>): {
   profiles: Record<string, ProfileDefinition>;
   errors: string[];
@@ -209,20 +252,7 @@ function loadProfilesFromDirectory(profilesDir: string, behavioralGuidelineSecti
   const profiles: Record<string, ProfileDefinition> = {};
   const errors: string[] = [];
 
-  let entries: string[];
-  try {
-    entries = readdirSync(profilesDir);
-  } catch (error) {
-    errors.push(`Failed to read profiles directory: ${error instanceof Error ? error.message : String(error)}`);
-    return { profiles, errors };
-  }
-
-  const yamlFiles = entries.filter(isProfileYamlFile).sort();
-
-  for (const fileName of yamlFiles) {
-    const profileName = fileName.slice(0, -5); // Remove .yaml extension
-    const filePath = join(profilesDir, fileName);
-
+  for (const { profileName, filePath } of collectProfileFiles(profilesDir, errors)) {
     try {
       const content = readFileSync(filePath, "utf8");
       const parsed = parseYaml(content);

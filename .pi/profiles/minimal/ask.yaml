@@ -14,7 +14,7 @@ mcpServersDisable:
   - deepwiki
 extensionState:
   behavioralGuidelines:
-    enabled: true
+    enabled: false
     sections:
       communicationAndToolUse: true
       executionPolicy: true
@@ -23,8 +23,20 @@ extensionState:
       validation: false
       finalResponse: false
       planningDiscipline: false
-packagesEnable: []
-packagesDisable: []
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ask-user
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-shake
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-shake
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:@spences10/pi-confirm-destructive
+  - npm:pi-observational-memory
+extensionsDisable:
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
 extensionsEnable:
   - ./extensions/disable-edit-tools.ts
   - ./extensions/disable-write-tool.ts

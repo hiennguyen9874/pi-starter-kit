@@ -35,3 +35,8 @@ extensionsEnable:
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
   - ./extensions/disable-write-tool.ts
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
+      projectContextRewriterDisableProjectContext: false
