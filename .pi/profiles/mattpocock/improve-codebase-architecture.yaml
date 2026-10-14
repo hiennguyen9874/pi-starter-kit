@@ -24,7 +24,6 @@ extensionState:
       finalResponse: true
       planningDiscipline: false
 packagesEnable:
-  - npm:@spences10/pi-confirm-destructive
   - npm:@hiennguyen9874/pi-multi-edit
   - git:github.com/hiennguyen9874/pi-ask-user
 packagesDisable:

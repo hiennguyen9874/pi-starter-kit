@@ -7,7 +7,7 @@ skills: false
 model: openai-codex/gpt-6.1-sol
 thinking: medium
 include_system_prompt: false
-extensions: [pi-commandcode-provider, pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
+extensions: [pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS

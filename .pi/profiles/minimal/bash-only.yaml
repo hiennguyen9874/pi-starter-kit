@@ -18,8 +18,7 @@ extensionState:
       validation: true
       finalResponse: true
       planningDiscipline: false
-packagesEnable:
-  - npm:@spences10/pi-confirm-destructive
+packagesEnable: []
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake

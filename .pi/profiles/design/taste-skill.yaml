@@ -33,7 +33,6 @@ packagesDisable:
   - git:github.com/hiennguyen9874/pi-codex-image-gen
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
-  - npm:@spences10/pi-confirm-destructive
   - npm:@hiennguyen9874/pi-multi-edit
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:pi-observational-memory

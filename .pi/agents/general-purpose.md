@@ -7,5 +7,5 @@ skills: false
 model: opencode-go/deepseek-v4.1-flash
 thinking: high
 include_system_prompt: true
-extensions: [pi-commandcode-provider, pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
+extensions: [pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---

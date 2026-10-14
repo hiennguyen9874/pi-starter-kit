@@ -27,7 +27,6 @@ packagesEnable:
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-notebook-mode@feat/single-edit-nested-tool
   - npm:@howaboua/pi-codex-conversion
-  - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
   - npm:pi-observational-memory

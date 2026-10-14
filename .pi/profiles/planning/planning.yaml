@@ -19,7 +19,6 @@ extensionState:
 packagesEnable: []
 packagesDisable:
   - npm:pi-observational-memory
-  - npm:@spences10/pi-confirm-destructive
   - npm:@hiennguyen9874/pi-multi-edit
   - npm:@gotgenes/pi-subagents
   - npm:pi-subagents-lite

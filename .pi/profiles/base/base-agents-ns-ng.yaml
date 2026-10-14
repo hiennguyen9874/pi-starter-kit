@@ -21,7 +21,6 @@ extensionState:
       planningDiscipline: true
 packagesEnable:
   - npm:pi-subagents-lite
-  - npm:@spences10/pi-confirm-destructive
   - npm:@hiennguyen9874/pi-multi-edit
   - npm:pi-observational-memory
 packagesDisable:
