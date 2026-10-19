@@ -1,7 +1,7 @@
 skillsEnable: []
 skillsDisable:
   - '*'
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

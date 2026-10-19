@@ -7,7 +7,7 @@ skillsEnable:
 skillsDisable:
   - skills/taste-skill/image-to-code
 promptsEnable: []
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

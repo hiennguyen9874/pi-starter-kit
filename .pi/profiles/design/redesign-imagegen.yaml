@@ -10,7 +10,7 @@ skillsEnable:
   - minimalist-ui
   - redesign-existing-projects
   - stitch-design-taste
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

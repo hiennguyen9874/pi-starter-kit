@@ -20,7 +20,7 @@ skillsEnable:
   - show-me
   - i-have-adhd
 promptsEnable: []
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

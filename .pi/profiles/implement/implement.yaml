@@ -4,7 +4,7 @@ skillsEnable:
   - handoff
   - show-me
   - i-have-adhd
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

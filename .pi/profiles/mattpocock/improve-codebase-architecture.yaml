@@ -1,11 +1,10 @@
 skillsEnable:
-  - pragmatic-principles
   - codebase-design
   - improve-codebase-architecture
   - ponytail
   - grilling
   - domain-modeling
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

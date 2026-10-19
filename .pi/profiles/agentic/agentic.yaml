@@ -3,7 +3,6 @@ skillsEnable:
   - grilling
   - agent-md-refactor
   - context7-cli
-  - pragmatic-principles
 promptsEnable:
   - agent-instructions
 mcpServersEnable: []

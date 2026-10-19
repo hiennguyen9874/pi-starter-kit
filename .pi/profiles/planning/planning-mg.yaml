@@ -2,7 +2,7 @@ skillsEnable:
   - tdd
   - codebase-design
   - ponytail
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable: ['*']
 extensionState:

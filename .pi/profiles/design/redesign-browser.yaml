@@ -11,7 +11,7 @@ skillsEnable:
   - redesign-existing-projects
   - stitch-design-taste
 promptsEnable: []
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - chrome-devtools

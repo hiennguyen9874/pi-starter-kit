@@ -5,7 +5,7 @@ skillsEnable:
   - ponytail
   - diagnosing-bugs
   - tdd
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

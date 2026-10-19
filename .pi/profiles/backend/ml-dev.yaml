@@ -2,7 +2,6 @@ skillsEnable:
   - grilling
   - context7-cli
   - diagnosing-bugs
-  - pragmatic-principles
   - source-driven-development
   - tdd
   - developing-with-streamlit

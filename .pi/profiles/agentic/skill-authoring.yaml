@@ -1,7 +1,6 @@
 skillsEnable:
   - grilling
   - writing-great-skills
-  - pragmatic-principles
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:

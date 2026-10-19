@@ -1,8 +1,9 @@
 skillsEnable:
   - code-review
   - codebase-design
-  - pragmatic-principles
-promptsDisable: ['*']
+  - ponytail
+  - ponytail-review
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

@@ -26,7 +26,7 @@ skillsEnable:
   - wayfinder
   - wizard
   - writing-for-agents
-promptsDisable: ['*']
+promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
   - exa

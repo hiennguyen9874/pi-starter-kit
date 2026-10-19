@@ -1,7 +1,6 @@
 skillsEnable:
   - grilling
   - diagnosing-bugs
-  - pragmatic-principles
   - docker-patterns
   - ci-cd-and-automation
   - git-workflow-and-versioning
