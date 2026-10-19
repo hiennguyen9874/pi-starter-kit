@@ -2,7 +2,6 @@
   "packages": [
     "npm:@gotgenes/pi-anthropic-auth",
     "npm:@xynogen/pix-footer",
-    "npm:@spences10/pi-confirm-destructive",
     "npm:pi-context-view",
     "-npm:pi-observational-memory",
     "npm:@hiennguyen9874/pi-multi-edit",

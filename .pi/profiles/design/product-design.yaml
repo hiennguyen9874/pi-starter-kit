@@ -34,7 +34,6 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-codex-image-gen
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-shake
-  - npm:@spences10/pi-confirm-destructive
 extensionsEnable:
   - ./extensions/system-prompt-appender.ts
 extensionsDisable:

@@ -26,7 +26,6 @@ packagesDisable:
   - npm:@hiennguyen9874/pi-multi-edit
   - git:github.com/hiennguyen9874/pi-shake
   - git:github.com/hiennguyen9874/pi-grep-glob
-  - npm:@spences10/pi-confirm-destructive
   - npm:pi-observational-memory
 extensionsDisable:
   - ./extensions/system-prompt-appender.ts
