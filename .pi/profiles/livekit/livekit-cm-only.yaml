@@ -32,6 +32,7 @@ extensionState:
       finalResponse: true
       planningDiscipline: true
 packagesEnable:
+  - npm:pi-subagents-lite
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@hiennguyen9874/pi-single-edit
 packagesDisable:
