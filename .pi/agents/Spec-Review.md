@@ -5,9 +5,9 @@ description: Spec alignment review — verifies implemented code matches require
 tools: [read, bash, grep, find, ls]
 skills: false
 model: openai-codex/gpt-6.1-sol
-thinking: medium
+thinking: high
 include_system_prompt: false
-extensions: [pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
+extensions: [pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS

@@ -32,9 +32,9 @@ extensionState:
 packagesEnable:
   - npm:pi-subagents-lite
   - git:github.com/hiennguyen9874/pi-grep-glob
-  - npm:@hiennguyen9874/pi-multi-edit
-packagesDisable:
   - npm:@hiennguyen9874/pi-single-edit
+packagesDisable:
+  - npm:@hiennguyen9874/pi-multi-edit
   - npm:@spences10/pi-confirm-destructive
   - git:github.com/hiennguyen9874/pi-ask-user
   - git:github.com/hiennguyen9874/pi-shake
