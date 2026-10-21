@@ -1,15 +1,5 @@
 skillsEnable:
-  - gpt-image
-  - brandkit
-  - design-taste-frontend
-  - gpt-taste
-  - high-end-visual-design
-  - image-to-code
-  - imagegen-frontend-web
-  - industrial-brutalist-ui
-  - minimalist-ui
-  - redesign-existing-projects
-  - stitch-design-taste
+  - taste-skill
 promptsDisable: ["*"]
 mcpServersEnable: []
 mcpServersDisable:
