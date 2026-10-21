@@ -1,0 +1,48 @@
+# REA via MCP (npx rea-agents mcp). Tools are deferred; found via tool-search.
+skillsEnable:
+  - reverse-engineer-anything
+  - handoff
+  - show-me
+promptsDisable: ["*"]
+mcpServersEnable:
+  - rea
+mcpServersDisable:
+  - exa
+  - deepwiki
+  - chrome-devtools
+  - context-mode
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+packagesEnable: []
+packagesDisable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+  - git:github.com/linearuncle/pi-openai-web-search
+extensionsDisable:
+  - builtin:codemode
+  - builtin:llama.cpp
+  - ./extensions/disable-project-context.ts
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - builtin:mcp
+  - builtin:tool-search
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
