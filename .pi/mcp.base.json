@@ -29,6 +29,10 @@
         "mcp"
       ],
       "exposure": "deferred"
+    },
+    "tcbs": {
+      "url": "https://mcp.tcbs.com.vn/mcp/tcinvest/",
+      "exposure": "codemode"
     }
   }
 }

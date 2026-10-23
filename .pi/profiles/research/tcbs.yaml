@@ -1,0 +1,58 @@
+skillsEnable:
+  - handoff
+  - show-me
+  - i-have-adhd
+promptsDisable: ["*"]
+mcpServersEnable:
+  - tcbs
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+packagesEnable:
+  - npm:@hiennguyen9874/pi-single-edit
+packagesDisable:
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:pi-web-access
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+  - git:github.com/linearuncle/pi-openai-web-search
+extensionsDisable:
+  - builtin:llama.cpp
+  - ./extensions/disable-project-context.ts
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - builtin:mcp
+  - builtin:codemode
+  - builtin:tool-search
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
+    defaultTools:
+      # - "+find"
+      # - "+grep"
+      # - "+ls"
+      - "+codemode"
+    codemode:
+      mode: "only"
+      inlineBudget": 3000
