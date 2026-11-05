@@ -49,7 +49,7 @@
     "./extensions/disable-om-recall-tool.ts"
   ],
   "extensionState": {
-    "piDocumentationEnabled": false,
+    "piDocumentationEnabled": true,
     "systemPromptAppenderEnabled": true,
     "systemPromptAppenderPromptPath": "system-prompt.md",
     "skillsInstructionsRewriterDisabledSkillFilters": [
