@@ -33,6 +33,10 @@
     "tcbs": {
       "url": "https://mcp.tcbs.com.vn/mcp/tcinvest/",
       "exposure": "codemode"
+    },
+    "sstock": {
+      "url": "https://api.sstock.vn/api/v1/mcp",
+      "exposure": "codemode"
     }
   }
 }
