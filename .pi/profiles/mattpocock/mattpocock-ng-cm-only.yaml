@@ -48,7 +48,6 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@hiennguyen9874/pi-single-edit
   - git:github.com/hiennguyen9874/pi-ask-user
-  - npm:pi-codemode-compact
 packagesDisable:
   - npm:@hiennguyen9874/pi-multi-edit
   - npm:pi-observational-memory

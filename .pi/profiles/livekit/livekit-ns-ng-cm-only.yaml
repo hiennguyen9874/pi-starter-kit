@@ -31,7 +31,6 @@ extensionState:
 packagesEnable:
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@hiennguyen9874/pi-single-edit
-  - npm:pi-codemode-compact
 packagesDisable:
   - npm:@hiennguyen9874/pi-multi-edit
   - npm:@spences10/pi-confirm-destructive

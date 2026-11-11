@@ -25,7 +25,6 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@hiennguyen9874/pi-single-edit
   - npm:pi-subagents-lite
-  - npm:pi-codemode-compact
 packagesDisable:
   - npm:pi-observational-memory
   - npm:@hiennguyen9874/pi-multi-edit
