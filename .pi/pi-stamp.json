@@ -1,0 +1,13 @@
+{
+  "timeZone": "Asia/Ho_Chi_Minh",
+  "hourCycle": "24h",
+  "showSeconds": true,
+  "dateContext": "day-change",
+  "responseTiming": "detailed",
+  "showTimeSinceUser": true,
+  "showRequestedModel": false,
+  "showCallCost": true,
+  "showCostSinceUser": true,
+  "stopReason": "abnormal",
+  "metadataLayout": "compact"
+}
