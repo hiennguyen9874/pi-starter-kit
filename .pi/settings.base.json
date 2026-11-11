@@ -19,7 +19,8 @@
     "-npm:pi-subagents",
     "-npm:@gotgenes/pi-subagents",
     "-npm:pi-subagents-lite",
-    "-npm:pi-intercom"
+    "-npm:pi-intercom",
+    "npm:@narumitw/pi-stamp"
   ],
   "extensions": [
     "-builtin:mcp",
@@ -49,7 +50,7 @@
     "./extensions/disable-om-recall-tool.ts"
   ],
   "extensionState": {
-    "piDocumentationEnabled": true,
+    "piDocumentationEnabled": false,
     "systemPromptAppenderEnabled": true,
     "systemPromptAppenderPromptPath": "system-prompt.md",
     "skillsInstructionsRewriterDisabledSkillFilters": [
