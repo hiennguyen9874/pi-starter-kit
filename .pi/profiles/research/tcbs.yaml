@@ -23,6 +23,7 @@ extensionState:
       planningDiscipline: false
 packagesEnable:
   - npm:@hiennguyen9874/pi-single-edit
+  - npm:pi-codemode-compact
 packagesDisable:
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:pi-web-access

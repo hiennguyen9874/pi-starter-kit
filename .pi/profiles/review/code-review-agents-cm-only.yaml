@@ -25,8 +25,9 @@ packagesEnable:
   - git:github.com/hiennguyen9874/pi-grep-glob
   - npm:@hiennguyen9874/pi-single-edit
   - npm:pi-subagents-lite
-  - npm:pi-observational-memory
+  - npm:pi-codemode-compact
 packagesDisable:
+  - npm:pi-observational-memory
   - npm:@hiennguyen9874/pi-multi-edit
   - git:github.com/hiennguyen9874/pi-notebook-mode@feat/single-edit-nested-tool
   - npm:@howaboua/pi-codex-conversion
