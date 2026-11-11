@@ -58,4 +58,4 @@ extra:
       - "+codemode"
     codemode:
       mode: "only"
-      inlineBudget": 3000
+      inlineBudget: 3000
