@@ -47,6 +47,7 @@ extensionsDisable:
 extensionsEnable:
   - builtin:codemode
   - builtin:tool-search
+  - ./extensions/codemode-direct-write.ts
 extra:
   override:
     extensionState:
