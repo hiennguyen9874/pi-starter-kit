@@ -4,6 +4,7 @@ import * as path from "path";
 
 const PI_DOCS_MARKER = "Pi documentation (read only";
 const PI_DOCS_TAG = "docs";
+const PI_DOCS_MESSAGE_TYPE = "pi-documentation";
 
 let enabled = false;
 let initialized = false;
@@ -98,7 +99,18 @@ function updateStatus(ctx: any): void {
 }
 
 export default function piDocumentationExtension(pi: ExtensionAPI) {
+	let requestedPrompt: string | undefined;
+	let includeForNextRun = false;
+	let activeDocumentation: string | undefined;
+
+	function resetRequest(): void {
+		requestedPrompt = undefined;
+		includeForNextRun = false;
+		activeDocumentation = undefined;
+	}
+
 	pi.on("session_start", async (_event, ctx) => {
+		resetRequest();
 		enabled = readEnabled();
 		initialized = true;
 		updateStatus(ctx);
@@ -109,9 +121,19 @@ export default function piDocumentationExtension(pi: ExtensionAPI) {
 			enabled = readEnabled();
 			initialized = true;
 		}
-		if (enabled) return undefined;
+		const section = findXmlSection(event.systemPrompt, PI_DOCS_TAG, PI_DOCS_MARKER);
+		activeDocumentation = includeForNextRun && section
+			? event.systemPrompt.slice(section.start, section.end)
+			: undefined;
+		if (activeDocumentation && ctx.hasUI) {
+			// UI-only feedback: never add this notice to model context.
+			ctx.ui.notify("📚 Pi documentation enabled for this message", "info");
+		}
+		const requestedDocumentation = includeForNextRun;
+		includeForNextRun = false;
+		if (enabled && !requestedDocumentation) return undefined;
 
-		if (!findXmlSection(event.systemPrompt, PI_DOCS_TAG, PI_DOCS_MARKER) && !warnedMissingSection) {
+		if (!section && !warnedMissingSection) {
 			warnedMissingSection = true;
 			if (ctx.hasUI) {
 				ctx.ui.notify("Pi documentation section not found", "warning");
@@ -119,6 +141,58 @@ export default function piDocumentationExtension(pi: ExtensionAPI) {
 		}
 
 		return { systemPrompt: removePiDocumentation(event.systemPrompt) };
+	});
+
+	pi.on("input", async (event) => {
+		// A failed/handled submission must not enable docs for a later, unrelated prompt.
+		includeForNextRun = requestedPrompt !== undefined
+			&& event.source === "extension" && event.text === requestedPrompt;
+		requestedPrompt = undefined;
+	});
+
+	pi.on("context", async (event) => {
+		if (!activeDocumentation) return;
+
+		// Provider-only context: keep docs out of the system prompt and session history.
+		const messages = event.messages.filter(
+			(message) => !(message.role === "custom" && message.customType === PI_DOCS_MESSAGE_TYPE),
+		);
+		let userIndex = messages.length - 1;
+		while (userIndex >= 0 && messages[userIndex].role !== "user") userIndex--;
+		if (userIndex < 0) return;
+
+		return {
+			messages: [
+				...messages.slice(0, userIndex),
+				{
+					role: "custom" as const,
+					customType: PI_DOCS_MESSAGE_TYPE,
+					content: activeDocumentation,
+					display: false,
+					timestamp: Date.now(),
+				},
+				...messages.slice(userIndex),
+			],
+		};
+	});
+
+	pi.on("agent_settled", async () => { activeDocumentation = undefined; });
+	pi.on("session_switch", async () => { resetRequest(); });
+
+	pi.registerCommand("pi-docs", {
+		description: "Send /pi-docs <message> with Pi documentation before it (this request only)",
+		handler: async (args, ctx) => {
+			const prompt = args.trim();
+			if (!prompt) {
+				ctx.ui.notify("Usage: /pi-docs <message>", "warning");
+				return;
+			}
+
+			// Do not attach a queued request's docs to the currently running agent.
+			await ctx.waitForIdle();
+			requestedPrompt = prompt;
+			pi.sendUserMessage(prompt);
+		},
 	});
 
 	pi.registerCommand("pi-documentation", {
