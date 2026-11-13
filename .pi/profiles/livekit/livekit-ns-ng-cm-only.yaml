@@ -39,6 +39,7 @@ packagesDisable:
   - npm:pi-observational-memory
 extensionsDisable:
   - builtin:codemode
+  - builtin:tool-search
   - ./extensions/disable-project-context.ts
   - ./extensions/system-prompt-appender.ts
   - ./extensions/disable-write-tool.ts
@@ -46,7 +47,6 @@ extensionsDisable:
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
 extensionsEnable:
-  - builtin:tool-search
   - ./extensions/codemode-direct-write.ts
 extra:
   override:
