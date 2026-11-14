@@ -1,4 +1,6 @@
 skillsEnable:
+  - show-me
+  - i-have-adhd
   - ask-matt
   - code-review
   - codebase-design
@@ -8,13 +10,13 @@ skillsEnable:
   - grill-with-docs
   - grilling
   - handoff
-  - show-me
-  - i-have-adhd
   - implement
+  - implement-spec
   - improve-codebase-architecture
+  - pr
   - prototype
   - research
-  - resolving-merge-conflicts
+  - retro
   - setup-matt-pocock-skills
   - tdd
   - teach
