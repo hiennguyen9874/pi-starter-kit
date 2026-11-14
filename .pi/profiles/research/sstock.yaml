@@ -2,6 +2,7 @@ skillsEnable:
   - handoff
   - show-me
   - i-have-adhd
+  - stock-analysis
 promptsDisable: ["*"]
 mcpServersEnable:
   - sstock
