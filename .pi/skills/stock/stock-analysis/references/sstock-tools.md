@@ -50,12 +50,13 @@ Server `sstock` (`https://api.sstock.vn/api/v1/mcp`) đi qua codemode: tên tool
 
 - **P/E TB 3 năm bị méo** ở cổ phiếu chu kỳ (HPG 2023: P/E vọt trên 200 vì lợi nhuận đáy, khiến `avg3YPe` = 18,9 trong khi trung vị là 8,9). Nên dùng trung vị P/E dương và P/B. `analyze.py` tự gắn cờ `avg3Y_distorted`.
 - **`peSstock`/`pbSstock` bị giữ nguyên** từ `peSstockLastComputableDate` (cần BCTC của 2 quý tương lai), nên không phản ánh giá hôm nay. Khi trích dẫn phải ghi rõ giữ nguyên từ ngày nào.
-- **Chuỗi toàn số 0**: `profitPerformance` của SSI trả ROE/ROA = 0 ở mọi kỳ. `analyze.py` gắn cờ `suspect` và dùng `snapshot.roe` thay thế. Gặp chuỗi 0 phẳng thì coi là lỗi nguồn, không phải số thật.
+- **Chuỗi toàn số 0**: `profitPerformance` của SSI trả ROE/ROA = 0 ở mọi kỳ. `analyze.py` gắn cờ `suspect` và dùng `snapshot.roe` thay thế; với securities có thêm `roeTTMDerivedPct` để đối chiếu. Gặp chuỗi 0 phẳng thì coi là lỗi nguồn, không phải số thật.
 - `get_stock_rrg` / `get_sector_rrg` chỉ chứa các mã mà engine theo dõi (một tập con, mặc định bỏ Tier-3 thanh khoản thấp). Muốn có danh sách ngành đầy đủ thì dùng `get_sector_companies`.
 - `get_elite_stocks` chỉ liệt kê các mã đã hoặc đang là Elite. Mã không xuất hiện không có nghĩa là bị guard chặn; muốn biết lý do thì dùng `get_elite_diagnostic`.
 - Sentiment/diffusion: `band` của đồng hồ và `band` của ô so sánh dùng hai bộ ngưỡng khác nhau. So sánh thì dùng `change`/`direction`, đừng so tên band.
 - `totalValue/totalVolume` trong giá là số tổng do sở công bố; trích nguyên số đó, không tự cộng khớp lệnh với thỏa thuận.
 - `get_price_history` trả cả giá gốc (`close`) lẫn `adjClose`. Chỉ báo kỹ thuật dùng `adjClose`, còn mức giá hiển thị cho người dùng dùng `close`.
+- **Sự kiện quyền** (cổ phiếu thưởng, cổ tức bằng cổ phiếu, chia tách): tại ngày GDKHQ, `close` gãy hơn 10% giữa hai phiên trong khi `adjClose` vẫn liên tục (SSI 14/08→17/08/2026: 24,5 → 19,8). Ngày GDKHQ tìm bằng `close` và đối chiếu với vốn góp/vốn điều lệ tăng trong FA. Mọi mức giá lịch sử trước ngày đó lấy theo `adjClose` để so sánh được với giá hiện tại. Lưu ý `rows` sắp xếp mới → cũ: sort theo `date` trước khi so phiên liền kề.
 - MCP có thể trả dữ liệu vượt mốc kiến thức của model (ví dụ năm 2026). Tin vào `asOf` của dữ liệu, không tự "sửa" ngày.
 
 ## Các job của fetch_stock.js

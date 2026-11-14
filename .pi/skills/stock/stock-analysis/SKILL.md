@@ -10,6 +10,7 @@ Pipeline có 4 tầng: **fetch** (codemode gọi MCP rồi ghi JSON thô) → **
 Tham chiếu dùng khi cần:
 - [references/sstock-tools.md](references/sstock-tools.md): 26 tool, đơn vị, thứ tự trục, giới hạn gói/rate-limit, các gotcha dữ liệu. Đọc khi gọi tool ngoài pipeline hoặc khi một số liệu trông bất thường.
 - [references/analysis-framework.md](references/analysis-framework.md): cách đọc từng khía cạnh, KPI và ngưỡng theo 4 cấu trúc BCTC (phi tài chính / ngân hàng / chứng khoán / bảo hiểm), cách diễn giải scorecard. Đọc trước bước 4.
+- [references/securities.md](references/securities.md): đọc trước bước 3 khi `structure` = securities (công ty chứng khoán). Gồm lợi nhuận theo mảng, NIM/COF, nền cao theo chu kỳ, phân loại sự kiện tăng vốn, P/B đi cùng ROE.
 - [templates/report.md](templates/report.md) là khung báo cáo; [examples/HPG-report.md](examples/HPG-report.md) là một báo cáo mẫu hoàn chỉnh.
 
 Đường dẫn script tính từ thư mục skill này: `.pi/skills/stock/stock-analysis/scripts/`.

@@ -37,6 +37,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - Lợi nhuận phụ thuộc thanh khoản thị trường (môi giới, margin) và tự doanh (beta cao với VNINDEX). Đọc cơ cấu lợi nhuận theo mảng để biết lợi nhuận đến từ đâu.
 - Margin/VCSH: trần pháp lý 200%, trên 180% là gần trần. NIM margin cho biết chênh lệch lãi suất cho vay ký quỹ.
 - Tự doanh/Tổng tài sản cao thì lợi nhuận biến động mạnh. Xem cơ cấu FVTPL (cổ phiếu niêm yết so với trái phiếu/tiền gửi).
+- Checklist chi tiết (lợi nhuận theo mảng, NIM/COF, sự kiện tăng vốn, P/B đi cùng ROE): [securities.md](securities.md).
 
 **Bảo hiểm** (`insurance`)
 - Combined ratio <100% là có lãi từ nghiệp vụ bảo hiểm (≤95% tốt, ≥105% xấu). Tỷ lệ bồi thường và tỷ lệ chi phí.

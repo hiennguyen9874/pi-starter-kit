@@ -99,6 +99,29 @@ def plot_fa(ax, df: pd.DataFrame, title: str, cid: str):
     ax.legend(h1, l1, loc="upper left", ncol=2 if len(l1) > 4 else 1, framealpha=0.85)
 
 
+def repair_profit_performance(frames, labels, quarterly: bool):
+    """profitPerformance can come back flat-zero (seen: SSI). Replace it with ROE/ROA computed from profit,
+    equity and total assets so the panel is not blank. Frames that carry real numbers are left untouched."""
+    pp = frames.get("profitPerformance")
+    if pp is None or pp.fillna(0).ne(0).any().any():
+        return frames, labels
+    get = lambda n, c=None: next((f[n] for k, f in frames.items() if n in f and (c is None or k == c)), None)
+    eq, ta = get("equity", "marginLoan") if get("equity", "marginLoan") is not None else get("equity"), get("totalAssets")
+    np_ = get("netProfitParentTTM") if quarterly else get("netProfitParent")
+    if np_ is None or (eq is None and ta is None):
+        return frames, labels
+    avg = (lambda s: s.rolling(5, min_periods=5).mean()) if quarterly else (lambda s: s)
+    tag = "TTM" if quarterly else ""
+    fixed = pd.DataFrame(index=pp.index)
+    if eq is not None:
+        fixed[f"roe{tag}DerivedPct"] = np_ / avg(eq).replace(0, np.nan) * 100
+    if ta is not None:
+        fixed[f"roa{tag}DerivedPct"] = np_ / avg(ta).replace(0, np.nan) * 100
+    frames = {**frames, "profitPerformance": fixed}
+    labels = {**labels, "profitPerformance": "ROE/ROA tự tính (nguồn trả 0)"}
+    return frames, labels
+
+
 def fa_grid(frames, labels, ids, out, name, title, ncols=3):
     ids = [i for i in ids if i in frames]
     if not ids:
@@ -205,9 +228,11 @@ def main(workdir):
     fqd, fyd = W.load("fa_q"), W.load("fa_y")
     fq, fy = fa_frames(fqd), fa_frames(fyd)
     labels = (fqd or {}).get("chartLabels", {})
+    fq, labels = repair_profit_performance(fq, labels, quarterly=True)
+    fy, labels_y = repair_profit_performance(fy, (fyd or {}).get("chartLabels", {}), quarterly=False)
     fa_grid(fq, labels, KEY_CHARTS.get(st, []), out, "04_fa_key.png", f"{sym} — Chỉ tiêu cơ bản chính (theo quý)")
     fa_grid(fq, labels, list(fq.keys()), out, "05_fa_dashboard.png", f"{sym} — Toàn bộ chart phân tích cơ bản (theo quý)", ncols=4)
-    fa_grid(fy, (fyd or {}).get("chartLabels", {}), [c for c in KEY_CHARTS.get(st, []) if not c.startswith("businessResults")], out, "06_fa_annual.png", f"{sym} — Chỉ tiêu cơ bản theo năm")
+    fa_grid(fy, labels_y, [c for c in KEY_CHARTS.get(st, []) if not c.startswith("businessResults")], out, "06_fa_annual.png", f"{sym} — Chỉ tiêu cơ bản theo năm")
 
     # 07 valuation
     v = W.load("valuation_1m")

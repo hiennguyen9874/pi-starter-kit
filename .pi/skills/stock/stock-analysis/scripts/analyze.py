@@ -72,7 +72,18 @@ KPI = {
         ("Doanh thu môi giới (Q)", "brokerageRevenue", "brokerageSegment", "bil", "up"),
         ("Biên gộp môi giới", "brokerageGrossMarginPct", "brokerageSegment", "pct", "up"),
         ("NIM margin", "nimPct", "marginNim", "pct", "up"),
+        ("YEA margin", "yeaPct", "marginNim", "pct", None),
+        ("COF", "cofPct", "marginNim", "pct", "down"),
+        ("LN mảng cho vay (Q)", "loansSegment", "profitStructure", "bil", "up"),
+        ("LN mảng môi giới (Q)", "brokerageSegment", "profitStructure", "bil", "up"),
+        ("LN mảng FVTPL (Q)", "fvtplSegment", "profitStructure", "bil", None),
+        ("LN mảng HTM (Q)", "htmSegment", "profitStructure", "bil", None),
         ("Tự doanh/Tổng TS", "proprietaryOverTotalAssetsPct", "asset", "pct", None),
+        ("FVTPL cổ phiếu niêm yết", "listedEquity", "fvtplBreakdown", "bil", None),
+        ("FVTPL trái phiếu", "bonds", "fvtplBreakdown", "bil", None),
+        ("NAV khách hàng", "investorNav", "manageNav", "bil", None),
+        ("VCSH", "equity", "marginLoan", "bil", None),
+        ("Vốn góp", "contributedCapital", "capital", "bil", None),
         ("Nợ/Tổng nguồn vốn", "debtOverTotalCapitalPct", "capital", "pct", "down"),
         ("ROE TTM", "roeTTMPct", "profitPerformance", "pct", "up"),
         ("ROA TTM", "roaTTMPct", "profitPerformance", "pct", "up"),
@@ -98,14 +109,17 @@ KPI = {
 ANNUAL = {
     "nonfinancial": ["netRevenue", "netProfitParent", "grossMarginPct", "netMarginPct", "roePct", "debt", "operating"],
     "bank": ["totalOperatingIncome", "netProfitParent", "nimPct", "nplPct", "cirPct", "roePct", "customerLoans"],
-    "securities": ["operatingRevenue", "netProfitParent", "marginBalance", "roePct", "totalAssets"],
+    "securities": ["operatingRevenue", "netProfitParent", "loansSegment", "brokerageSegment", "fvtplSegment",
+                   "marginBalance", "equity", "contributedCapital", "totalAssets"],
     "insurance": ["netRevenue", "netProfitParent", "combinedRatioPct", "roePct", "totalAssets"],
 }
 SERIES_VI = {k[1]: k[0] for v in KPI.values() for k in v}
 SERIES_VI.update({"roePct": "ROE", "grossMarginPct": "Biên gộp", "netMarginPct": "Biên ròng", "nimPct": "NIM",
                   "nplPct": "NPL", "cirPct": "CIR", "netRevenue": "Doanh thu thuần", "netProfitParent": "LNST cty mẹ",
                   "totalOperatingIncome": "Tổng TN hoạt động", "operatingRevenue": "Doanh thu hoạt động",
-                  "operating": "LCTT HĐKD", "debt": "Nợ vay", "totalAssets": "Tổng tài sản"})
+                  "operating": "LCTT HĐKD", "debt": "Nợ vay", "totalAssets": "Tổng tài sản",
+                  "loansSegment": "LN mảng cho vay", "brokerageSegment": "LN mảng môi giới", "fvtplSegment": "LN mảng FVTPL",
+                  "roeDerivedPct": "ROE (LNST/VCSH cuối kỳ, tự tính)"})
 
 
 def last_valid(s: pd.Series | None):
@@ -167,6 +181,18 @@ def derived_fa(frames, structure):
     s = fa_series(frames, ttm_name)
     if s is not None and len(s.dropna()) > 4:
         d["netProfitTTMYoYPct"] = pct_change(s.iloc[-1], s.iloc[-5])
+    if s is not None and len(s.dropna()) > 1:  # TTM rolling over while YoY is still positive = peak/high-base warning
+        d["netProfitTTMQoQPct"] = pct_change(s.iloc[-1], s.iloc[-2])
+    if structure == "securities":
+        # profitPerformance ROE/ROA can come back flat-zero (SSI) -> cross-check ROE from TTM profit / avg equity
+        eq, cap, mb = fa_series(frames, "equity", "marginLoan"), fa_series(frames, "contributedCapital", "capital"), \
+            fa_series(frames, "marginBalance", "marginLoan")
+        if s is not None and eq is not None and len(eq.dropna()) >= 5:
+            d["roeTTMDerivedPct"] = s.iloc[-1] / eq.iloc[-5:].mean() * 100
+        if cap is not None and len(cap.dropna()) > 4:
+            d["contributedCapitalYoYPct"] = pct_change(cap.iloc[-1], cap.iloc[-5])  # >0 = dilution, see references/securities.md
+        if eq is not None and mb is not None:
+            d["marginHeadroomBil"] = 2 * eq.iloc[-1] - mb.iloc[-1]  # room to the 200% Margin/VCSH legal cap
     rev = next((fa_series(frames, n) for n in ("netRevenueTTM", "totalOperatingIncomeTTM", "operatingRevenueTTM")
                 if fa_series(frames, n) is not None), None)
     if rev is not None and len(rev.dropna()) > 4:
@@ -325,6 +351,10 @@ def main(workdir):
         yrs = list(next(iter(fy.values())).index)
         FA["annual"] = {"years": yrs, "rows": {n: fa_series(fy, n).round(2).tolist() for n in names
                                                if fa_series(fy, n) is not None}}
+        if structure == "securities":
+            npy, eqy = fa_series(fy, "netProfitParent"), fa_series(fy, "equity", "marginLoan")
+            if npy is not None and eqy is not None:
+                FA["annual"]["rows"]["roeDerivedPct"] = (npy / eqy.replace(0, np.nan) * 100).round(2).tolist()
 
     FA["dataQuality"] = [f"{k['label']} ({k['series']}) = 0 ở mọi kỳ gần đây — nghi lỗi dữ liệu nguồn"
                          for k in FA.get("kpi", []) if k.get("suspect")]
