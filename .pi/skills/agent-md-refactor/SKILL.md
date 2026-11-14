@@ -1,12 +1,12 @@
 ---
 name: agent-md-refactor
-description: Audit, create, or refactor AGENTS.md and task-scoped docs/agent-instructions.
+description: Audit, create, or refactor AGENTS.md and task-scoped docs/agents.
 disable-model-invocation: true
 ---
 
 # Agent MD Refactor
 
-Create or refactor a repository's root `AGENTS.md` using **docs-only** progressive disclosure: keep always-loaded guidance small and put retained task-specific guidance under `docs/agent-instructions/`.
+Create or refactor a repository's root `AGENTS.md` using **docs-only** progressive disclosure: keep always-loaded guidance small and put retained task-specific guidance under `docs/agents/`.
 
 This skill is Pi-only. Apply guidance written for `CLAUDE.md` to `AGENTS.md`, but create and edit only `AGENTS.md`. Do not maintain duplicate `AGENTS.md` and `CLAUDE.md` content. If both exist, report material overlap or conflict; edit another instruction system only when the user includes it in scope.
 
@@ -15,7 +15,7 @@ This skill is Pi-only. Apply guidance written for `CLAUDE.md` to `AGENTS.md`, bu
 - **load-bearing** — guidance that changes behavior because it is non-derivable, prevents a specific mistake, records rationale or a failure contract, supplies a non-standard command, or overrides a wrong default.
 - **derivable** — information a fresh session can reconstruct reliably with a few repository tool calls. Derivable content does not belong in agent instructions.
 - **resident** — guidance loaded for nearly every task. Resident content must justify its recurring context cost.
-- **disclose** — move retained task-specific guidance behind a task-triggered link under `docs/agent-instructions/`.
+- **disclose** — move retained task-specific guidance behind a task-triggered link under `docs/agents/`.
 
 Use `references/classification-rubric.md` to classify content and `references/output-contract.md` to construct the result.
 
@@ -35,7 +35,7 @@ Use Audit mode for review or planning requests. Otherwise, create or refactor wh
 project-root/
 ├── AGENTS.md
 └── docs/
-    └── agent-instructions/
+    └── agents/
         └── <task-specific files only>
 ```
 
@@ -45,7 +45,7 @@ project-root/
 
 ### 1. Inventory
 
-Inspect the repository and existing instruction sources before deciding what to write. Include the root `AGENTS.md`, `docs/agent-instructions/`, repository documentation, manifests, scripts, CI configuration, formatter/linter configuration, and relevant source needed to verify claims.
+Inspect the repository and existing instruction sources before deciding what to write. Include the root `AGENTS.md`, `docs/agents/`, repository documentation, manifests, scripts, CI configuration, formatter/linter configuration, and relevant source needed to verify claims.
 
 Read every in-scope instruction file fully. Note each source's loading scope and any custom syntax worth preserving.
 
@@ -68,7 +68,7 @@ Apply the rubric sentence by sentence. Preserve user-authored safety prohibition
 
 Resolve material contradictions before incorporating either side. Quote both instructions, explain the behavioral difference, recommend a winner based on shared and current repository evidence, and ask the user which wins.
 
-Write the smallest root file that satisfies `references/output-contract.md`. Disclose task-specific guidance only when enough load-bearing content exists to justify a separate file. Reuse suitable files already under `docs/agent-instructions/`; create no empty or speculative files.
+Write the smallest root file that satisfies `references/output-contract.md`. Disclose task-specific guidance only when enough load-bearing content exists to justify a separate file. Reuse suitable files already under `docs/agents/`; create no empty or speculative files.
 
 Preserve custom syntax unless conversion is requested. Mark unsupported factual claims as uncertain rather than incorporating them.
 

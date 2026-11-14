@@ -17,7 +17,7 @@ When uncertain whether a user-authored prohibition is safety-critical, keep it r
 
 ## Disclose
 
-Move load-bearing guidance to `docs/agent-instructions/` when it has a clear task trigger, such as work involving testing, releases, deployment, security-sensitive paths, generated code, a subsystem, or a non-standard workflow.
+Move load-bearing guidance to `docs/agents/` when it has a clear task trigger, such as work involving testing, releases, deployment, security-sensitive paths, generated code, a subsystem, or a non-standard workflow.
 
 Disclose only retained guidance. A separate file is justified when it prevents unrelated tasks from paying for context they do not need; a single short rule may be clearer in root than behind an extra hop.
 

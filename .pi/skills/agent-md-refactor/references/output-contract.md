@@ -15,7 +15,7 @@ Eligible content:
 
 An instruction-index entry states:
 
-1. the exact file under `docs/agent-instructions/`;
+1. the exact file under `docs/agents/`;
 2. the task condition that should trigger reading it;
 3. a short description only when the filename and trigger are insufficient.
 
@@ -25,7 +25,7 @@ Root content is ineligible merely because it is useful. Exclude information that
 
 ## Detailed Instructions
 
-Files under `docs/agent-instructions/` contain task-specific, load-bearing guidance. Organize files by a task an agent recognizes before acting, not by a generic documentation taxonomy.
+Files under `docs/agents/` contain task-specific, load-bearing guidance. Organize files by a task an agent recognizes before acting, not by a generic documentation taxonomy.
 
 Each file must have:
 
@@ -39,7 +39,7 @@ Prefer an existing authoritative repository document or source file over copying
 
 ## File Boundaries
 
-- Detailed instructions live only under `docs/agent-instructions/`.
+- Detailed instructions live only under `docs/agents/`.
 - Do not create nested `AGENTS.md` files.
 - Do not create or modify tool-private instruction files unless the user explicitly expands scope.
 - Do not mirror the same guidance into both `AGENTS.md` and `CLAUDE.md`.
