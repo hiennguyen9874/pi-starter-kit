@@ -1,0 +1,65 @@
+skillsEnable:
+  - tdd
+  - ponytail
+  - handoff
+  - show-me
+  - i-have-adhd
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: false
+      executionPolicy: false
+      evidenceDiscipline: false
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+      communicationAndToolUseMinimal: true
+      executionPolicyMinimal: true
+      evidenceDisciplineMinimal: true
+      changeScopeMinimal: true
+      validationMinimal: true
+      finalResponseMinimal: true
+      planningDisciplineMinimal: false
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:@hiennguyen9874/pi-single-edit
+packagesDisable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+extensionsDisable:
+  - builtin:codemode
+  - builtin:tool-search
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+extensionsEnable:
+  - ./extensions/codemode-direct-write.ts
+extra:
+  override:
+    extensionState:
+      piDocumentationEnabled: false
+    defaultTools:
+      # - "+find"
+      # - "+grep"
+      # - "+ls"
+      - "+codemode"
+    codemode:
+      mode: "only"
+      inlineBudget: 3000
