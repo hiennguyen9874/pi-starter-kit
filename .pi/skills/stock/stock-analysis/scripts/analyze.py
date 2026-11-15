@@ -223,10 +223,22 @@ ASSET_VI = {"cashBank": "Tiền", "receivables": "Phải thu", "inventory": "Hà
             "constructionWip": "XDCB dở dang", "finInvest": "Đầu tư TC", "otherAssets": "Tài sản khác"}
 
 
-def balance_sheet_events(frames, n=8):
+def _quarter(date_str: str) -> str:
+    y, m = int(date_str[:4]), int(date_str[5:7])
+    return f"{y}Q{(m - 1) // 3 + 1}"
+
+
+def _prev_quarter(per: str) -> str:
+    y, q = int(per[:4]), int(per[-1])
+    return f"{y - 1}Q4" if q == 1 else f"{y}Q{q - 1}"
+
+
+def balance_sheet_events(frames, n=8, actions=None):
     """Nonfinancial only. (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
     XDCB -> tồn kho: land bank turned saleable). (2) Charter-capital changes, with a hint whether the rise was funded from
-    retained earnings (LNST quý - Δquỹ&LNGPP ≈ Δvốn: cổ tức CP/thưởng) or by new money. Both are hints for the report."""
+    retained earnings (LNST quý - Δquỹ&LNGPP ≈ Δvốn: cổ tức CP/thưởng) or by new money. Both are hints for the report.
+    actions = corporate_actions(px): a capital rise whose % matches an ex-right factor in the same or previous quarter
+    is a stock bonus/dividend even when the LNGPP check misses (bonus funded from other reserves or share premium)."""
     ev = []
     a = frames.get("asset")
     if a is not None and "totalAssets" in a:
@@ -256,6 +268,13 @@ def balance_sheet_events(frames, n=8):
                         if dc[per] > 0 and abs(moved - dc[per]) <= 0.3 * abs(dc[per])
                         else "không khớp chuyển từ LNGPP → có thể phát hành thu tiền/ESOP")
                 msg += f"; LNST quý {npq[per]:,.0f}, Δquỹ&LNGPP {sur.diff()[per]:+,.0f} → {hint} (cần tin DN)"
+            rise = dc[per] / cap.shift(1)[per]
+            for a in actions or []:
+                if (dc[per] > 0 and _quarter(a["date"]) in (per, _prev_quarter(per))
+                        and abs((a["factor"] - 1) - rise) <= max(0.25 * rise, 0.01)):
+                    msg += (f"; khớp sự kiện quyền {a['date']} hệ số {a['factor']:.3f} → CP thưởng/cổ tức CP "
+                            f"~{rise * 100:.0f}%, ưu tiên kết luận này hơn gợi ý LNGPP")
+                    break
             ev.append(msg)
     return ev
 
@@ -284,7 +303,8 @@ BANK_FUNDING_VI = {"valuablePapers": "giấy tờ có giá", "interbankFunding":
 def bank_events(frames, n=4):
     """Bank only. Lines the agent must explain in step 3 (see references/banking.md):
     loan-group migration, NPL up while provision expense down YoY, LLR drops, loans funded outside customer deposits,
-    minority-interest jumps (subsidiary stake sale/IPO). Returns (events, data-quality notes)."""
+    QoQ profit carried by a provision cut, one-off otherIncome, loss loans rising 3+ quarters, NPL cut via VAMC sale,
+    deposit run-off / CASA drop, minority-interest jumps (subsidiary stake sale/IPO). Returns (events, data-quality notes)."""
     ev, dq = [], []
     g = lambda name, c=None: fa_series(frames, name, c)
     loans, q = g("totalLoans", "loanStructure"), frames.get("loanStructureByQuality")
@@ -322,6 +342,60 @@ def bank_events(frames, n=4):
                 alt = [f"{BANK_FUNDING_VI[k]} {cur[k] - prev[k]:+,.0f}" for k in BANK_FUNDING_VI if k in j and cur[k] - prev[k] > 0]
                 ev.append(f"{per}: cho vay KH {dl:+,.0f} tỷ nhưng tiền gửi KH {dd:+,.0f} tỷ"
                           + (f"; nguồn bù: {', '.join(alt)} tỷ" if alt else "") + " — vốn đắt hơn, theo dõi COF")
+    # Profit quality QoQ: net-profit rise explained by a provision cut (after 20% tax).
+    npq, pbp = g("netProfitParent", "businessResultQuarter"), g("profitBeforeProvision", "profitStructure")
+    if npq is not None and "prov" in j:
+        for i in range(max(1, len(j) - n), len(j)):
+            per = j.index[i]
+            dn = npq.get(per, np.nan) - npq.shift(1).get(per, np.nan)
+            cut = (j["prov"].iloc[i - 1] - j["prov"].iloc[i]) * 0.8
+            if pd.notna(dn) and pd.notna(cut) and dn > 0 and cut >= 0.5 * dn:
+                pb = "" if pbp is None else f", LN trước dự phòng {pct_change(pbp.get(per), pbp.shift(1).get(per)):+.1f}%"
+                npl = ("; ⚠️ cùng quý NPL tăng" if "npl" in j and j["npl"].iloc[i] - j["npl"].iloc[i - 1] >= 0.1 else "")
+                ev.append(f"{per}: LNST {dn:+,.0f} tỷ QoQ, trong đó dự phòng giảm {j['prov'].iloc[i - 1]:,.0f}→"
+                          f"{j['prov'].iloc[i]:,.0f} tỷ đóng góp ~{cut:,.0f} tỷ ({cut / dn * 100:.0f}%){pb}{npl}")
+    # One-off income: otherIncome far above its own history (bad-debt recovery, asset sale).
+    oi, toi = g("otherIncome", "profitStructure"), g("totalOperatingIncome", "businessResultQuarter")
+    if oi is not None:
+        for i in range(max(4, len(oi) - 8), len(oi)):
+            per, v, base = oi.index[i], oi.iloc[i], oi.iloc[max(0, i - 8):i].median()
+            share = v / toi.get(per) * 100 if toi is not None and toi.get(per) else None
+            if pd.notna(v) and pd.notna(base) and base > 0 and v >= 2.5 * base and share is not None and share >= 10:
+                ev.append(f"{per}: thu nhập khác {v:,.0f} tỷ (~{v / base:.1f}× trung vị 8 quý trước, {share:.0f}% TOI) — "
+                          "khoản một lần (thu hồi nợ đã xử lý/bán tài sản?), làm cao nền so sánh cùng kỳ năm sau")
+    if q is not None:
+        # Loss loans (nhóm 5) creeping up quarter after quarter: slower than the +30% migration rule, same message.
+        if "lossLoans" in q and len(q) >= 4:
+            ll, k = q["lossLoans"], 0
+            while k + 1 < len(ll) and ll.iloc[-1 - k] > ll.iloc[-2 - k] > 0:
+                k += 1
+            if k >= 3 and ll.iloc[-1] / ll.iloc[-1 - k] - 1 >= 0.3:
+                ev.append(f"{q.index[-1]}: nợ nhóm 5 tăng {k} quý liên tiếp {ll.iloc[-1 - k]:,.0f}→{ll.iloc[-1]:,.0f} tỷ "
+                          f"({pct_change(ll.iloc[-1], ll.iloc[-1 - k]):+.0f}%) — nợ mất vốn tích tụ, dự phòng sẽ phải duy trì cao")
+        # VAMC: NPL falls in the quarter VAMC bonds appear/grow -> NPL cut by selling debt, not by recovery.
+        if "vamcBonds" in q and "npl" in j:
+            vb = q["vamcBonds"].fillna(0)
+            for i in range(max(1, len(vb) - 8), len(vb)):
+                per, dv = vb.index[i], vb.iloc[i] - vb.iloc[i - 1]
+                if per in j.index and dv > 0.001 * (loans.get(per, np.inf) if loans is not None else np.inf):
+                    k = j.index.get_loc(per)
+                    dn = j["npl"].iloc[k] - j["npl"].iloc[k - 1] if k >= 1 else np.nan
+                    if pd.notna(dn) and dn < 0:
+                        ev.append(f"{per}: trái phiếu VAMC {vb.iloc[i - 1]:,.0f}→{vb.iloc[i]:,.0f} tỷ cùng quý NPL "
+                                  f"{j['npl'].iloc[k - 1]:.2f}→{j['npl'].iloc[k]:.2f}% — NPL giảm nhờ bán nợ cho VAMC, chưa phải thu hồi")
+    # Deposit run-off / CASA drop even when loans are flat (the loans-vs-deposits rule above needs loans to grow).
+    casa = g("casaPct", "depositStructure")
+    for i in range(max(1, len(j) - n), len(j)):
+        per, cur, prev = j.index[i], j.iloc[i], j.iloc[i - 1]
+        if "dep" in j and prev["dep"] and (cur["dep"] / prev["dep"] - 1) <= -0.03 and not (
+                "loan" in j and cur["loan"] - prev["loan"] > 0):
+            alt = [f"{BANK_FUNDING_VI[k]} {cur[k] - prev[k]:+,.0f}" for k in BANK_FUNDING_VI if k in j and cur[k] - prev[k] > 0]
+            ev.append(f"{per}: tiền gửi KH {cur['dep'] - prev['dep']:+,.0f} tỷ ({pct_change(cur['dep'], prev['dep']):+.1f}% QoQ)"
+                      + (f"; nguồn bù: {', '.join(alt)} tỷ" if alt else "") + " — huy động dân cư co lại, theo dõi COF")
+        if casa is not None and per in casa.index:
+            k = casa.index.get_loc(per)
+            if k >= 1 and casa.iloc[k] - casa.iloc[k - 1] <= -3:
+                ev.append(f"{per}: CASA {casa.iloc[k - 1]:.1f}→{casa.iloc[k]:.1f}% ({casa.iloc[k] - casa.iloc[k - 1]:+.1f}pp) — mất vốn rẻ, COF sẽ tăng")
     mi, tc = g("minorityInterest", "capital"), g("totalCapital", "capital")
     if mi is not None and tc is not None:
         for i in range(max(1, len(mi) - 8), len(mi)):
@@ -490,7 +564,7 @@ def main(workdir):
         FA["derived"] = derived_fa(fq, structure)
         FA["ytd"] = ytd_cumulative(fq)
         if structure in ("nonfinancial", "bank"):  # bank: only the charter-capital lines can fire
-            FA["bs_events"] = balance_sheet_events(fq)
+            FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"))
         if structure == "bank":
             FA["bank_events"], FA["bank_dataQuality"] = bank_events(fq)
         cc = fa_series(fq, "charterCapital", "capital")
