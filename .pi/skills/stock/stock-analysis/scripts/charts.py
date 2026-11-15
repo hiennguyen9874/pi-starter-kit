@@ -18,7 +18,7 @@ import pandas as pd
 import seaborn as sns
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sstock_lib import BIL, Work, axis_series, fa_frames, flow_frame, macd, price_frame, rsi, sma
+from sstock_lib import BIL, Work, axis_series, bogus_annual_ttm, fa_frames, flow_frame, macd, price_frame, rsi, sma
 
 sns.set_theme(style="whitegrid", context="notebook", font="DejaVu Sans")
 plt.rcParams.update({"figure.dpi": 110, "savefig.dpi": 130, "axes.titlesize": 11, "axes.titleweight": "bold",
@@ -230,6 +230,8 @@ def main(workdir):
     labels = (fqd or {}).get("chartLabels", {})
     fq, labels = repair_profit_performance(fq, labels, quarterly=True)
     fy, labels_y = repair_profit_performance(fy, (fyd or {}).get("chartLabels", {}), quarterly=False)
+    for b in bogus_annual_ttm(fy):  # annual *TTMPct can be a source bug; tables.md carries the warning
+        fy = {**fy, b["chart"]: fy[b["chart"]].drop(columns=b["series"])}
     fa_grid(fq, labels, KEY_CHARTS.get(st, []), out, "04_fa_key.png", f"{sym} — Chỉ tiêu cơ bản chính (theo quý)")
     fa_grid(fq, labels, list(fq.keys()), out, "05_fa_dashboard.png", f"{sym} — Toàn bộ chart phân tích cơ bản (theo quý)", ncols=4)
     fa_grid(fy, labels_y, [c for c in KEY_CHARTS.get(st, []) if not c.startswith("businessResults")], out, "06_fa_annual.png", f"{sym} — Chỉ tiêu cơ bản theo năm")

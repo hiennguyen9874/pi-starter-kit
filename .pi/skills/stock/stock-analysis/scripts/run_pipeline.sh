@@ -6,6 +6,8 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK="${1:?usage: run_pipeline.sh <workdir>}"
 export PYTHONDONTWRITEBYTECODE=1
 DEPS=(--with pandas --with numpy --with matplotlib --with seaborn)
-uv run -q "${DEPS[@]}" python "$DIR/analyze.py" "$WORK"
+SUMMARY="$(uv run -q "${DEPS[@]}" python "$DIR/analyze.py" "$WORK")"
+echo "$SUMMARY"
 MPLBACKEND=Agg uv run -q "${DEPS[@]}" python "$DIR/charts.py" "$WORK" 2>&1 | grep -v -i "warning" || true
 ls "$WORK"/charts
+echo "$SUMMARY" | tail -1  # last line = score & verdict

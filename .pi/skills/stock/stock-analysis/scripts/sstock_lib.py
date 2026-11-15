@@ -62,6 +62,24 @@ def fa_series(frames: dict[str, pd.DataFrame], name: str, prefer: str | None = N
     return None
 
 
+def bogus_annual_ttm(frames: dict[str, pd.DataFrame], ratio: float = 2.0) -> list[dict]:
+    """Annual (unit=Y) frames: a *TTMPct series running >ratio x its plain *Pct twin is a source bug
+    (seen: bank roeTTMPct 59-83% vs roePct 15-22%, roughly the sum of four quarterly TTMs). Quarterly frames are fine."""
+    out = []
+    for cid, df in frames.items():
+        for col in [c for c in df if c.endswith("TTMPct")]:
+            base = col.replace("TTMPct", "Pct")
+            if base not in df:
+                continue
+            j = pd.concat([df[col], df[base]], axis=1).dropna()
+            j = j[j.iloc[:, 1].abs() > 0]
+            if len(j) >= 2:
+                r = float((j.iloc[:, 0].abs() / j.iloc[:, 1].abs()).median())
+                if r > ratio:
+                    out.append({"chart": cid, "series": col, "twin": base, "ratio": r})
+    return out
+
+
 def price_frame(data: dict | None) -> pd.DataFrame:
     if not data or not data.get("rows"):
         return pd.DataFrame()

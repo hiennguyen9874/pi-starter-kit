@@ -32,6 +32,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - Chất lượng tài sản: NPL ≤1,5% tốt và ≥3% xấu; nợ nhóm 2 tăng là dấu hiệu sớm của nợ xấu; LLR ≥100% là bộ đệm dày, ≤60% là mỏng. Chi phí dự phòng giảm trong khi NPL tăng nghĩa là lợi nhuận đang được "làm đẹp".
 - Huy động và tín dụng: CASA cao thì vốn rẻ; LDR gần trần quy định hạn chế dư địa tăng trưởng; tăng trưởng tín dụng so với hạn mức ngành.
 - Tăng trưởng LN trước dự phòng (`profitBeforeProvision`) phản ánh năng lực lõi; LNST còn chịu ảnh hưởng của dự phòng.
+- Checklist chi tiết (chất lượng lợi nhuận, nợ chuyển nhóm, nguồn vốn, sự kiện quyền, P/B đi cùng ROE): [banking.md](banking.md).
 
 **Chứng khoán** (`securities`)
 - Lợi nhuận phụ thuộc thanh khoản thị trường (môi giới, margin) và tự doanh (beta cao với VNINDEX). Đọc cơ cấu lợi nhuận theo mảng để biết lợi nhuận đến từ đâu.

@@ -13,8 +13,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sstock_lib import (BIL, Work, atr, axis_series, clean, fa_frames, fa_series, flow_frame, fmt, fmt_signed,
-                        macd, max_drawdown, pct_change, percentile_of, price_frame, ret, rsi, sma, ytd)
+from sstock_lib import (BIL, Work, atr, axis_series, bogus_annual_ttm, clean, fa_frames, fa_series, flow_frame, fmt,
+                        fmt_signed, macd, max_drawdown, pct_change, percentile_of, price_frame, ret, rsi, sma, ytd)
 
 # KPI spec per report structure: (key, series name, preferred chart, kind, better)
 #   kind: "bil" (tỷ đồng, YoY computed) | "pct" (%, change in pp) ; better: "up" | "down" | None
@@ -45,6 +45,7 @@ KPI = {
         ("TOI TTM", "totalOperatingIncomeTTM", "businessResults", "bil", "up"),
         ("LNST TTM", "netProfitParentTTM", "businessResults", "bil", "up"),
         ("Thu nhập lãi thuần (Q)", "netInterestIncome", "profitStructure", "bil", "up"),
+        ("Thu nhập dịch vụ (Q)", "serviceIncome", "profitStructure", "bil", "up"),
         ("LN trước dự phòng (Q)", "profitBeforeProvision", "profitStructure", "bil", "up"),
         ("Chi phí dự phòng (Q)", "creditProvisionExpense", "costStructure", "bil", "down"),
         ("NIM", "nimPct", "profitability", "pct", "up"),
@@ -55,6 +56,7 @@ KPI = {
         ("Nợ nhóm 2", "npl2Pct", "rateBadDebt", "pct", "down"),
         ("LLR (bao phủ nợ xấu)", "llrPct", "rateBadDebt", "pct", "up"),
         ("CASA", "casaPct", "depositStructure", "pct", "up"),
+        ("Tiền gửi khách hàng", "customerDeposits", "capital", "bil", "up"),
         ("LDR", "ldrPct", "loanStructure", "pct", None),
         ("Tăng trưởng tín dụng", "creditGrowthPct", "asset", "pct", "up"),
         ("Tăng trưởng huy động", "depositGrowthPct", "capital", "pct", "up"),
@@ -258,6 +260,78 @@ def balance_sheet_events(frames, n=8):
     return ev
 
 
+def corporate_actions(px: pd.DataFrame) -> list[dict]:
+    """Ex-right sessions: close/adjClose steps down on the first ex-date (adjClose is back-adjusted).
+    factor = price adjustment ratio. >=1.10 is a stock bonus/dividend/split (dilution, no new money);
+    <1.05 is a cash dividend; in between could be either. A hint for the report, confirm with company news."""
+    if px.empty or "adjClose" not in px or "close" not in px:
+        return []
+    r = (px["close"] / px["adjClose"]).replace([np.inf, -np.inf], np.nan).dropna()
+    f = r.shift(1) / r
+    ev = []
+    for d, k in f[f > 1.003].items():
+        kind = ("cổ phiếu thưởng/cổ tức CP/chia tách — pha loãng, không có tiền mới" if k >= 1.0995  # 10% bonus prints 1.0999x
+                else "cổ tức tiền" if k < 1.05 else "cổ tức tiền lớn hoặc CP thưởng nhỏ")
+        ev.append({"date": str(d.date()), "factor": float(k), "prev_close": float(px["close"].shift(1)[d]),
+                   "close": float(px["close"][d]), "kind": kind})
+    return ev
+
+
+BANK_GROUPS = {"watchLoans": "nhóm 2", "substandardLoans": "nhóm 3", "doubtfulLoans": "nhóm 4", "lossLoans": "nhóm 5"}
+BANK_FUNDING_VI = {"valuablePapers": "giấy tờ có giá", "interbankFunding": "liên ngân hàng", "govAndSbvDebt": "vay CP/NHNN"}
+
+
+def bank_events(frames, n=4):
+    """Bank only. Lines the agent must explain in step 3 (see references/banking.md):
+    loan-group migration, NPL up while provision expense down YoY, LLR drops, loans funded outside customer deposits,
+    minority-interest jumps (subsidiary stake sale/IPO). Returns (events, data-quality notes)."""
+    ev, dq = [], []
+    g = lambda name, c=None: fa_series(frames, name, c)
+    loans, q = g("totalLoans", "loanStructure"), frames.get("loanStructureByQuality")
+    if q is not None and loans is not None:
+        cols = [c for c in BANK_GROUPS if c in q]
+        for i in range(max(1, len(q) - n), len(q)):
+            per, moves = q.index[i], []
+            for c in cols:
+                a, b = q[c].iloc[i - 1], q[c].iloc[i]
+                if pd.notna(a) and pd.notna(b) and a > 0 and (b - a) / a >= 0.3 and (b - a) >= 0.001 * loans.get(per, np.inf):
+                    moves.append(f"{BANK_GROUPS[c]} {a:,.0f}→{b:,.0f} ({pct_change(b, a):+.0f}%)")
+            if moves:
+                ev.append(f"{per}: nợ xấu đi theo nhóm — " + "; ".join(moves) + " tỷ")
+        if "standardLoans" in q and "standardRatioPct" in q:
+            cls, tl = q[["standardLoans"] + cols].iloc[-1].sum(), loans.iloc[-1]
+            if tl and cls and cls / tl < 0.97:
+                dq.append(f"standardRatioPct {q['standardRatioPct'].iloc[-1]:.1f}% chia cho totalLoans {tl:,.0f} tỷ, lớn hơn tổng nợ "
+                          f"đã phân loại {cls:,.0f} tỷ; nhóm 1 trên nợ đã phân loại = {q['standardLoans'].iloc[-1] / cls * 100:.1f}%. "
+                          "Xu hướng giảm của standardRatioPct là méo mẫu số, đọc chất lượng nợ bằng NPL/nhóm 2")
+    j = pd.concat({k: s for k, s in {"npl": g("nplPct"), "llr": g("llrPct"), "prov": g("creditProvisionExpense", "costStructure"),
+                                     "loan": g("customerLoans", "asset"), "dep": g("customerDeposits", "capital"),
+                                     **{k: g(k, "capital") for k in BANK_FUNDING_VI}}.items() if s is not None}, axis=1)
+    for i in range(max(1, len(j) - n), len(j)):
+        per, cur, prev = j.index[i], j.iloc[i], j.iloc[i - 1]
+        if {"npl", "prov"} <= set(j) and i >= 4 and cur["npl"] - prev["npl"] >= 0.1:
+            py = pct_change(cur["prov"], j["prov"].iloc[i - 4])
+            if py is not None and py < 0:
+                ev.append(f"{per}: ⚠️ NPL {prev['npl']:.2f}→{cur['npl']:.2f}% trong khi chi phí dự phòng {cur['prov']:,.0f} tỷ "
+                          f"({py:+.1f}% YoY) — lợi nhuận đang được hỗ trợ bởi dự phòng thấp")
+        if "llr" in j and cur["llr"] - prev["llr"] <= -10:
+            ev.append(f"{per}: LLR {prev['llr']:.1f}→{cur['llr']:.1f}% ({cur['llr'] - prev['llr']:+.1f}pp) — bộ đệm dự phòng mỏng đi")
+        if {"loan", "dep"} <= set(j):
+            dl, dd = cur["loan"] - prev["loan"], cur["dep"] - prev["dep"]
+            if dl > 0 and dd < 0.25 * dl:
+                alt = [f"{BANK_FUNDING_VI[k]} {cur[k] - prev[k]:+,.0f}" for k in BANK_FUNDING_VI if k in j and cur[k] - prev[k] > 0]
+                ev.append(f"{per}: cho vay KH {dl:+,.0f} tỷ nhưng tiền gửi KH {dd:+,.0f} tỷ"
+                          + (f"; nguồn bù: {', '.join(alt)} tỷ" if alt else "") + " — vốn đắt hơn, theo dõi COF")
+    mi, tc = g("minorityInterest", "capital"), g("totalCapital", "capital")
+    if mi is not None and tc is not None:
+        for i in range(max(1, len(mi) - 8), len(mi)):
+            a, b = mi.iloc[i - 1], mi.iloc[i]
+            if pd.notna(a) and pd.notna(b) and a > 0 and abs(b - a) / a >= 0.3 and abs(b - a) >= 0.003 * tc.iloc[i]:
+                ev.append(f"{mi.index[i]}: lợi ích CĐ thiểu số {a:,.0f}→{b:,.0f} tỷ — thay đổi sở hữu ở công ty con "
+                          "(bán bớt/IPO hoặc mua lại), cần tin DN")
+    return sorted(ev), dq  # "YYYYQn: ..." sorts chronologically
+
+
 def main(workdir):
     W = Work(workdir)
     sym, structure = W.symbol, W.structure
@@ -285,6 +359,7 @@ def main(workdir):
             if not vn.empty:
                 P[f"vnindex_ret_{k}"] = ret(vn["close"], n)
                 P[f"rel_{k}"] = None if P[f"ret_{k}"] is None or P[f"vnindex_ret_{k}"] is None else P[f"ret_{k}"] - P[f"vnindex_ret_{k}"]
+        P["corporate_actions"] = corporate_actions(px)
         P["ret_ytd"] = ytd(c)
         P["vnindex_ret_ytd"] = ytd(vn["close"]) if not vn.empty else None
         w = c.iloc[-252:]
@@ -414,13 +489,20 @@ def main(workdir):
         FA["kpi"] = kpi_block(fq, structure)
         FA["derived"] = derived_fa(fq, structure)
         FA["ytd"] = ytd_cumulative(fq)
-        if structure == "nonfinancial":
+        if structure in ("nonfinancial", "bank"):  # bank: only the charter-capital lines can fire
             FA["bs_events"] = balance_sheet_events(fq)
+        if structure == "bank":
+            FA["bank_events"], FA["bank_dataQuality"] = bank_events(fq)
+        cc = fa_series(fq, "charterCapital", "capital")
+        if cc is not None and cc.notna().any():
+            FA["charterCapital_latest"] = float(cc.dropna().iloc[-1])
     if fy:
         names = ANNUAL.get(structure, [])
         yrs = list(next(iter(fy.values())).index)
         FA["annual"] = {"years": yrs, "rows": {n: fa_series(fy, n).round(2).tolist() for n in names
                                                if fa_series(fy, n) is not None}}
+        FA["annual_dataQuality"] = [f"{b['series']} theo năm ≈ {b['ratio']:.1f}× {b['twin']} — nghi lỗi nguồn (không vẽ trong 06_fa_annual), dùng {b['twin']}"
+                                    for b in bogus_annual_ttm(fy)]
         if structure == "securities":
             npy, eqy = fa_series(fy, "netProfitParent"), fa_series(fy, "equity", "marginLoan")
             if npy is not None and eqy is not None:
@@ -677,6 +759,15 @@ def tables_md(M):
     if (P.get("putthrough_share_60_pct") or 0) >= 20:
         L += [f"> ⚠️ Thỏa thuận chiếm {fmt(P['putthrough_share_60_pct'])}% GTGD 60 phiên (lớn nhất {pmx.get('date')}: {fmt(pmx.get('bil'))} tỷ): "
               "TB20/TB60 bị thổi phồng, dùng khớp lệnh TB20 làm ngưỡng thanh khoản cho breakout.", ""]
+    ca = P.get("corporate_actions") or []
+    if ca:
+        L += ["Sự kiện quyền (giá gốc gãy, adjClose liên tục; mọi mức giá lịch sử dùng adjClose):"] + [
+            f"- {e['date']}: hệ số {e['factor']:.3f} (giá gốc {e['prev_close']:.2f} → {e['close']:.2f}) → {e['kind']} (cần tin DN)" for e in ca]
+        shares, cc = (V.get("snapshot") or {}).get("sharesOutstanding"), FA.get("charterCapital_latest")
+        if shares and cc and abs(shares / (cc * 1e5) - 1) > 0.05:  # vốn điều lệ (tỷ) / mệnh giá 10.000 đ = số CP
+            L += ["", f"> ⚠️ Số CP lưu hành (định giá) {shares / 1e9:,.2f} tỷ cp ≠ vốn điều lệ BCTC {FA.get('latest_period')} "
+                     f"{cc:,.0f} tỷ / 10.000 đ = {cc * 1e5 / 1e9:,.2f} tỷ cp → BCTC chưa phản ánh sự kiện quyền gần nhất; EPS/P/E theo số CP mới."]
+        L.append("")
     L += ["| Kỳ | Cổ phiếu | VNINDEX | Chênh lệch (pp) |", "|---|---|---|---|"]
     for k in ("1w", "1m", "3m", "6m", "ytd", "1y"):
         L.append(f"| {k.upper()} | {fmt_signed(P.get('ret_'+k))} | {fmt_signed(P.get('vnindex_ret_'+k))} | "
@@ -721,13 +812,24 @@ def tables_md(M):
             L += ["", "Lũy kế năm so với cùng kỳ: " + " · ".join(
                 f"{SERIES_VI.get(k, k)} {v['label']} {fmt(v['value'], 0)} vs {fmt(v['prev'], 0)} ({fmt_signed(v['yoyPct'])})"
                 for k, v in FA["ytd"].items())]
+            ttm, yt = (FA.get("derived") or {}).get("netProfitTTMYoYPct"), (FA["ytd"].get("netProfitParent") or {}).get("yoyPct")
+            # gap must be material in absolute and relative terms (+90% vs +103% reads the same; +30% vs +18% does not)
+            if ttm is not None and yt is not None and abs(ttm - yt) >= max(10, 0.3 * max(abs(ttm), abs(yt))):
+                L += ["", f"> ⚠️ LNST TTM YoY {ttm:+.1f}% lệch lũy kế năm {yt:+.1f}% ({ttm - yt:+.1f}pp): cửa sổ TTM chứa một quý nền bất thường. "
+                      "Đọc tăng trưởng theo lũy kế năm, tìm quý gây lệch trong bảng quý và ghi override ở Scorecard nếu ngưỡng chấm điểm đổi chiều."]
         if FA.get("bs_events"):
             L += ["", "Sự kiện bảng cân đối (8 quý, gợi ý cần giải thích ở bước 3):"] + [f"- {e}" for e in FA["bs_events"]]
+        if FA.get("bank_events"):
+            L += ["", "Sự kiện ngân hàng (cần giải thích ở bước 3, xem references/banking.md):"] + [f"- {e}" for e in FA["bank_events"]]
+        if FA.get("bank_dataQuality"):
+            L += ["", "> ⚠️ Chất lượng dữ liệu (ngân hàng): " + "; ".join(FA["bank_dataQuality"])]
     if FA.get("annual"):
         A = FA["annual"]
         L += ["", "## Theo năm", "| Chỉ tiêu | " + " | ".join(A["years"]) + " |", "|---" * (len(A["years"]) + 1) + "|"]
         for n, vals in A["rows"].items():
             L.append(f"| {SERIES_VI.get(n, n)} | " + " | ".join(fmt(v, 1 if n.endswith('Pct') else 0) for v in vals) + " |")
+        if FA.get("annual_dataQuality"):
+            L += ["", "> ⚠️ Chất lượng dữ liệu (theo năm): " + "; ".join(FA["annual_dataQuality"])]
     pe, pb = V.get("pe", {}), V.get("pb", {})
     if pe:
         L += ["", "## Định giá", "| | Hiện tại | TB 3 năm | Trung vị 10N | Min–Max 10N | Percentile 10N | Ngành | Thị trường |", "|---|---|---|---|---|---|---|---|",
