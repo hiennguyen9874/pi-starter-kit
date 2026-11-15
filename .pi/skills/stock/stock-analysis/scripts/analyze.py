@@ -32,7 +32,7 @@ KPI = {
         ("EBITDA (Q)", "ebitda", "ebitda", "bil", "up"),
         ("Nợ vay", "debt", "capital", "bil", "down"),
         ("Nợ vay/Tổng nguồn vốn", "debtOverTotalCapitalPct", "capital", "pct", "down"),
-        ("Tiền & tương đương", "cashBank", "asset", "bil", None),
+        ("Tiền & tiền gửi (cashBank)", "cashBank", "asset", "bil", None),  # gồm tiền gửi có kỳ hạn, xem cash_gap_event
         ("Hàng tồn kho", "inventory", "asset", "bil", None),
         ("Tồn kho/Tổng TS", "inventoryOverTotalAssetsPct", "inventory", "pct", None),
         ("XDCB dở dang", "constructionWip", "asset", "bil", None),
@@ -233,7 +233,7 @@ def _prev_quarter(per: str) -> str:
     return f"{y - 1}Q4" if q == 1 else f"{y}Q{q - 1}"
 
 
-def balance_sheet_events(frames, n=8, actions=None):
+def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
     """Nonfinancial only. (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
     XDCB -> tồn kho: land bank turned saleable). (2) Charter-capital changes, with a hint whether the rise was funded from
     retained earnings (LNST quý - Δquỹ&LNGPP ≈ Δvốn: cổ tức CP/thưởng) or by new money. Both are hints for the report.
@@ -274,15 +274,58 @@ def balance_sheet_events(frames, n=8, actions=None):
                         and abs((a["factor"] - 1) - rise) <= max(0.25 * rise, 0.01)):
                     msg += (f"; khớp sự kiện quyền {a['date']} hệ số {a['factor']:.3f} → CP thưởng/cổ tức CP "
                             f"~{rise * 100:.0f}%, ưu tiên kết luận này hơn gợi ý LNGPP")
+                    # the factor-only label in "Sự kiện quyền" can't tell a 5% stock dividend from a cash dividend (FRT
+                    # 2026-06-29: 1.0499 printed "cổ tức tiền"); the capital match settles it, so relabel the price event too
+                    a["kind"] = f"cổ tức CP/thưởng ~{rise * 100:.0f}% (khớp vốn điều lệ {per}) — pha loãng, không có tiền mới"
                     break
             ev.append(msg)
+    if structure == "nonfinancial":  # bank_events already carries the minority lines
+        ev += minority_events(frames) + cash_gap_event(frames)
+    return sorted(ev)  # "YYYYQn: ..." sorts chronologically
+
+
+def minority_events(frames, n=8):
+    """Minority-interest jumps (>=30% QoQ and material vs total capital): a subsidiary sold a stake / IPO'd / raised
+    outside capital, or was bought back. Profit to the parent's holders is diluted. Shared by bank and nonfinancial."""
+    ev = []
+    mi, tc = fa_series(frames, "minorityInterest", "capital"), fa_series(frames, "totalCapital", "capital")
+    if mi is not None and tc is not None:
+        for i in range(max(1, len(mi) - n), len(mi)):
+            a, b = mi.iloc[i - 1], mi.iloc[i]
+            if pd.notna(a) and pd.notna(b) and a > 0 and abs(b - a) / a >= 0.3 and abs(b - a) >= 0.003 * tc.iloc[i]:
+                ev.append(f"{mi.index[i]}: lợi ích CĐ thiểu số {a:,.0f}→{b:,.0f} tỷ — thay đổi sở hữu ở công ty con "
+                          "(bán bớt/IPO hoặc mua lại), cần tin DN")
     return ev
+
+
+def cash_gap_event(frames):
+    """Nonfinancial. cashBank (asset chart) includes term deposits; cashEndOfPeriod (cash-flow chart) is cash &
+    equivalents only. A wide gap means deposits sit inside cashBank, and placing them shows up as investing outflow
+    (FRT 2026Q3: cashBank 11,784 vs cashEndOfPeriod 511; investing 4Q -5,958 with fixed assets flat)."""
+    g = lambda n, c=None: fa_series(frames, n, c)
+    cb, ce, ta, inv = g("cashBank", "asset"), g("cashEndOfPeriod", "cashFlow"), g("totalAssets", "asset"), g("investing", "cashFlow")
+    if cb is None or ce is None or ta is None or not (pd.notna(cb.iloc[-1]) and pd.notna(ce.iloc[-1])):
+        return []
+    per, gap = cb.index[-1], cb.iloc[-1] - ce.iloc[-1]
+    if gap < 0.3 * cb.iloc[-1] or gap < 0.05 * ta.iloc[-1]:
+        return []
+    msg = (f"{per}: cashBank {cb.iloc[-1]:,.0f} vs tiền cuối kỳ LCTT {ce.iloc[-1]:,.0f} tỷ → ~{gap:,.0f} tỷ là tiền gửi "
+           "có kỳ hạn/đầu tư ngắn hạn gộp trong cashBank (vẫn trừ vào nợ vay ròng)")
+    fixed = [s for s in (g("fixedAssets", "asset"), g("constructionWip", "asset")) if s is not None]
+    if inv is not None and len(inv.dropna()) >= 4 and fixed and len(cb) > 4:
+        inv4 = inv.iloc[-4:].sum()
+        dfix = sum(s.iloc[-1] - s.iloc[-5] for s in fixed if len(s) > 4 and pd.notna(s.iloc[-5]))
+        msg += f"; LCTT đầu tư 4Q {inv4:+,.0f} tỷ, Δ(TSCĐ+XDCB) 4Q {dfix:+,.0f} tỷ"
+        if inv4 < 0 and dfix < 0.3 * -inv4:
+            msg += " → phần lớn LCTT đầu tư là gửi tiền có kỳ hạn, không phải capex; FCF TTM bị đánh giá thấp tương ứng"
+    return [msg]
 
 
 def corporate_actions(px: pd.DataFrame) -> list[dict]:
     """Ex-right sessions: close/adjClose steps down on the first ex-date (adjClose is back-adjusted).
     factor = price adjustment ratio. >=1.10 is a stock bonus/dividend/split (dilution, no new money);
-    <1.05 is a cash dividend; in between could be either. A hint for the report, confirm with company news."""
+    <1.05 is a cash dividend; in between could be either. A 5% stock dividend prints 1.0499x (like 10% -> 1.0999x),
+    so the cash cut sits at 1.0495; balance_sheet_events relabels any factor that matches a charter-capital rise. A hint for the report, confirm with company news."""
     if px.empty or "adjClose" not in px or "close" not in px:
         return []
     r = (px["close"] / px["adjClose"]).replace([np.inf, -np.inf], np.nan).dropna()
@@ -290,7 +333,7 @@ def corporate_actions(px: pd.DataFrame) -> list[dict]:
     ev = []
     for d, k in f[f > 1.003].items():
         kind = ("cổ phiếu thưởng/cổ tức CP/chia tách — pha loãng, không có tiền mới" if k >= 1.0995  # 10% bonus prints 1.0999x
-                else "cổ tức tiền" if k < 1.05 else "cổ tức tiền lớn hoặc CP thưởng nhỏ")
+                else "cổ tức tiền" if k < 1.0495 else "cổ tức tiền lớn hoặc CP thưởng nhỏ")
         ev.append({"date": str(d.date()), "factor": float(k), "prev_close": float(px["close"].shift(1)[d]),
                    "close": float(px["close"][d]), "kind": kind})
     return ev
@@ -396,13 +439,7 @@ def bank_events(frames, n=4):
             k = casa.index.get_loc(per)
             if k >= 1 and casa.iloc[k] - casa.iloc[k - 1] <= -3:
                 ev.append(f"{per}: CASA {casa.iloc[k - 1]:.1f}→{casa.iloc[k]:.1f}% ({casa.iloc[k] - casa.iloc[k - 1]:+.1f}pp) — mất vốn rẻ, COF sẽ tăng")
-    mi, tc = g("minorityInterest", "capital"), g("totalCapital", "capital")
-    if mi is not None and tc is not None:
-        for i in range(max(1, len(mi) - 8), len(mi)):
-            a, b = mi.iloc[i - 1], mi.iloc[i]
-            if pd.notna(a) and pd.notna(b) and a > 0 and abs(b - a) / a >= 0.3 and abs(b - a) >= 0.003 * tc.iloc[i]:
-                ev.append(f"{mi.index[i]}: lợi ích CĐ thiểu số {a:,.0f}→{b:,.0f} tỷ — thay đổi sở hữu ở công ty con "
-                          "(bán bớt/IPO hoặc mua lại), cần tin DN")
+    ev += minority_events(frames)
     return sorted(ev), dq  # "YYYYQn: ..." sorts chronologically
 
 
@@ -564,7 +601,7 @@ def main(workdir):
         FA["derived"] = derived_fa(fq, structure)
         FA["ytd"] = ytd_cumulative(fq)
         if structure in ("nonfinancial", "bank"):  # bank: only the charter-capital lines can fire
-            FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"))
+            FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"), structure=structure)
         if structure == "bank":
             FA["bank_events"], FA["bank_dataQuality"] = bank_events(fq)
         cc = fa_series(fq, "charterCapital", "capital")
@@ -637,8 +674,16 @@ def main(workdir):
             recent = s.iloc[-36:]
             outl = s[s > 3 * v["median10y"]] if pd.notna(v["median10y"]) else s.iloc[:0]
             v["outlier_months"] = [str(pd.Timestamp(d).date()) for d in outl.index]
-            v["avg3Y_distorted"] = bool(v["avg3Y"] and (v["avg3Y"] > 1.5 * v["median10y"]
-                                                        or (len(recent) and v["avg3Y"] > 1.3 * recent.median())))
+            a3 = v["avg3Y"]  # <= 0: a loss period inside the 3Y window (FRT 2023) makes the website mean meaningless
+            v["avg3Y_distorted"] = bool(a3 is not None and pd.notna(a3) and (a3 <= 0 or a3 > 1.5 * v["median10y"]
+                                                                            or (len(recent) and a3 > 1.3 * recent.median())))
+        # P/B outliers right after a loss year can be real: equity shrank (FRT 2024: P/B 15-18 on ~1,900 tỷ equity after
+        # the 2023 loss), not a broken source block (IDC 2023). Flag the loss years so the warning names both readings.
+        npy = fa_series(fy, "netProfitParent") if fy else None
+        om = V["pb"]["outlier_months"]
+        if om and npy is not None:
+            yrs = range(int(om[0][:4]) - 1, int(om[-1][:4]) + 1)
+            V["pb"]["loss_years_near_outliers"] = [str(y) for y in yrs if str(y) in npy.index and npy[str(y)] < 0]
         price = M["price"].get("close")
         if price and cur_pe and cur_pb:
             V["implied_price"] = {
@@ -943,12 +988,15 @@ def tables_md(M):
     L.append("\nTổng phụ: " + " · ".join(f"{k} {v:+d}" for k, v in sg["subtotals"].items())
              + " (Kỹ thuật ±8, Cơ bản ±6, Bối cảnh ±2)")
     if V.get("pe", {}).get("avg3Y_distorted"):
-        L.append("\n> ⚠️ P/E TB 3 năm bị méo bởi giai đoạn lợi nhuận đáy (TB > 1.5× trung vị 10N hoặc > 1.3× trung vị 36 tháng) — dùng trung vị P/E dương và P/B để định giá.")
+        L.append("\n> ⚠️ P/E TB 3 năm bị méo bởi giai đoạn lợi nhuận đáy hoặc kỳ lỗ (TB ≤ 0, TB > 1.5× trung vị 10N hoặc > 1.3× trung vị 36 tháng) — dùng trung vị P/E dương và P/B để định giá.")
     if V.get("pb", {}).get("avg3Y_distorted"):
         L.append("\n> ⚠️ P/B TB 3 năm bị méo (TB > 1.5× trung vị 10N hoặc > 1.3× trung vị 36 tháng) — at_pb_avg3Y đã bỏ; dùng trung vị P/B 10N kèm ROE.")
     om = V.get("pb", {}).get("outlier_months") or []
     if om:
-        L.append(f"\n> ⚠️ P/B: {len(om)} tháng > 3× trung vị 10N ({om[0]} … {om[-1]}) — nghi lỗi dữ liệu nguồn (VCSH), "
+        ly = V["pb"].get("loss_years_near_outliers") or []
+        cause = (f"năm lỗ {', '.join(ly)} ngay trước/trong giai đoạn này làm VCSH co lại nên P/B cao có thể là thật "
+                 "(đối chiếu VCSH theo năm), cũng có thể là lỗi nguồn" if ly else "nghi lỗi dữ liệu nguồn (VCSH)")
+        L.append(f"\n> ⚠️ P/B: {len(om)} tháng > 3× trung vị 10N ({om[0]} … {om[-1]}) — {cause}; "
                  "min–max và percentile 10N có chứa các tháng này.")
     return "\n".join(L) + "\n"
 
