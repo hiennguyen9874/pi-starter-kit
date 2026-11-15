@@ -195,6 +195,18 @@ def derived_fa(frames, structure):
             d["contributedCapitalYoYPct"] = pct_change(cap.iloc[-1], cap.iloc[-5])  # >0 = dilution, see references/securities.md
         if eq is not None and mb is not None:
             d["marginHeadroomBil"] = 2 * eq.iloc[-1] - mb.iloc[-1]  # room to the 200% Margin/VCSH legal cap
+        # profitStructure segments are gross results; interest on borrowings, admin cost and tax sit outside them
+        # (CTS 2026Q3: segments 189 vs LNST 5). The gap = what the segments must cover before profit shows up.
+        ps, npq = frames.get("profitStructure"), fa_series(frames, "netProfitParent")
+        if ps is not None and npq is not None:
+            segs = ps[[c for c in ps.columns if c != "netProfitParent"]].sum(axis=1, min_count=1)
+            gap = (segs - npq).dropna()
+            if len(gap) >= 4:
+                d["segmentProfitSumQ"] = segs[gap.index[-1]]
+                d["unallocatedCostQ"] = gap.iloc[-1]
+                d["unallocatedCostTTM"] = gap.iloc[-4:].sum()
+                if len(gap) >= 5:
+                    d["unallocatedCostQYoYPct"] = pct_change(gap.iloc[-1], gap.iloc[-5])
     rev = next((fa_series(frames, n) for n in ("netRevenueTTM", "totalOperatingIncomeTTM", "operatingRevenueTTM")
                 if fa_series(frames, n) is not None), None)
     if rev is not None and len(rev.dropna()) > 4:
@@ -234,14 +246,14 @@ def _prev_quarter(per: str) -> str:
 
 
 def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
-    """Nonfinancial only. (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
+    """Nonfinancial (all checks), bank and securities (capital lines only; securities report contributedCapital). (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
     XDCB -> tồn kho: land bank turned saleable). (2) Charter-capital changes, with a hint whether the rise was funded from
     retained earnings (LNST quý - Δquỹ&LNGPP ≈ Δvốn: cổ tức CP/thưởng) or by new money. Both are hints for the report.
     actions = corporate_actions(px): a capital rise whose % matches an ex-right factor in the same or previous quarter
     is a stock bonus/dividend even when the LNGPP check misses (bonus funded from other reserves or share premium)."""
     ev = []
     a = frames.get("asset")
-    if a is not None and "totalAssets" in a:
+    if a is not None and "totalAssets" in a and structure != "securities":  # securities asset chart has other columns
         comp = [c for c in ASSET_VI if c in a]
         d = a[comp].diff()
         for per in a.index[-n:]:
@@ -253,7 +265,8 @@ def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
                 for inc, iv in row[(row >= 0.7 * -dv) & (row <= 1.3 * -dv)].items():
                     ev.append(f"{per}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {ASSET_VI[inc]} {iv:+,.0f} tỷ "
                               f"(bù trừ nhau, khả năng phân loại lại tài sản)")
-    cap = fa_series(frames, "charterCapital", "capital")
+    cap_name, cap_vi = ("contributedCapital", "Vốn góp") if structure == "securities" else ("charterCapital", "Vốn điều lệ")
+    cap = fa_series(frames, cap_name, "capital")
     sur = fa_series(frames, "surplusRetainedFunds", "capital")
     npq = fa_series(frames, "netProfitParent")
     if cap is not None:
@@ -261,7 +274,7 @@ def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
         for per in cap.index[-n:]:
             if not pd.notna(dc.get(per)) or abs(dc[per]) < 0.005 * cap.shift(1)[per]:
                 continue
-            msg = f"{per}: Vốn điều lệ {cap.shift(1)[per]:,.0f} → {cap[per]:,.0f} tỷ ({pct_change(cap[per], cap.shift(1)[per]):+.1f}%)"
+            msg = f"{per}: {cap_vi} {cap.shift(1)[per]:,.0f} → {cap[per]:,.0f} tỷ ({pct_change(cap[per], cap.shift(1)[per]):+.1f}%)"
             if sur is not None and npq is not None and pd.notna(sur.diff().get(per)) and pd.notna(npq.get(per)):
                 moved = npq[per] - sur.diff()[per]  # profit that left retained earnings this quarter
                 hint = ("khớp chuyển từ LNGPP sang vốn → cổ tức CP/thưởng, không có tiền mới"
@@ -276,7 +289,7 @@ def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
                             f"~{rise * 100:.0f}%, ưu tiên kết luận này hơn gợi ý LNGPP")
                     # the factor-only label in "Sự kiện quyền" can't tell a 5% stock dividend from a cash dividend (FRT
                     # 2026-06-29: 1.0499 printed "cổ tức tiền"); the capital match settles it, so relabel the price event too
-                    a["kind"] = f"cổ tức CP/thưởng ~{rise * 100:.0f}% (khớp vốn điều lệ {per}) — pha loãng, không có tiền mới"
+                    a["kind"] = f"cổ tức CP/thưởng ~{rise * 100:.0f}% (khớp {cap_vi.lower()} {per}) — pha loãng, không có tiền mới"
                     break
             ev.append(msg)
     if structure == "nonfinancial":  # bank_events already carries the minority lines
@@ -600,7 +613,7 @@ def main(workdir):
         FA["kpi"] = kpi_block(fq, structure)
         FA["derived"] = derived_fa(fq, structure)
         FA["ytd"] = ytd_cumulative(fq)
-        if structure in ("nonfinancial", "bank"):  # bank: only the charter-capital lines can fire
+        if structure in ("nonfinancial", "bank", "securities"):  # bank/securities: only the capital lines can fire
             FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"), structure=structure)
         if structure == "bank":
             FA["bank_events"], FA["bank_dataQuality"] = bank_events(fq)
@@ -961,7 +974,10 @@ def tables_md(M):
             L.append("Giá tham chiếu (nghìn đ): " + " · ".join(f"{k}={fmt(v, 2)}" for k, v in ip.items()))
     if M["peers"]:
         L += ["", "## So sánh cùng ngành (mã được RRG theo dõi)", "| Mã | Sàn | Vốn hóa (tỷ) | RS3 | RS6 | Góc | VCR | AMFI | GTGD20 (tỷ) |", "|---|---|---|---|---|---|---|---|---|"]
-        for p in M["peers"][:12]:
+        shown = M["peers"][:12]
+        if not any(p["symbol"] == meta["symbol"] for p in shown):  # small caps fall below the top-12 cut (CTS rank 15)
+            shown += [p for p in M["peers"] if p["symbol"] == meta["symbol"]]
+        for p in shown:
             b = "**" if p["symbol"] == meta["symbol"] else ""
             L.append(f"| {b}{p['symbol']}{b} | {p['exchange']} | {fmt(p['marketCapBil'],0)} | {fmt(p['rs3'],0)} | {fmt(p['rs6'],0)} | {p['quadrant']} | {fmt(p['vcr'],2)} | {fmt(p['amfi'],3)} | {fmt(p['gtgdAvg20_bil'],1)} |")
     sr = S.get("rrg")

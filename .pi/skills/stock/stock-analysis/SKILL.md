@@ -10,7 +10,7 @@ Pipeline có 4 tầng: **fetch** (codemode gọi MCP rồi ghi JSON thô) → **
 Tham chiếu dùng khi cần:
 - [references/sstock-tools.md](references/sstock-tools.md): 26 tool, đơn vị, thứ tự trục, giới hạn gói/rate-limit, các gotcha dữ liệu. Đọc khi gọi tool ngoài pipeline hoặc khi một số liệu trông bất thường.
 - [references/analysis-framework.md](references/analysis-framework.md): cách đọc từng khía cạnh, KPI và ngưỡng theo 4 cấu trúc BCTC (phi tài chính / ngân hàng / chứng khoán / bảo hiểm), cách diễn giải scorecard. Đọc trước bước 4.
-- [references/securities.md](references/securities.md): đọc trước bước 3 khi `structure` = securities (công ty chứng khoán). Gồm lợi nhuận theo mảng, NIM/COF, nền cao theo chu kỳ, phân loại sự kiện tăng vốn, P/B đi cùng ROE.
+- [references/securities.md](references/securities.md): đọc trước bước 3 khi `structure` = securities (công ty chứng khoán). Gồm lợi nhuận theo mảng và chi phí không phân bổ, NIM/COF, nền cao theo chu kỳ, phân loại sự kiện tăng vốn, nguồn vốn/tự doanh/đòn bẩy, P/B đi cùng ROE.
 - [references/banking.md](references/banking.md): đọc trước bước 3 khi `structure` = bank (ngân hàng). Gồm chất lượng lợi nhuận (dự phòng so với nợ xấu), nợ chuyển nhóm, nguồn vốn/COF, sự kiện quyền, P/B đi cùng ROE.
 - [references/industrial-park.md](references/industrial-park.md): đọc trước bước 3 khi ngành là Khu công nghiệp (sectorId 4). Gồm doanh thu ghi nhận theo đợt (lumpy), quỹ đất trên bảng cân đối, phân loại lại XDCB/tồn kho, định giá khi không có RNAV.
 - [references/retail.md](references/retail.md): đọc trước bước 3 khi ngành là Bán lẻ (sectorId 1). Gồm đòn bẩy hoạt động (chi phí bán hàng/doanh thu), tồn kho và vốn lưu động, LCTT đầu tư là gửi tiền hay capex, ROE theo đòn bẩy, EV/EBITDA.
