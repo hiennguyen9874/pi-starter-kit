@@ -50,6 +50,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - So với ngành và thị trường: `pe_vs_sector_pct`, P/E VNINDEX.
 - **Cổ phiếu chu kỳ:** P/E thấp *ở đỉnh lợi nhuận* là cái bẫy giá trị. Hãy kiểm tra biên lợi nhuận và ROE hiện tại so với đỉnh chu kỳ trước. Ưu tiên P/B kết hợp ROE: P/B thấp với ROE đang tăng là kết hợp tốt nhất. `avg3YPe` thường bị méo bởi năm lợi nhuận đáy.
 - **Ngân hàng / chứng khoán / bảo hiểm:** P/B là thước đo chính, đi kèm ROE.
+- **Tái định giá cấu trúc:** trên `07_valuation.png`, khi P/E chuyển hẳn sang một mặt bằng mới (mô hình kinh doanh thay đổi), trung vị và percentile 10 năm bị kéo về phía mặt bằng cũ. Lấy khoảng từ năm tái định giá làm vùng tham chiếu và ghi override cho tiêu chí P/E/trung vị 10N.
 - `implied_price` (giá nếu bội số quay về trung vị hoặc TB 3 năm) là **vùng tham chiếu**, không phải giá mục tiêu. Luôn ghi rõ giả định là lợi nhuận hoặc giá trị sổ sách giữ nguyên.
 
 ## 5. Kỹ thuật: "xu hướng giá có xác nhận không?"
@@ -66,6 +67,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - **VCR** (tốc độ dòng tiền): <0,8 là rút, 0,8–1 là ổn định, 1–1,2 là tăng, ≥1,2 là mạnh. **AMFI** (mua chủ động có trọng số): >0 nghĩa là phe mua chiếm ưu thế. **bear20Active** là phân kỳ giảm đã được xác nhận, một tín hiệu cảnh báo.
 - **Elite v23**: vào vị thế khi đủ 5/5 trụ (rs3 ≥ 80 và rs6 ≥ 60, VCR ≥ 1, AMFI > 0, GTGD20 ≥ 5 tỷ, không có bear20) trong 3 phiên liên tiếp và không bị guard nào chặn. Trụ còn thiếu chính là trigger cần theo dõi. Guard-2 ("không phải cổ phiếu HOSE 3 ký tự") là cố định với mã HNX/UPCoM: mã đó không bao giờ vào Elite, nên báo cáo chỉ dùng các trụ làm điều kiện xác nhận, không viết "chờ tín hiệu Elite". Lịch sử các episode (tỷ lệ thắng, lãi/lỗ trung bình) cho biết tín hiệu này có đáng tin với mã đó hay không.
 - Khối ngoại (5/20/60/250 phiên kèm đường lũy kế), mua/bán chủ động (âm kéo dài nghĩa là phe bán chủ động áp đảo), tự doanh. **Xác nhận** là khi giá tăng đồng thời dòng tiền dương; **phân kỳ** là khi giá tăng nhưng dòng tiền âm, hoặc ngược lại.
+- Khi giá bứt phá, tính tỷ trọng tự doanh trong các phiên đó: `proprietaryTradingValue / totalValue` trong `price_frame`. Trên 30% là lực mua tập trung ở tự doanh (có thể là phòng hộ chứng quyền/ETF). Xác nhận chỉ tính khi dòng mua/bán chủ động cũng dương (REE 2026-11-13: tự doanh +78,5 / GTGD 137 tỷ ≈ 57%).
 
 ## 7. So sánh cùng ngành
 
