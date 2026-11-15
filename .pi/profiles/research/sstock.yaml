@@ -34,6 +34,7 @@ packagesDisable:
   - npm:pi-observational-memory
   - git:github.com/linearuncle/pi-openai-web-search
 extensionsDisable:
+  - builtin:codemode
   - builtin:llama.cpp
   - ./extensions/disable-project-context.ts
   - ./extensions/system-prompt-appender.ts
@@ -43,7 +44,7 @@ extensionsDisable:
   - ./extensions/disable-edit-tools.ts
 extensionsEnable:
   - builtin:mcp
-  - builtin:codemode
+  - ./extensions/codemode-direct-write.ts
   - builtin:tool-search
 extra:
   override:
