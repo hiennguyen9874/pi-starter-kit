@@ -36,6 +36,9 @@ KPI = {
         ("Hàng tồn kho", "inventory", "asset", "bil", None),
         ("Tồn kho/Tổng TS", "inventoryOverTotalAssetsPct", "inventory", "pct", None),
         ("XDCB dở dang", "constructionWip", "asset", "bil", None),
+        # backlog: tiền khách đã trả, chưa ghi nhận doanh thu (BĐS, KCN, xây dựng); appropriatedDebt gồm cả phải trả khác
+        ("Người mua trả trước NH", "buyerAdvancesShort", "inventory", "bil", None),
+        ("Nợ chiếm dụng", "appropriatedDebt", "capital", "bil", None),
         ("LCTT HĐKD (Q)", "operating", "cashFlow", "bil", "up"),
         ("LCTT HĐĐT (Q)", "investing", "cashFlow", "bil", None),
     ],
@@ -245,6 +248,57 @@ def _prev_quarter(per: str) -> str:
     return f"{y - 1}Q4" if q == 1 else f"{y}Q{q - 1}"
 
 
+def reclass_events(a, periods, tag=""):
+    """Offsetting asset moves in one period (>=5% of prior total assets, the other side within ±30%) = reclassification:
+    XDCB -> TSCĐ: plant goes live; XDCB -> tồn kho: land bank / infrastructure turned saleable (KCN, BĐS)."""
+    ev = []
+    if a is None or "totalAssets" not in a:
+        return ev
+    d = a[[c for c in ASSET_VI if c in a]].diff()
+    for per in periods:
+        ta = a["totalAssets"].shift(1).get(per)
+        if per not in d.index or not ta or pd.isna(ta):
+            continue
+        row = d.loc[per]
+        for dec, dv in row[row < -0.05 * ta].items():
+            pair = row[(row >= 0.7 * -dv) & (row <= 1.3 * -dv)]
+            for inc, iv in pair.items():
+                ev.append(f"{per}{tag}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {ASSET_VI[inc]} {iv:+,.0f} tỷ "
+                          f"(bù trừ nhau, khả năng phân loại lại tài sản)")
+            split = row[row >= 0.3 * -dv]  # one source into several lines (SZC 2022: XDCB -2,156 -> tồn kho +1,337, TS khác +1,143)
+            if pair.empty and len(split) >= 2 and 0.7 * -dv <= split.sum() <= 1.5 * -dv:
+                parts = " + ".join(f"{ASSET_VI[i]} {v:+,.0f}" for i, v in split.items())
+                ev.append(f"{per}{tag}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {parts} tỷ (tách sang nhiều khoản, khả năng phân loại lại tài sản)")
+    return ev
+
+
+def annual_reclass_events(fy, quarters):
+    """Nonfinancial. Reclassifications in years the quarterly window does not fully cover (17 quarters reach back ~4
+    years; fa_y goes to 2018). SZC 2022: XDCB 4,856 -> 2,699 while tồn kho 7 -> 1,343, i.e. the KCN infrastructure
+    moved to saleable stock before the quarterly data starts, which is why tồn kho/TTS looks structurally high."""
+    a = fy.get("asset") if fy else None
+    if a is None:
+        return []
+    qs = set(quarters or [])
+    years = [y for y in a.index if not (f"{int(y) - 1}Q4" in qs and f"{y}Q4" in qs)]
+    return reclass_events(a, years, tag=" (năm)")
+
+
+def _rights_issue(action, per, rise, dcap, financing):
+    """A capital rise whose ex-right factor is well below the rise (k-1 < 0.8×rise) with a financing inflow covering
+    half the new par value = rights offering: new money, not a bonus. Subscription price from the TERP identity
+    P/k = (P + r·S)/(1+r)  =>  S = (P(1+r)/k − P)/r  (SZC 2024-01-05: k 1.219, r 48.7%, P 43.2 -> S ≈ 19.5)."""
+    k, P = action.get("factor"), action.get("prev_close")
+    if (dcap <= 0 or not k or not P or _quarter(action["date"]) not in (per, _prev_quarter(per))
+            or (k - 1) >= 0.8 * rise or financing is None or pd.isna(financing) or financing < 0.5 * dcap):
+        return None
+    S = (P * (1 + rise) / k - P) / rise
+    if not 0 < S < P:
+        return None
+    return (f"phát hành quyền mua ~{rise * 100:.0f}% giá ước ~{S:.1f} nghìn đ/cp (LCTT tài chính quý {financing:+,.0f} tỷ) "
+            "— có tiền mới, VCSH tăng nên ROE bị kéo xuống")
+
+
 def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
     """Nonfinancial (all checks), bank and securities (capital lines only; securities report contributedCapital). (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
     XDCB -> tồn kho: land bank turned saleable). (2) Charter-capital changes, with a hint whether the rise was funded from
@@ -253,44 +307,44 @@ def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
     is a stock bonus/dividend even when the LNGPP check misses (bonus funded from other reserves or share premium)."""
     ev = []
     a = frames.get("asset")
-    if a is not None and "totalAssets" in a and structure != "securities":  # securities asset chart has other columns
-        comp = [c for c in ASSET_VI if c in a]
-        d = a[comp].diff()
-        for per in a.index[-n:]:
-            ta = a["totalAssets"].shift(1).get(per)
-            if per not in d.index or not ta or pd.isna(ta):
-                continue
-            row = d.loc[per]
-            for dec, dv in row[row < -0.05 * ta].items():
-                for inc, iv in row[(row >= 0.7 * -dv) & (row <= 1.3 * -dv)].items():
-                    ev.append(f"{per}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {ASSET_VI[inc]} {iv:+,.0f} tỷ "
-                              f"(bù trừ nhau, khả năng phân loại lại tài sản)")
+    if structure != "securities":  # securities asset chart has other columns
+        ev += reclass_events(a, list(a.index[-n:]) if a is not None else [])
     cap_name, cap_vi = ("contributedCapital", "Vốn góp") if structure == "securities" else ("charterCapital", "Vốn điều lệ")
     cap = fa_series(frames, cap_name, "capital")
     sur = fa_series(frames, "surplusRetainedFunds", "capital")
     npq = fa_series(frames, "netProfitParent")
+    fin = fa_series(frames, "financing", "cashFlow")
     if cap is not None:
         dc = cap.diff()
-        for per in cap.index[-n:]:
+        # capital lines scan every quarter on file, not just n: rare, and they explain ex-right events up to 3 years back
+        # (SZC 2024-01-05 sat 11 quarters back, so the factor-only label "CP thưởng" stood uncorrected)
+        for per in cap.index[1:]:
             if not pd.notna(dc.get(per)) or abs(dc[per]) < 0.005 * cap.shift(1)[per]:
                 continue
             msg = f"{per}: {cap_vi} {cap.shift(1)[per]:,.0f} → {cap[per]:,.0f} tỷ ({pct_change(cap[per], cap.shift(1)[per]):+.1f}%)"
+            from_lngpp = False
             if sur is not None and npq is not None and pd.notna(sur.diff().get(per)) and pd.notna(npq.get(per)):
                 moved = npq[per] - sur.diff()[per]  # profit that left retained earnings this quarter
-                hint = ("khớp chuyển từ LNGPP sang vốn → cổ tức CP/thưởng, không có tiền mới"
-                        if dc[per] > 0 and abs(moved - dc[per]) <= 0.3 * abs(dc[per])
+                from_lngpp = bool(dc[per] > 0 and abs(moved - dc[per]) <= 0.3 * abs(dc[per]))
+                hint = ("khớp chuyển từ LNGPP sang vốn → cổ tức CP/thưởng, không có tiền mới" if from_lngpp
                         else "không khớp chuyển từ LNGPP → có thể phát hành thu tiền/ESOP")
                 msg += f"; LNST quý {npq[per]:,.0f}, Δquỹ&LNGPP {sur.diff()[per]:+,.0f} → {hint} (cần tin DN)"
             rise = dc[per] / cap.shift(1)[per]
-            for a in actions or []:
-                if (dc[per] > 0 and _quarter(a["date"]) in (per, _prev_quarter(per))
-                        and abs((a["factor"] - 1) - rise) <= max(0.25 * rise, 0.01)):
-                    msg += (f"; khớp sự kiện quyền {a['date']} hệ số {a['factor']:.3f} → CP thưởng/cổ tức CP "
-                            f"~{rise * 100:.0f}%, ưu tiên kết luận này hơn gợi ý LNGPP")
-                    # the factor-only label in "Sự kiện quyền" can't tell a 5% stock dividend from a cash dividend (FRT
-                    # 2026-06-29: 1.0499 printed "cổ tức tiền"); the capital match settles it, so relabel the price event too
-                    a["kind"] = f"cổ tức CP/thưởng ~{rise * 100:.0f}% (khớp {cap_vi.lower()} {per}) — pha loãng, không có tiền mới"
-                    break
+            near = [a for a in actions or [] if dc[per] > 0 and _quarter(a["date"]) in (per, _prev_quarter(per))]
+            bonus = next((a for a in near if abs((a["factor"] - 1) - rise) <= max(0.25 * rise, 0.01)), None)
+            if bonus:
+                msg += (f"; khớp sự kiện quyền {bonus['date']} hệ số {bonus['factor']:.3f} → CP thưởng/cổ tức CP "
+                        f"~{rise * 100:.0f}%, ưu tiên kết luận này hơn gợi ý LNGPP")
+                # the factor-only label in "Sự kiện quyền" can't tell a 5% stock dividend from a cash dividend (FRT
+                # 2026-06-29: 1.0499 printed "cổ tức tiền"); the capital match settles it, so relabel the price event too
+                bonus["kind"] = f"cổ tức CP/thưởng ~{rise * 100:.0f}% (khớp {cap_vi.lower()} {per}) — pha loãng, không có tiền mới"
+            elif not from_lngpp:  # a rise funded from LNGPP is never a rights issue (HPG 2026Q3: +10% bonus, debt-funded inflow)
+                for a in near:
+                    rights = _rights_issue(a, per, rise, dc[per], fin.get(per) if fin is not None else None)
+                    if rights:
+                        msg += f"; khớp sự kiện quyền {a['date']} hệ số {a['factor']:.3f} → {rights}"
+                        a["kind"] = f"{rights} (khớp {cap_vi.lower()} {per})"
+                        break
             ev.append(msg)
     if structure == "nonfinancial":  # bank_events already carries the minority lines
         ev += minority_events(frames) + cash_gap_event(frames)
@@ -338,16 +392,19 @@ def corporate_actions(px: pd.DataFrame) -> list[dict]:
     """Ex-right sessions: close/adjClose steps down on the first ex-date (adjClose is back-adjusted).
     factor = price adjustment ratio. >=1.10 is a stock bonus/dividend/split (dilution, no new money);
     <1.05 is a cash dividend; in between could be either. A 5% stock dividend prints 1.0499x (like 10% -> 1.0999x),
-    so the cash cut sits at 1.0495; balance_sheet_events relabels any factor that matches a charter-capital rise. A hint for the report, confirm with company news."""
+    so the cash cut sits at 1.0495; balance_sheet_events relabels any factor that matches a charter-capital rise, and a
+    factor well below the rise with a financing inflow as a rights issue (SZC 2024-01-05: 1.219 is not a bonus). A hint for the report, confirm with company news."""
     if px.empty or "adjClose" not in px or "close" not in px:
         return []
     r = (px["close"] / px["adjClose"]).replace([np.inf, -np.inf], np.nan).dropna()
     f = r.shift(1) / r
     ev = []
     for d, k in f[f > 1.003].items():
+        prev = float(px["close"].shift(1)[d])
+        cash = f" ~{prev * (1 - 1 / k) * 1000:,.0f} đ/cp"  # dividend implied by the factor: P_prev × (1 − 1/k)
         kind = ("cổ phiếu thưởng/cổ tức CP/chia tách — pha loãng, không có tiền mới" if k >= 1.0995  # 10% bonus prints 1.0999x
-                else "cổ tức tiền" if k < 1.0495 else "cổ tức tiền lớn hoặc CP thưởng nhỏ")
-        ev.append({"date": str(d.date()), "factor": float(k), "prev_close": float(px["close"].shift(1)[d]),
+                else "cổ tức tiền" + cash if k < 1.0495 else f"cổ tức tiền lớn ({cash.strip()}) hoặc CP thưởng nhỏ")
+        ev.append({"date": str(d.date()), "factor": float(k), "prev_close": prev,
                    "close": float(px["close"][d]), "kind": kind})
     return ev
 
@@ -615,6 +672,8 @@ def main(workdir):
         FA["ytd"] = ytd_cumulative(fq)
         if structure in ("nonfinancial", "bank", "securities"):  # bank/securities: only the capital lines can fire
             FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"), structure=structure)
+            if structure == "nonfinancial":
+                FA["bs_events"] = annual_reclass_events(fy, list(any_df.index)) + FA["bs_events"]
         if structure == "bank":
             FA["bank_events"], FA["bank_dataQuality"] = bank_events(fq)
         cc = fa_series(fq, "charterCapital", "capital")
@@ -634,6 +693,10 @@ def main(workdir):
 
     FA["dataQuality"] = [f"{k['label']} ({k['series']}) = 0 ở mọi kỳ gần đây — nghi lỗi dữ liệu nguồn"
                          for k in FA.get("kpi", []) if k.get("suspect")]
+    dep = fa_series(fq, "depreciation", "costStructure") if fq and structure == "nonfinancial" else None
+    if dep is not None and len(dep.iloc[-8:].dropna()) >= 4 and (dep.iloc[-8:].dropna() == 0).all():
+        # SZC: quarterly depreciation 0 every quarter while fa_y still reports it, so ebitda == ebit
+        FA["dataQuality"].append("Khấu hao quý (depreciation) = 0 ở mọi kỳ gần đây — nghi lỗi nguồn, EBITDA (Q) thực chất = EBIT")
 
     # sector FA share
     sfa = fa_frames(W.load("sector_fa"))
@@ -950,7 +1013,7 @@ def tables_md(M):
                 L += ["", f"> ⚠️ LNST TTM YoY {ttm:+.1f}% lệch lũy kế năm {yt:+.1f}% ({ttm - yt:+.1f}pp): cửa sổ TTM chứa một quý nền bất thường. "
                       "Đọc tăng trưởng theo lũy kế năm, tìm quý gây lệch trong bảng quý và ghi override ở Scorecard nếu ngưỡng chấm điểm đổi chiều."]
         if FA.get("bs_events"):
-            L += ["", "Sự kiện bảng cân đối (8 quý, gợi ý cần giải thích ở bước 3):"] + [f"- {e}" for e in FA["bs_events"]]
+            L += ["", "Sự kiện bảng cân đối (gợi ý cần giải thích ở bước 3):"] + [f"- {e}" for e in FA["bs_events"]]
         if FA.get("bank_events"):
             L += ["", "Sự kiện ngân hàng (cần giải thích ở bước 3, xem references/banking.md):"] + [f"- {e}" for e in FA["bank_events"]]
         if FA.get("bank_dataQuality"):
