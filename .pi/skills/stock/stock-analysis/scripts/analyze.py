@@ -124,7 +124,8 @@ SERIES_VI.update({"roePct": "ROE", "grossMarginPct": "Biên gộp", "netMarginPc
                   "totalOperatingIncome": "Tổng TN hoạt động", "operatingRevenue": "Doanh thu hoạt động",
                   "operating": "LCTT HĐKD", "debt": "Nợ vay", "totalAssets": "Tổng tài sản",
                   "loansSegment": "LN mảng cho vay", "brokerageSegment": "LN mảng môi giới", "fvtplSegment": "LN mảng FVTPL",
-                  "roeDerivedPct": "ROE (LNST/VCSH cuối kỳ, tự tính)"})
+                  "roeDerivedPct": "ROE (LNST/VCSH cuối kỳ, tự tính)",
+                  "profitBeforeProvision": "LN trước dự phòng", "creditProvisionExpense": "Chi phí dự phòng"})
 
 
 def last_valid(s: pd.Series | None):
@@ -210,6 +211,21 @@ def derived_fa(frames, structure):
                 d["unallocatedCostTTM"] = gap.iloc[-4:].sum()
                 if len(gap) >= 5:
                     d["unallocatedCostQYoYPct"] = pct_change(gap.iloc[-1], gap.iloc[-5])
+    if structure == "bank":
+        # Interbank reliance: gross interbankFunding overstates the funding gap when the bank parks the same money at
+        # other CIs (TPB 2026Q3: +27,267 vs +25,627), so report the share and the net position side by side.
+        ib, tc = fa_series(frames, "interbankFunding", "capital"), fa_series(frames, "totalCapital", "capital")
+        dep_ci = fa_series(frames, "depositsLoansToOtherCIs", "asset")
+        if ib is not None and tc is not None:
+            sh = (ib / tc.where(tc > 0) * 100).replace([np.inf, -np.inf], np.nan)
+            if len(sh) and pd.notna(sh.iloc[-1]):
+                d["interbankFundingSharePct"] = sh.iloc[-1]
+                if len(sh) >= 5 and pd.notna(sh.iloc[-5]):
+                    d["interbankFundingShareChg4Qpp"] = sh.iloc[-1] - sh.iloc[-5]
+            if dep_ci is not None:
+                net = ib - dep_ci
+                if len(net) and pd.notna(net.iloc[-1]):
+                    d["netInterbankBil"] = net.iloc[-1]  # >0 = net borrower; maturities/currencies may differ
     rev = next((fa_series(frames, n) for n in ("netRevenueTTM", "totalOperatingIncomeTTM", "operatingRevenueTTM")
                 if fa_series(frames, n) is not None), None)
     if rev is not None and len(rev.dropna()) > 4:
@@ -217,11 +233,14 @@ def derived_fa(frames, structure):
     return d
 
 
-def ytd_cumulative(frames):
+def ytd_cumulative(frames, structure=None):
     """Year-to-date sums vs the same quarters a year earlier. Lumpy recognisers (KCN land leases, BĐS handovers)
     swing ±50% per quarter, so 9T/26 vs 9T/25 is the fairer growth read than the single-quarter YoY."""
     out = {}
-    for name in ("netRevenue", "totalOperatingIncome", "operatingRevenue", "netProfitParent"):
+    names = ("netRevenue", "totalOperatingIncome", "operatingRevenue", "netProfitParent")
+    if structure == "bank":
+        names += ("profitBeforeProvision", "creditProvisionExpense")
+    for name in names:
         s = fa_series(frames, name)
         if s is None or s.dropna().empty or "Q" not in str(s.index[-1]):
             continue
@@ -437,16 +456,26 @@ def bank_events(frames, n=4):
                 dq.append(f"standardRatioPct {q['standardRatioPct'].iloc[-1]:.1f}% chia cho totalLoans {tl:,.0f} tỷ, lớn hơn tổng nợ "
                           f"đã phân loại {cls:,.0f} tỷ; nhóm 1 trên nợ đã phân loại = {q['standardLoans'].iloc[-1] / cls * 100:.1f}%. "
                           "Xu hướng giảm của standardRatioPct là méo mẫu số, đọc chất lượng nợ bằng NPL/nhóm 2")
-    j = pd.concat({k: s for k, s in {"npl": g("nplPct"), "llr": g("llrPct"), "prov": g("creditProvisionExpense", "costStructure"),
+    series = {k: s for k, s in {"npl": g("nplPct"), "llr": g("llrPct"), "prov": g("creditProvisionExpense", "costStructure"),
                                      "loan": g("customerLoans", "asset"), "dep": g("customerDeposits", "capital"),
-                                     **{k: g(k, "capital") for k in BANK_FUNDING_VI}}.items() if s is not None}, axis=1)
+                                     **{k: g(k, "capital") for k in BANK_FUNDING_VI}}.items() if s is not None}
+    j = pd.concat(series, axis=1) if series else pd.DataFrame()
     for i in range(max(1, len(j) - n), len(j)):
         per, cur, prev = j.index[i], j.iloc[i], j.iloc[i - 1]
         if {"npl", "prov"} <= set(j) and i >= 4 and cur["npl"] - prev["npl"] >= 0.1:
             py = pct_change(cur["prov"], j["prov"].iloc[i - 4])
             if py is not None and py < 0:
+                # quantify: provision saved vs the same quarter last year, after 20% tax
+                lift = (j["prov"].iloc[i - 4] - cur["prov"]) * 0.8
+                npq_ = fa_series(frames, "netProfitParent", "businessResultQuarter")
+                base = npq_.get(per) if npq_ is not None else None
+                base = base if base is not None and pd.notna(base) and base > 0 else None
+                tail = (f"; LNST tăng thêm nhờ dự phòng thấp ≈ {lift:,.0f} tỷ"
+                        + (f" ({lift / base * 100:.1f}% LNST quý)" if base else ""))
+                if base and lift < 0.05 * base:
+                    tail += " — phần hỗ trợ nhỏ; đối chiếu thêm NPL/LLR để đánh giá bộ đệm"
                 ev.append(f"{per}: ⚠️ NPL {prev['npl']:.2f}→{cur['npl']:.2f}% trong khi chi phí dự phòng {cur['prov']:,.0f} tỷ "
-                          f"({py:+.1f}% YoY) — lợi nhuận đang được hỗ trợ bởi dự phòng thấp")
+                          f"({py:+.1f}% YoY) — lợi nhuận đang được hỗ trợ bởi dự phòng thấp" + tail)
         if "llr" in j and cur["llr"] - prev["llr"] <= -10:
             ev.append(f"{per}: LLR {prev['llr']:.1f}→{cur['llr']:.1f}% ({cur['llr'] - prev['llr']:+.1f}pp) — bộ đệm dự phòng mỏng đi")
         if {"loan", "dep"} <= set(j):
@@ -496,6 +525,48 @@ def bank_events(frames, n=4):
                     if pd.notna(dn) and dn < 0:
                         ev.append(f"{per}: trái phiếu VAMC {vb.iloc[i - 1]:,.0f}→{vb.iloc[i]:,.0f} tỷ cùng quý NPL "
                                   f"{j['npl'].iloc[k - 1]:.2f}→{j['npl'].iloc[k]:.2f}% — NPL giảm nhờ bán nợ cho VAMC, chưa phải thu hồi")
+    # Provision buffer vs bad-debt balance (nhóm 3–5). Computed from loanStructureByQuality so LLR = dự phòng / nợ xấu.
+    if q is not None and len(q) and "loanLossProvision" in q and all(c in q for c in ("substandardLoans", "doubtfulLoans", "lossLoans")):
+        bad = q[["substandardLoans", "doubtfulLoans", "lossLoans"]].sum(axis=1, min_count=3)
+        pv = q["loanLossProvision"]
+        llr_c = (pv / bad * 100).where(bad > 0)
+        vb = q["vamcBonds"].fillna(0) if "vamcBonds" in q else pd.Series(0, index=q.index)
+        # Falling bad-debt and provision stocks suggest a write-off; repayments/reclassification can also explain it.
+        for i in range(max(1, len(q) - 8), len(q)):
+            per, b0, b1, p0, p1 = q.index[i], bad.iloc[i - 1], bad.iloc[i], pv.iloc[i - 1], pv.iloc[i]
+            if any(pd.isna(x) for x in (b0, b1, p0, p1)) or b0 <= 0 or p0 <= 0 or vb.iloc[i] > vb.iloc[i - 1]:
+                continue
+            if b1 / b0 - 1 <= -0.15 and p1 / p0 - 1 <= -0.03:
+                s = (f"{per}: nợ nhóm 3–5 {b0:,.0f}→{b1:,.0f} tỷ cùng số dư dự phòng {p0:,.0f}→{p1:,.0f} tỷ — "
+                     "có thể xử lý/xóa nợ bằng dự phòng; cũng có thể thu hồi/chuyển nhóm, cần thuyết minh DN")
+                if "npl" in j and per in j.index:
+                    k = j.index.get_loc(per)
+                    if k + 1 < len(j) and j["npl"].iloc[k + 1] - j["npl"].iloc[k] >= 0.3:
+                        s += f"; quý sau NPL bật lại {j['npl'].iloc[k]:.2f}→{j['npl'].iloc[k + 1]:.2f}%"
+                ev.append(s)
+        # (b) Gap to the best recent buffer: extra provision (and LNST after 20% tax) needed to restore it.
+        hist = llr_c.iloc[-6:-1].dropna()
+        reported = g("llrPct")
+        comparable = (reported is None or (q.index[-1] in reported.index and pd.notna(reported.loc[q.index[-1]])
+                      and abs(reported.loc[q.index[-1]] - llr_c.iloc[-1]) <= 5))
+        if not comparable:
+            dq.append("LLR nguồn không khớp dự phòng/nợ nhóm 3–5 (hoặc thiếu cùng kỳ); bỏ độ nhạy LLR, cần kiểm tra phạm vi")
+        if comparable and len(hist) and pd.notna(llr_c.iloc[-1]) and llr_c.iloc[-1] < 100 and hist.max() - llr_c.iloc[-1] >= 10:
+            tgt, per_t = hist.max(), hist.idxmax()
+            need = tgt / 100 * bad.iloc[-1] - pv.iloc[-1]
+            ttm = fa_series(frames, "netProfitParentTTM")
+            share = (f", ~{need * 0.8 / ttm.iloc[-1] * 100:.0f}% LNST TTM" if ttm is not None and pd.notna(ttm.iloc[-1])
+                     and ttm.iloc[-1] > 0 else "")
+            ev.append(f"{q.index[-1]}: LLR (dự phòng/nợ nhóm 3–5) {llr_c.iloc[-1]:.0f}%, thấp hơn mức {tgt:.0f}% của {per_t} — "
+                      f"độ nhạy: nếu giữ nguyên nợ nhóm 3–5 và khôi phục LLR cũ, cần thêm ≈ {need:,.0f} tỷ dự phòng "
+                      f"(tác động sau thuế 20% ≈ {need * 0.8:,.0f} tỷ{share}); không phải dự báo hay nghĩa vụ trích lập")
+    # Other assets are aggregated: composition needs issuer notes, not an assumption about accrued income.
+    oa, ta = g("otherAssets", "asset"), g("totalAssets", "asset")
+    if oa is not None and ta is not None and len(oa) >= 5 and len(ta) and oa.iloc[-5] > 0 and ta.iloc[-1] > 0:
+        gr, sh = oa.iloc[-1] / oa.iloc[-5] - 1, oa.iloc[-1] / ta.iloc[-1]
+        if gr >= 0.5 and sh >= 0.05:
+            ev.append(f"{oa.index[-1]}: tài sản khác {oa.iloc[-5]:,.0f}→{oa.iloc[-1]:,.0f} tỷ ({gr * 100:+.0f}% YoY, {sh * 100:.1f}% tổng TS) — "
+                      "chưa rõ cơ cấu (có thể gồm lãi dự thu/phải thu và khoản khác), cần thuyết minh DN")
     # Deposit run-off / CASA drop even when loans are flat (the loans-vs-deposits rule above needs loans to grow).
     casa = g("casaPct", "depositStructure")
     for i in range(max(1, len(j) - n), len(j)):
@@ -669,7 +740,7 @@ def main(workdir):
         FA["periods"] = list(any_df.index)
         FA["kpi"] = kpi_block(fq, structure)
         FA["derived"] = derived_fa(fq, structure)
-        FA["ytd"] = ytd_cumulative(fq)
+        FA["ytd"] = ytd_cumulative(fq, structure)
         if structure in ("nonfinancial", "bank", "securities"):  # bank/securities: only the capital lines can fire
             FA["bs_events"] = balance_sheet_events(fq, actions=P.get("corporate_actions"), structure=structure)
             if structure == "nonfinancial":

@@ -1,6 +1,6 @@
 # Ngân hàng (`structure` = bank)
 
-File này bổ sung cho mục "Ngân hàng" trong [analysis-framework.md](analysis-framework.md) và dùng trong bước 3–5. Lợi nhuận ngân hàng = quy mô tín dụng × NIM − chi phí hoạt động − **dự phòng**. Dự phòng là biến số ban lãnh đạo chủ động điều chỉnh được, nên mọi nhận định về tăng trưởng phải đi kèm một đánh giá **chất lượng lợi nhuận**.
+File này bổ sung cho mục "Ngân hàng" trong [analysis-framework.md](analysis-framework.md) và dùng trong bước 3–5. Đọc kèm [banking-checks.md](banking-checks.md) trước bước 3 để kiểm chứng nguyên nhân, khoản mục tổng hợp và kịch bản độ nhạy. Lợi nhuận ngân hàng = quy mô tín dụng × NIM − chi phí hoạt động − **dự phòng**. Dự phòng là biến số ban lãnh đạo chủ động điều chỉnh được, nên mọi nhận định về tăng trưởng phải đi kèm một đánh giá **chất lượng lợi nhuận**.
 
 ## Tăng trưởng: lõi trước, LNST sau
 
@@ -16,13 +16,13 @@ File này bổ sung cho mục "Ngân hàng" trong [analysis-framework.md](analys
 |---|---|
 | "nợ xấu đi theo nhóm" | Nợ đang dịch chuyển xuống nhóm thấp hơn. Nhóm 2 tăng là tín hiệu sớm; nhóm 3 tăng mạnh sẽ đẩy NPL lên ở quý đó hoặc quý sau. Nếu nhóm 5 giảm trong khi số dư dự phòng gần như đi ngang, nhiều khả năng ngân hàng vừa xử lý/xóa nợ (ghi "cần tin DN") |
 | "⚠️ NPL … trong khi chi phí dự phòng giảm YoY" | Lợi nhuận đang được hỗ trợ bởi dự phòng thấp. Định lượng phần hỗ trợ này: (dự phòng cùng kỳ − dự phòng quý này) × (1 − 20% thuế) = LNST tăng thêm nhờ dự phòng thấp. Viết lại tăng trưởng YoY sau khi trừ phần đó |
-| "LLR … bộ đệm dự phòng mỏng đi" | So với đáy LLR trong bảng năm (TCB: 102% năm 2023). LLR dưới 100% và đang giảm thì chi phí dự phòng sẽ phải tăng lại |
+| "LLR … bộ đệm dự phòng mỏng đi" | So với đáy LLR trong bảng năm (TCB: 102% năm 2023). LLR dưới 100% và đang giảm là rủi ro bộ đệm mỏng; đối chiếu thu hồi/xử lý nợ và độ nhạy LLR trước khi dự báo chi phí |
 | "nợ nhóm 5 tăng N quý liên tiếp" | Nợ mất vốn đang tích tụ chậm, nên quy tắc +30%/quý không bắt được. Chi phí dự phòng sẽ phải duy trì cao. Lúc này LLR tăng chỉ là đang đuổi theo nợ xấu chứ không phải bộ đệm dày lên (OCB: nhóm 5 tăng từ 3,389 lên 5,852 tỷ trong 5 quý, LLR từ 30% lên 56%) |
 | "trái phiếu VAMC … cùng quý NPL giảm" | NPL giảm nhờ bán nợ cho VAMC, nợ chưa được thu hồi. Rủi ro vẫn nằm trên bảng cân đối dưới dạng trái phiếu đặc biệt phải trích dự phòng dần. Báo cáo coi mức NPL trước khi bán là NPL "thật" (OCB 2025Q4: 4.34% xuống 3.39% khi xuất hiện 1,313 tỷ trái phiếu VAMC) |
 
-Nhóm 2 giảm cùng quý nhóm 3–5 tăng là nợ **trượt xuống nhóm thấp hơn**, không phải chất lượng nợ cải thiện. Đọc nhóm 2 cùng các nhóm 3–5 trong `loanStructureByQuality`, đừng đọc riêng nhóm 2.
+Nhóm 2 giảm cùng quý nhóm 3–5 tăng **có thể là nợ trượt nhóm**; cần bảng chuyển nhóm để xác nhận, chưa đủ kết luận chất lượng nợ cải thiện. Đọc nhóm 2 cùng các nhóm 3–5 trong `loanStructureByQuality`, đừng đọc riêng nhóm 2.
 
-Scorecard nhóm "Chất lượng" chỉ chấm mức NPL/LLR hiện tại, không chấm xu hướng. Khi cả ba dòng trên cùng xuất hiện trong 2 quý gần nhất, ghi chúng thành rủi ro ở mục Scorecard và mục Rủi ro. Override điểm khi NPL đã vượt 1,5% hoặc LLR đã xuống dưới 100%.
+Scorecard nhóm "Chất lượng" chỉ chấm mức NPL/LLR hiện tại, không chấm xu hướng. Khi nợ trượt nhóm, NPL tăng với dự phòng giảm và LLR mỏng đi cùng xuất hiện trong 2 quý gần nhất, ghi thành rủi ro ở mục Scorecard và mục Rủi ro. Cách giữ điểm gốc và override có giải trình nằm ở mục 6 của [banking-checks.md](banking-checks.md).
 
 **Dữ liệu méo:** `standardRatioPct` (chart `loanStructureByQuality`) chia cho `totalLoans`, mà con số này lớn hơn tổng các nhóm nợ đã phân loại. Vì vậy chuỗi trượt dần xuống dù chất lượng nợ không đổi. Khi `tables.md` có cảnh báo này, dùng NPL/nhóm 2 và tỷ lệ nhóm 1 trên nợ đã phân loại được in kèm.
 
@@ -36,8 +36,8 @@ Scorecard nhóm "Chất lượng" chỉ chấm mức NPL/LLR hiện tại, khôn
 
 ## Vốn và sự kiện
 
-- Ngân hàng hay chia cổ phiếu thưởng. Đọc "Sự kiện quyền" ở mục Giá; dòng vốn điều lệ trong "Sự kiện bảng cân đối" có đuôi "khớp sự kiện quyền" là CP thưởng/cổ tức CP, kể cả khi gợi ý LNGPP ghi "không khớp" (thưởng từ quỹ dự trữ/thặng dư nằm ở `otherCapital`, như OCB 2025Q3). Khi có cảnh báo "Số CP lưu hành ≠ vốn điều lệ BCTC", vốn điều lệ trên BCTC chưa cập nhật, còn EPS và P/E đã tính theo số cổ phiếu mới. Mọi mức giá trước ngày GDKHQ trong báo cáo lấy theo `adjClose`.
-- Dòng "lợi ích CĐ thiểu số" nghĩa là đã có thay đổi sở hữu ở công ty con (công ty chứng khoán, tài chính tiêu dùng, bảo hiểm). Nếu khoản này tăng cùng lúc với vốn khác (`otherCapital`), nhiều khả năng ngân hàng đã bán bớt cổ phần hoặc IPO công ty con, tức có lãi nằm trong vốn chủ chứ không qua P&L.
+- Ngân hàng hay chia cổ phiếu thưởng. Đọc "Sự kiện quyền" ở mục Giá; dòng vốn điều lệ trong "Sự kiện bảng cân đối" có đuôi "khớp sự kiện quyền" là CP thưởng/cổ tức CP, kể cả khi gợi ý LNGPP ghi "không khớp" (có thể thưởng từ quỹ dự trữ/thặng dư; nguồn cụ thể cần thuyết minh DN). Khi có cảnh báo "Số CP lưu hành ≠ vốn điều lệ BCTC", vốn điều lệ trên BCTC chưa cập nhật, còn EPS và P/E đã tính theo số cổ phiếu mới. Mọi mức giá trước ngày GDKHQ trong báo cáo lấy theo `adjClose`.
+- Dòng "lợi ích CĐ thiểu số" gợi ý biến động ở công ty con. Kiểm chứng thay đổi sở hữu/phạm vi hợp nhất theo mục 4 của [banking-checks.md](banking-checks.md).
 
 ## Định giá: P/B đi cùng ROE
 
