@@ -18,7 +18,7 @@
 
 ## 3. Doanh nghiệp: KPI theo cấu trúc BCTC
 
-Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analyze.py` cho +1 điểm khi LNST ≥ 15% và doanh thu ≥ 10%), ROE TTM (≥15% tốt, ≤8% yếu), xu hướng 8 quý chứ không chỉ quý mới nhất, và tách lợi nhuận một lần ra khỏi lợi nhuận cốt lõi (`financialProfit` / `otherProfit` đột biến).
+Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analyze.py` cho +1 điểm khi LNST ≥ 15% và doanh thu ≥ 10%), đối chiếu với dòng "Lũy kế năm so với cùng kỳ" khi lợi nhuận quý dao động mạnh vì nền so sánh, ROE TTM (≥15% tốt, ≤8% yếu), xu hướng 8 quý chứ không chỉ quý mới nhất, và tách lợi nhuận một lần ra khỏi lợi nhuận cốt lõi (`financialProfit` / `otherProfit` đột biến).
 
 **Phi tài chính** (`nonfinancial`)
 - Biên gộp/ròng TTM tăng nghĩa là sức mạnh định giá cải thiện hoặc chu kỳ đang thuận. Với ngành chu kỳ (thép, phân bón, hóa chất, BĐS, vận tải biển), luôn so với đỉnh và đáy chu kỳ trong bảng theo năm.
@@ -63,7 +63,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 
 - **RS3/RS6** (0-100, xếp hạng toàn thị trường): ≥80 là nhóm dẫn đầu, ≤30 là nhóm yếu. Đọc thêm Δ5 phiên và Δ60 phiên trên biểu đồ Sức mạnh.
 - **VCR** (tốc độ dòng tiền): <0,8 là rút, 0,8–1 là ổn định, 1–1,2 là tăng, ≥1,2 là mạnh. **AMFI** (mua chủ động có trọng số): >0 nghĩa là phe mua chiếm ưu thế. **bear20Active** là phân kỳ giảm đã được xác nhận, một tín hiệu cảnh báo.
-- **Elite v23**: vào vị thế khi đủ 5/5 trụ (rs3 ≥ 80 và rs6 ≥ 60, VCR ≥ 1, AMFI > 0, GTGD20 ≥ 5 tỷ, không có bear20) trong 3 phiên liên tiếp và không bị guard nào chặn. Trụ còn thiếu chính là trigger cần theo dõi. Lịch sử các episode (tỷ lệ thắng, lãi/lỗ trung bình) cho biết tín hiệu này có đáng tin với mã đó hay không.
+- **Elite v23**: vào vị thế khi đủ 5/5 trụ (rs3 ≥ 80 và rs6 ≥ 60, VCR ≥ 1, AMFI > 0, GTGD20 ≥ 5 tỷ, không có bear20) trong 3 phiên liên tiếp và không bị guard nào chặn. Trụ còn thiếu chính là trigger cần theo dõi. Guard-2 ("không phải cổ phiếu HOSE 3 ký tự") là cố định với mã HNX/UPCoM: mã đó không bao giờ vào Elite, nên báo cáo chỉ dùng các trụ làm điều kiện xác nhận, không viết "chờ tín hiệu Elite". Lịch sử các episode (tỷ lệ thắng, lãi/lỗ trung bình) cho biết tín hiệu này có đáng tin với mã đó hay không.
 - Khối ngoại (5/20/60/250 phiên kèm đường lũy kế), mua/bán chủ động (âm kéo dài nghĩa là phe bán chủ động áp đảo), tự doanh. **Xác nhận** là khi giá tăng đồng thời dòng tiền dương; **phân kỳ** là khi giá tăng nhưng dòng tiền âm, hoặc ngược lại.
 
 ## 7. So sánh cùng ngành

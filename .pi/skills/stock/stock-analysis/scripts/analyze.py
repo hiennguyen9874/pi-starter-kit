@@ -200,6 +200,64 @@ def derived_fa(frames, structure):
     return d
 
 
+def ytd_cumulative(frames):
+    """Year-to-date sums vs the same quarters a year earlier. Lumpy recognisers (KCN land leases, BĐS handovers)
+    swing ±50% per quarter, so 9T/26 vs 9T/25 is the fairer growth read than the single-quarter YoY."""
+    out = {}
+    for name in ("netRevenue", "totalOperatingIncome", "operatingRevenue", "netProfitParent"):
+        s = fa_series(frames, name)
+        if s is None or s.dropna().empty or "Q" not in str(s.index[-1]):
+            continue
+        y, q = int(s.index[-1][:4]), int(s.index[-1][-1])
+        cur, prev = [f"{y}Q{i}" for i in range(1, q + 1)], [f"{y - 1}Q{i}" for i in range(1, q + 1)]
+        if q < 2 or not all(p in s.index for p in cur + prev) or s[cur + prev].isna().any():
+            continue
+        out[name] = {"label": f"{3 * q}T/{y}", "value": s[cur].sum(), "prev": s[prev].sum(),
+                     "yoyPct": pct_change(s[cur].sum(), s[prev].sum())}
+    return out
+
+
+ASSET_VI = {"cashBank": "Tiền", "receivables": "Phải thu", "inventory": "Hàng tồn kho", "fixedAssets": "TSCĐ",
+            "constructionWip": "XDCB dở dang", "finInvest": "Đầu tư TC", "otherAssets": "Tài sản khác"}
+
+
+def balance_sheet_events(frames, n=8):
+    """Nonfinancial only. (1) Offsetting asset moves in one quarter = reclassification (XDCB -> TSCĐ: plant goes live;
+    XDCB -> tồn kho: land bank turned saleable). (2) Charter-capital changes, with a hint whether the rise was funded from
+    retained earnings (LNST quý - Δquỹ&LNGPP ≈ Δvốn: cổ tức CP/thưởng) or by new money. Both are hints for the report."""
+    ev = []
+    a = frames.get("asset")
+    if a is not None and "totalAssets" in a:
+        comp = [c for c in ASSET_VI if c in a]
+        d = a[comp].diff()
+        for per in a.index[-n:]:
+            ta = a["totalAssets"].shift(1).get(per)
+            if per not in d.index or not ta or pd.isna(ta):
+                continue
+            row = d.loc[per]
+            for dec, dv in row[row < -0.05 * ta].items():
+                for inc, iv in row[(row >= 0.7 * -dv) & (row <= 1.3 * -dv)].items():
+                    ev.append(f"{per}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {ASSET_VI[inc]} {iv:+,.0f} tỷ "
+                              f"(bù trừ nhau, khả năng phân loại lại tài sản)")
+    cap = fa_series(frames, "charterCapital", "capital")
+    sur = fa_series(frames, "surplusRetainedFunds", "capital")
+    npq = fa_series(frames, "netProfitParent")
+    if cap is not None:
+        dc = cap.diff()
+        for per in cap.index[-n:]:
+            if not pd.notna(dc.get(per)) or abs(dc[per]) < 0.005 * cap.shift(1)[per]:
+                continue
+            msg = f"{per}: Vốn điều lệ {cap.shift(1)[per]:,.0f} → {cap[per]:,.0f} tỷ ({pct_change(cap[per], cap.shift(1)[per]):+.1f}%)"
+            if sur is not None and npq is not None and pd.notna(sur.diff().get(per)) and pd.notna(npq.get(per)):
+                moved = npq[per] - sur.diff()[per]  # profit that left retained earnings this quarter
+                hint = ("khớp chuyển từ LNGPP sang vốn → cổ tức CP/thưởng, không có tiền mới"
+                        if dc[per] > 0 and abs(moved - dc[per]) <= 0.3 * abs(dc[per])
+                        else "không khớp chuyển từ LNGPP → có thể phát hành thu tiền/ESOP")
+                msg += f"; LNST quý {npq[per]:,.0f}, Δquỹ&LNGPP {sur.diff()[per]:+,.0f} → {hint} (cần tin DN)"
+            ev.append(msg)
+    return ev
+
+
 def main(workdir):
     W = Work(workdir)
     sym, structure = W.symbol, W.structure
@@ -251,6 +309,15 @@ def main(workdir):
         P["avg_value_20_bil"] = val.iloc[-20:].mean()
         P["avg_value_60_bil"] = val.iloc[-60:].mean()
         P["value_ratio_20_60"] = P["avg_value_20_bil"] / P["avg_value_60_bil"] if P["avg_value_60_bil"] else None
+        # Put-through (thỏa thuận) blocks inflate totalValue averages -> keep a matched-only baseline for breakout checks.
+        if "matchedValue" in px:
+            P["avg_matched_20_bil"] = (px["matchedValue"] / BIL).iloc[-20:].mean()
+        if "putThroughValue" in px:
+            ptv = (px["putThroughValue"].fillna(0) / BIL).iloc[-60:]
+            tot60 = val.iloc[-60:].sum()
+            P["putthrough_share_60_pct"] = ptv.sum() / tot60 * 100 if tot60 else None
+            if ptv.max() > 0:
+                P["putthrough_max_60"] = {"date": str(ptv.idxmax().date()), "bil": ptv.max()}
         if not vn.empty:
             j = pd.concat([dr, vn["close"].pct_change()], axis=1, keys=["s", "m"]).dropna().iloc[-252:]
             P["beta_1y"] = j["s"].cov(j["m"]) / j["m"].var() if len(j) > 60 else None
@@ -346,6 +413,9 @@ def main(workdir):
         FA["periods"] = list(any_df.index)
         FA["kpi"] = kpi_block(fq, structure)
         FA["derived"] = derived_fa(fq, structure)
+        FA["ytd"] = ytd_cumulative(fq)
+        if structure == "nonfinancial":
+            FA["bs_events"] = balance_sheet_events(fq)
     if fy:
         names = ANNUAL.get(structure, [])
         yrs = list(next(iter(fy.values())).index)
@@ -400,17 +470,25 @@ def main(workdir):
                    "median10y": pe.median(), "mean10y": pe.mean(), "std10y": pe.std(),
                    "min10y": pe.min(), "max10y": pe.max(), "pctile10y": percentile_of(pe, cur_pe),
                    "negative_months": int((pe_raw <= 0).sum())}
-        # A trough-earnings year inflates the 3Y average P/E (cyclicals: steel, securities, real estate).
-        V["pe"]["avg3Y_distorted"] = bool(V["pe"]["avg3Y"] and V["pe"]["avg3Y"] > 1.5 * V["pe"]["median10y"])
         V["pb"] = {"current": cur_pb, "avg3Y": a3pb.iloc[-1] if len(a3pb) else None,
                    "median10y": pb.median(), "mean10y": pb.mean(), "std10y": pb.std(),
                    "min10y": pb.min(), "max10y": pb.max(), "pctile10y": percentile_of(pb, cur_pb)}
+        # The website 3Y average is a mean, so a trough-earnings year (P/E) or a broken source block (P/B; seen: IDC 2023,
+        # P/B 13-27 vs ~3) drags it far from typical. Flag: avg > 1.5x 10Y median, or avg > 1.3x median of the last
+        # 36 months (mean >> median = outliers). outlier_months (> 3x 10Y median): trough earnings for P/E, suspect source for P/B.
+        for key, s in (("pe", pe), ("pb", pb)):
+            v, s = V[key], s.dropna()
+            recent = s.iloc[-36:]
+            outl = s[s > 3 * v["median10y"]] if pd.notna(v["median10y"]) else s.iloc[:0]
+            v["outlier_months"] = [str(pd.Timestamp(d).date()) for d in outl.index]
+            v["avg3Y_distorted"] = bool(v["avg3Y"] and (v["avg3Y"] > 1.5 * v["median10y"]
+                                                        or (len(recent) and v["avg3Y"] > 1.3 * recent.median())))
         price = M["price"].get("close")
         if price and cur_pe and cur_pb:
             V["implied_price"] = {
                 "at_pe_avg3Y": price * V["pe"]["avg3Y"] / cur_pe if V["pe"]["avg3Y"] and not V["pe"]["avg3Y_distorted"] else None,
                 "at_pe_median10y": price * V["pe"]["median10y"] / cur_pe,
-                "at_pb_avg3Y": price * V["pb"]["avg3Y"] / cur_pb if V["pb"]["avg3Y"] else None,
+                "at_pb_avg3Y": price * V["pb"]["avg3Y"] / cur_pb if V["pb"]["avg3Y"] and not V["pb"]["avg3Y_distorted"] else None,
                 "at_pb_median10y": price * V["pb"]["median10y"] / cur_pb,
             }
     sva = (W.load("sector_val_all") or {}).get("sectors", [])
@@ -432,6 +510,8 @@ def main(workdir):
 
     # ---------------- Peers ----------------
     caps = {c["code"]: c.get("marketCap") for c in (W.load("sector_companies") or {}).get("companies", [])}
+    if M["price"].get("marketCapBil") is None and caps.get(sym):  # price rows can carry marketCap = null (seen: IDC)
+        M["price"]["marketCapBil"], M["price"]["marketCapSource"] = caps[sym], "sector_companies"
     pr = []
     for s in peers:
         pr.append({"symbol": s["symbol"], "exchange": s.get("exchange"), "marketCapBil": caps.get(s["symbol"]),
@@ -586,14 +666,18 @@ def tables_md(M):
         L += ["> Giới hạn gói: " + "; ".join(f"{k}: {v}" for k, v in meta["packageNotes"].items()), ""]
     L += ["## Giá & kỹ thuật", "| Chỉ tiêu | Giá trị |", "|---|---|",
           f"| Giá đóng cửa (nghìn đ) | {fmt(P.get('close'), 2)} ({fmt_signed(P.get('changePct'), 2)}) |",
-          f"| Vốn hóa (tỷ) | {fmt(P.get('marketCapBil'), 0)} |",
+          f"| Vốn hóa (tỷ) | {fmt(P.get('marketCapBil'), 0)}{' (nguồn: sector_companies)' if P.get('marketCapSource') else ''} |",
           f"| Đỉnh / đáy 52 tuần | {fmt(P.get('high_52w'), 2)} / {fmt(P.get('low_52w'), 2)} (cách đỉnh {fmt_signed(P.get('from_high_pct'))}) |",
           f"| MA20 / MA50 / MA200 | {fmt(P.get('ma20'), 2)} / {fmt(P.get('ma50'), 2)} / {fmt(P.get('ma200'), 2)} |",
           f"| RSI14 · MACD hist | {fmt(P.get('rsi14'))} · {fmt(P.get('macd_hist'), 3)} |",
           f"| ATR14 % · Biến động năm % · Beta 1Y | {fmt(P.get('atr14_pct'))} · {fmt(P.get('vol_annual_pct'))} · {fmt(P.get('beta_1y'), 2)} |",
           f"| Max drawdown 1Y | {fmt(P.get('max_drawdown_1y_pct'))}% |",
-          f"| GTGD TB20 / TB60 (tỷ) | {fmt(P.get('avg_value_20_bil'))} / {fmt(P.get('avg_value_60_bil'))} |", "",
-          "| Kỳ | Cổ phiếu | VNINDEX | Chênh lệch (pp) |", "|---|---|---|---|"]
+          f"| GTGD TB20 / TB60 (tỷ) | {fmt(P.get('avg_value_20_bil'))} / {fmt(P.get('avg_value_60_bil'))} · khớp lệnh TB20 {fmt(P.get('avg_matched_20_bil'))} · thỏa thuận {fmt(P.get('putthrough_share_60_pct'))}% GTGD 60 phiên |", ""]
+    pmx = P.get("putthrough_max_60") or {}
+    if (P.get("putthrough_share_60_pct") or 0) >= 20:
+        L += [f"> ⚠️ Thỏa thuận chiếm {fmt(P['putthrough_share_60_pct'])}% GTGD 60 phiên (lớn nhất {pmx.get('date')}: {fmt(pmx.get('bil'))} tỷ): "
+              "TB20/TB60 bị thổi phồng, dùng khớp lệnh TB20 làm ngưỡng thanh khoản cho breakout.", ""]
+    L += ["| Kỳ | Cổ phiếu | VNINDEX | Chênh lệch (pp) |", "|---|---|---|---|"]
     for k in ("1w", "1m", "3m", "6m", "ytd", "1y"):
         L.append(f"| {k.upper()} | {fmt_signed(P.get('ret_'+k))} | {fmt_signed(P.get('vnindex_ret_'+k))} | "
                  f"{fmt_signed(P.get('rel_'+k) if k!='ytd' else (P.get('ret_ytd') - P.get('vnindex_ret_ytd') if P.get('ret_ytd') is not None and P.get('vnindex_ret_ytd') is not None else None), 1, '')} |")
@@ -613,6 +697,8 @@ def tables_md(M):
         if p:
             L.append(f"| Sức mạnh {rt.upper()} hiện tại / 20 phiên trước / 60 phiên trước | {fmt(p['now'])} / {fmt(p['20d'])} / {fmt(p['60d'])} (ngành {fmt(p['sector_now'])}) |")
     L += [f"| Elite | {'ĐANG MỞ' if E.get('openEpisode') else 'Không'} · {E.get('pillars')}/5 trục · thiếu: {', '.join(E.get('missingPillars') or []) or '—'} · guard: {E.get('guardsTripped') or '—'} |"]
+    if any(g.get("guard") == 2 for g in E.get("guardsTripped") or []):
+        L.append(f"| Elite guard-2 | cố định: mã niêm yết {meta.get('exchange')}, Elite chỉ xét HOSE, nên mã này không bao giờ vào Elite. Các trụ vẫn dùng được làm trigger xác nhận |")
     if E.get("history"):
         h = E["history"]
         L.append(f"| Lịch sử Elite | {h['episodes']} lần, thắng {fmt(h['win_rate_pct'],0)}%, TB {fmt_signed(h['avg_pl_pct'])} |")
@@ -631,6 +717,12 @@ def tables_md(M):
                   + f". ROE snapshot (get_stock_valuation): {fmt((V.get('snapshot') or {}).get('roe'))}%"]
         if FA.get("derived"):
             L += ["", "Chỉ tiêu suy ra: " + " · ".join(f"{k}={fmt(v, 2)}" for k, v in FA["derived"].items())]
+        if FA.get("ytd"):
+            L += ["", "Lũy kế năm so với cùng kỳ: " + " · ".join(
+                f"{SERIES_VI.get(k, k)} {v['label']} {fmt(v['value'], 0)} vs {fmt(v['prev'], 0)} ({fmt_signed(v['yoyPct'])})"
+                for k, v in FA["ytd"].items())]
+        if FA.get("bs_events"):
+            L += ["", "Sự kiện bảng cân đối (8 quý, gợi ý cần giải thích ở bước 3):"] + [f"- {e}" for e in FA["bs_events"]]
     if FA.get("annual"):
         A = FA["annual"]
         L += ["", "## Theo năm", "| Chỉ tiêu | " + " | ".join(A["years"]) + " |", "|---" * (len(A["years"]) + 1) + "|"]
@@ -675,7 +767,13 @@ def tables_md(M):
     L.append("\nTổng phụ: " + " · ".join(f"{k} {v:+d}" for k, v in sg["subtotals"].items())
              + " (Kỹ thuật ±8, Cơ bản ±6, Bối cảnh ±2)")
     if V.get("pe", {}).get("avg3Y_distorted"):
-        L.append("\n> ⚠️ P/E TB 3 năm bị méo bởi giai đoạn lợi nhuận đáy (>1.5× trung vị 10N) — dùng trung vị P/E dương và P/B để định giá.")
+        L.append("\n> ⚠️ P/E TB 3 năm bị méo bởi giai đoạn lợi nhuận đáy (TB > 1.5× trung vị 10N hoặc > 1.3× trung vị 36 tháng) — dùng trung vị P/E dương và P/B để định giá.")
+    if V.get("pb", {}).get("avg3Y_distorted"):
+        L.append("\n> ⚠️ P/B TB 3 năm bị méo (TB > 1.5× trung vị 10N hoặc > 1.3× trung vị 36 tháng) — at_pb_avg3Y đã bỏ; dùng trung vị P/B 10N kèm ROE.")
+    om = V.get("pb", {}).get("outlier_months") or []
+    if om:
+        L.append(f"\n> ⚠️ P/B: {len(om)} tháng > 3× trung vị 10N ({om[0]} … {om[-1]}) — nghi lỗi dữ liệu nguồn (VCSH), "
+                 "min–max và percentile 10N có chứa các tháng này.")
     return "\n".join(L) + "\n"
 
 
