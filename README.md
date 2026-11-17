@@ -5,8 +5,14 @@ A starter configuration for the [Pi coding agent](https://github.com/badlogic/pi
 ## Getting started
 
 1. Install Pi and configure a model provider and authentication for your environment.
-2. Clone this repository and start `pi` from its root directory.
-3. Use `/profile` to explore and select a workflow profile. The configured default is `base`.
+2. Clone this repository and install the profile extension's dependencies from the repository root:
+
+   ```bash
+   npm install --prefix .pi/extensions/profile
+   ```
+
+3. Start `pi` from the repository root. On first use, run `/new`, then `/reload` to automatically install and load the extensions.
+4. Use `/profile` to explore and select a workflow profile. The configured default is `base`.
 
 Review `.pi/settings.json` and the selected profile before use: packages, tools, skills, and MCP servers can vary by profile and may require additional dependencies or credentials.
 
