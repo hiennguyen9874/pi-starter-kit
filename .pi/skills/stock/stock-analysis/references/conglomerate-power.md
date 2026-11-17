@@ -6,12 +6,7 @@ File này bổ sung cho mục "Phi tài chính" trong [analysis-framework.md](an
 
 1. Liệt kê các mảng kinh doanh chính của doanh nghiệp, rồi gán mỗi mảng một `sectorId` lấy trong `raw/sector_rrg.json`: điện 13, nước 26, thiết bị điện/dây cáp 32, BĐS 3, KCN 4, xây dựng/M&E 41, VLXD 40. sstock không có cơ cấu doanh thu theo mảng, nên ghi rõ nguồn của bước gán: "theo hiểu biết, cần BCTC bộ phận".
 2. Fetch rồi tính bảng (4 lần gọi MCP cho mỗi ngành):
-   ```js
-   // @options: {"timeout_ms": 200000}
-   const AF = Object.getPrototypeOf(async function(){}).constructor;
-   const src = await tools.read({ path: ".pi/skills/stock/stock-analysis/scripts/fetch_proxy.js" });
-   return await new AF("tools", "args", src)(tools, { outDir: "stock-reports/REE-2026-11-15", sectorIds: [13, 26, 32] });
-   ```
+   Dùng mục **Ngành proxy** của file runtime đã chọn ở SKILL.md: [ipython](runtime-ipython.md#ngành-proxy) khi có tool `ipython`, hoặc [codemode](runtime-codemode.md#ngành-proxy) khi dùng codemode. Chỉ đọc nhánh khớp runtime.
    ```bash
    uv run -q --with pandas --with numpy python .pi/skills/stock/stock-analysis/scripts/proxy_sectors.py stock-reports/REE-2026-11-15
    ```

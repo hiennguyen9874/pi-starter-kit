@@ -1,7 +1,7 @@
 """Render the analysis charts for one fetched ticker.
 
 usage: uv run --with pandas --with numpy --with matplotlib --with seaborn python charts.py <workdir>
-writes: <workdir>/charts/*.png  (look at every PNG with the read tool before writing the report)
+writes: <workdir>/charts/*.png  (inspect every PNG in the active runtime before writing the report)
 """
 from __future__ import annotations
 

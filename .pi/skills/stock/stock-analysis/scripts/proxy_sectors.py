@@ -1,4 +1,4 @@
-"""proxy_sectors.py <workdir> — benchmark a stock against proxy sectors fetched by fetch_proxy.js.
+"""proxy_sectors.py <workdir> — benchmark a stock against proxy sectors fetched by fetch_proxy.py or fetch_proxy.js.
 
 Reads raw/proxy_<id>.json, raw/sector_rrg.json and metrics.json (run_pipeline.sh first).
 Writes <workdir>/proxy.md and prints it. Additive: the main pipeline never reads proxy.md.

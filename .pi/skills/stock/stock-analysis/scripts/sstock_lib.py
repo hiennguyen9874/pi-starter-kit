@@ -1,6 +1,6 @@
 """Shared loaders + indicators for the sstock stock-analysis pipeline.
 
-Raw files live in <workdir>/raw/<job>.json as {tool, args, isError, data} (written by fetch_stock.js).
+Raw files live in <workdir>/raw/<job>.json as {tool, args, isError, data} (written by fetch_stock.py or fetch_stock.js).
 Units coming out of sstock (see references/sstock-tools.md):
   price/MA: nghìn đồng | values/foreign/marketCap in price rows: đồng | FA money: tỷ đồng | *Pct: %.
 """
