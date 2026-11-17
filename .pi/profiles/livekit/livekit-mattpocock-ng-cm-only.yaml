@@ -76,8 +76,6 @@ extensionsEnable:
   - ./extensions/codemode-direct-write.ts
 extra:
   override:
-    extensionState:
-      piDocumentationEnabled: false
     defaultTools:
       # - "+find"
       # - "+grep"

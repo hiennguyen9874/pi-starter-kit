@@ -47,8 +47,6 @@ extensionsEnable:
   - builtin:tool-search
 extra:
   override:
-    extensionState:
-      piDocumentationEnabled: false
     defaultTools:
       # - "+find"
       # - "+grep"
