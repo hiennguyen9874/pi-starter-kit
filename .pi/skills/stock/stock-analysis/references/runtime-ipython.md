@@ -6,10 +6,9 @@ Ví dụ bắt đầu ở thư mục gốc repo. Nếu cwd khác, dùng đườn
 
 ## Fetch một mã
 
-Khởi tạo một lần trong kernel; dùng lại `client` cho fetch mã, retry và ngành proxy để chia sẻ ngân sách rate-limit. Chờ task trước hoàn tất rồi mới khởi chạy task kế tiếp:
+Khởi tạo một lần trong kernel; dùng lại `client` cho fetch mã, retry và ngành proxy để chia sẻ ngân sách rate-limit. **Vòng đời bridge:** chạy mọi lời gọi `pi` bằng top-level `await` trong cell khởi tạo lời gọi, giữ cell sống tới khi hoàn tất. Task nền chạy qua ranh giới cell có thể lỗi `Bridged calls are only allowed while their originating Cell runs`; dùng cách gọi trực tiếp dưới đây cho mọi mã:
 
 ```python
-import asyncio
 import sys
 from datetime import date
 from pathlib import Path
@@ -22,26 +21,17 @@ from fetch_stock import fetch_stock
 symbol = "HPG"
 workdir = (Path("stock-reports") / f"{symbol}-{date.today().isoformat()}").resolve()
 client = SStockClient(pi, per_min=25)
-fetch_task = asyncio.create_task(fetch_stock(client, symbol, workdir))
-print("Fetch started; poll fetch_task in a later cell.")
+fetch_summary = await fetch_stock(client, symbol, workdir)
+print(fetch_summary)
 ```
 
-Fetch có thể lâu hơn một lượt tool. Poll ở cell sau; kết quả/lỗi được giữ trong task:
+Chỉ sang compute khi `fetch_summary["failed"]` đã được xử lý theo bước 1 của SKILL.md. Client dùng `await pi.describe(name)` trước lần gọi đầu tiên, lưu mô tả trong `client.descriptions`, gọi `await pi.tool(name, args)`, chờ bằng `asyncio.sleep`. Bridge có thể trả chuỗi khi tool không khai báo output schema; `sstock_fetch.py` xử lý chuỗi JSON, MCP envelope (`structuredContent` hoặc `content[].text`) và lỗi `pi.ToolError.result`. Đọc schema/guidelines trước khi thêm lời gọi ngoài pipeline. Với lời gọi ad-hoc, tìm tên bằng `await pi.search("sstock <tool>")`, đọc `await pi.describe(name)` rồi mới `await pi.tool(name, args)`.
+
+Retry job cụ thể bằng cùng client, vẫn chờ trong cell gọi:
 
 ```python
-if fetch_task.done():
-    fetch_summary = fetch_task.result()
-    print(fetch_summary)
-else:
-    print("Still fetching; poll again in a later cell.")
-```
-
-Chỉ sang compute khi task đã kết thúc và `failed` đã được xử lý. Client dùng `await pi.describe(name)` trước lần gọi đầu tiên, lưu mô tả trong `client.descriptions`, gọi `await pi.tool(name, args)`, chờ bằng `asyncio.sleep`. Bridge có thể trả chuỗi khi tool không khai báo output schema; `sstock_fetch.py` xử lý chuỗi JSON, MCP envelope (`structuredContent` hoặc `content[].text`) và lỗi `pi.ToolError.result`. Đọc schema/guidelines trước khi thêm lời gọi ngoài pipeline. Với lời gọi ad-hoc, tìm tên bằng `await pi.search("sstock <tool>")`, đọc `await pi.describe(name)` rồi mới `await pi.tool(name, args)`.
-
-Retry job cụ thể bằng cùng client (poll `fetch_task` như trên):
-
-```python
-fetch_task = asyncio.create_task(fetch_stock(client, symbol, workdir, only=["fa_q"]))
+fetch_summary = await fetch_stock(client, symbol, workdir, only=["fa_q"])
+print(fetch_summary)
 ```
 
 `price_years=3` là số trang giá (250 phiên/trang). Python checkpoint `manifest.json` sau mỗi job và giữ trạng thái các job không được chọn khi retry. Nếu trang sau lỗi, các dòng đã lấy vẫn dùng được, nhưng job xuất hiện trong `failed` và cảnh báo `Partial fetch` được ghi vào `note`. Lỗi identity/structure dừng fetch để tránh chọn sai BCTC.
@@ -55,14 +45,17 @@ Chạy khi cần benchmark theo mảng, với ID theo [conglomerate-power.md](co
 
 ```python
 from fetch_proxy import fetch_proxy
-proxy_task = asyncio.create_task(fetch_proxy(client, workdir, [13, 26, 32]))
+proxy_summary = await fetch_proxy(client, workdir, [13, 26, 32])
+print(proxy_summary)
 ```
 
-Poll `proxy_task` như `fetch_task`. Mỗi giá trị trong summary phải là `ok`, hoặc lỗi được ghi vào giới hạn trước khi diễn giải bảng proxy. Output: `raw/proxy_<id>.json` với bốn khóa `rrg`, `val`, `fa`, `companies`.
+Mỗi giá trị trong `proxy_summary` phải là `ok`, hoặc lỗi được ghi vào giới hạn trước khi diễn giải bảng proxy. Output: `raw/proxy_<id>.json` với bốn khóa `rrg`, `val`, `fa`, `companies`.
 
 Sau khi compute chính xong, tính bảng proxy qua `bash()`:
 
 ```python
+import shlex
+
 proxy_pipeline = bash(
     f"uv run -q --with pandas --with numpy python "
     f"{shlex.quote(str(skill_dir / 'scripts/proxy_sectors.py'))} {shlex.quote(str(workdir))}",

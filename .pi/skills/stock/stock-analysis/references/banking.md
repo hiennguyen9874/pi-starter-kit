@@ -24,7 +24,7 @@ Nhóm 2 giảm cùng quý nhóm 3–5 tăng **có thể là nợ trượt nhóm*
 
 Scorecard nhóm "Chất lượng" chỉ chấm mức NPL/LLR hiện tại, không chấm xu hướng. Khi nợ trượt nhóm, NPL tăng với dự phòng giảm và LLR mỏng đi cùng xuất hiện trong 2 quý gần nhất, ghi thành rủi ro ở mục Scorecard và mục Rủi ro. Cách giữ điểm gốc và override có giải trình nằm ở mục 6 của [banking-checks.md](banking-checks.md).
 
-**Dữ liệu méo:** `standardRatioPct` (chart `loanStructureByQuality`) chia cho `totalLoans`, mà con số này lớn hơn tổng các nhóm nợ đã phân loại. Vì vậy chuỗi trượt dần xuống dù chất lượng nợ không đổi. Khi `tables.md` có cảnh báo này, dùng NPL/nhóm 2 và tỷ lệ nhóm 1 trên nợ đã phân loại được in kèm.
+**Đối chiếu nhãn và mẫu số:** kiểm chứng `npl2Pct`, `standardRatioPct` và dư nợ gộp/sau dự phòng theo [data-reconciliation.md §1](data-reconciliation.md#1-ngân-hàng-nhãn-tỷ-lệ-phải-khớp-số-dư) trước khi diễn giải. Chỉ gọi `standardRatioPct` là lệch mẫu số khi phép đối chiếu xác nhận; có mã chuỗi này khớp tổng nợ đã phân loại. Khi dịch vụ đổi bậc hoặc số dư dự phòng đi ngược chi phí, làm tiếp §2 trước khi kết luận tăng trưởng lõi.
 
 ## Nguồn vốn và NIM
 
