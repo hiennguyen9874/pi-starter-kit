@@ -43,12 +43,34 @@ export function removeDisabledSkillsFromPrompt(systemPrompt: string, filters: st
   });
 }
 
+type PromptSkill = { name: string; disableModelInvocation?: boolean };
+
+/**
+ * Hides matching skills from model invocation without removing them, so later
+ * handlers that rebuild the prompt from systemPromptOptions (e.g. pi-ipython)
+ * omit them too, while /skill:name and prompt-skills.ts can still resolve them.
+ */
+export function hideDisabledSkills<T extends PromptSkill>(skills: T[], filters: string[]): T[] {
+  if (filters.length === 0) return skills;
+  return skills.map((skill) =>
+    !skill.disableModelInvocation && filters.some((filter) => matchesSkillName(skill.name, filter))
+      ? { ...skill, disableModelInvocation: true }
+      : skill,
+  );
+}
+
 export default function skillsInstructionsRewriterExtension(pi: ExtensionAPI) {
   pi.on("before_agent_start", (event) => {
-    const systemPrompt = removeDisabledSkillsFromPrompt(
-      event.systemPrompt,
-      readDisabledSkillFilters(),
-    );
+    const filters = readDisabledSkillFilters();
+    if (filters.length === 0) return undefined;
+
+    // systemPromptOptions is shared by every before_agent_start handler and the final
+    // render, so this reaches extensions that ignore event.systemPrompt.
+    const options = event.systemPromptOptions;
+    if (options.skills) options.skills = hideDisabledSkills(options.skills, filters);
+
+    // Fallback for a prompt that was forced before this handler ran.
+    const systemPrompt = removeDisabledSkillsFromPrompt(event.systemPrompt, filters);
     return systemPrompt === event.systemPrompt ? undefined : { systemPrompt };
   });
 }
