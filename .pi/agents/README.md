@@ -8,6 +8,8 @@ Mỗi file `.md` là một loại agent: **frontmatter** là cấu hình, **ph�
 
 ## 1. Cài đặt và bật extension
 
+Yêu cầu Node.js >= 22.19.0 và pi >= 0.99.0.
+
 ```bash
 pi install -l npm:pi-subagents-lite     # project-local
 pi -e npm:pi-subagents-lite             # thử, không cài
@@ -36,8 +38,9 @@ Thứ tự ưu tiên khi trùng tên (cao → thấp):
 | `~/.pi/agent/agents/` | Global (user) |
 | Built-in | `general-purpose`, `Explore` |
 
-Tên agent không phân biệt hoa thường. Tên agent tự điền vào enum của tham số `agent`
-trong tool `Agent`, không cần đăng ký thêm. File trùng tên built-in sẽ ghi đè built-in.
+Tên agent được tìm theo tên chính xác trước, sau đó theo tên không phân biệt hoa thường
+nếu kết quả là duy nhất; các tên chỉ khác chữ hoa/thường cần gọi chính xác. Tên agent
+hiện trong mô tả tham số `agent` của tool `Agent`, không cần đăng ký thêm. File trùng tên built-in sẽ ghi đè built-in.
 
 ## 3. Frontmatter
 
@@ -76,12 +79,13 @@ Bạn là chuyên gia review bảo mật...
 
 | Field | Kiểu | Mặc định | Ý nghĩa |
 |---|---|---|---|
-| `tools` | `true` \| `string[]` \| `false` | `true` | Whitelist tool. `true` = tất cả tool đang active, `false` = không có tool. |
-| `exclude_tools` | `string[]` | không | Blacklist tool. Loại trừ lẫn nhau với `tools` (nếu đặt cả hai, `tools` thắng). |
+| `tools` | danh sách hoặc chuỗi phân cách bằng dấu phẩy | `defaultTools` của pi | Whitelist tool; danh sách rỗng = không có tool. Nếu bỏ trống, xem `loadToolsImplicitly`. |
+| `exclude_tools` | danh sách hoặc chuỗi phân cách bằng dấu phẩy | không | Blacklist tool. Loại trừ lẫn nhau với `tools` (nếu đặt cả hai, `tools` thắng). |
 
 - Giá trị hợp lệ: tên built-in (`read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`),
   tên tool của extension (`web_search`), glob `ext/*` (ví dụ `tavily/*`).
-- Sub-agent **không** nhận `Agent`, `StopAgent`, `AgentStatus` (không spawn lồng nhau).
+- Subagent không thể spawn hoặc dừng agent. Khi extension được load trong subagent,
+  `MessageAgent` và `AgentStatus` có thể được cấp tùy cấu hình tool.
 - `exclude_tools: [tavily/*]` chỉ ẩn tool, extension vẫn load. Muốn không load, dùng `exclude_extensions`.
 
 ```yaml
@@ -93,7 +97,7 @@ exclude_tools: [edit, write]        # hoặc blacklist (không dùng cùng tools
 
 | Field | Kiểu | Mặc định | Ý nghĩa |
 |---|---|---|---|
-| `extensions` | `true` \| `string[]` \| `false` | `true` | Extension nào được load (hook, command). **Không** điều khiển việc tool có hiển thị. |
+| `extensions` | `true` \| `string[]` \| `false` | `true` | Extension nào được load (bao gồm tool, hook, command); `tools` điều khiển quyền dùng tool riêng. |
 | `exclude_extensions` | `string[]` | không | Blacklist extension, ngăn load hẳn. |
 
 ### 3.4 Skills
@@ -108,7 +112,7 @@ exclude_tools: [edit, write]        # hoặc blacklist (không dùng cùng tools
 | Field | Kiểu | Mặc định | Ý nghĩa |
 |---|---|---|---|
 | `model` | string | kế thừa agent cha | Dạng `provider/model-id`. |
-| `thinking` | string | kế thừa agent cha | `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`. |
+| `thinking` | string | theo thứ tự chọn thinking | `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`, hoặc `parent` để theo session cha. |
 | `max_turns` | number | không giới hạn | Giới hạn mềm, sau đó có lượt gia hạn (`graceTurns`) rồi abort cứng. |
 | `max_tokens` | number | không giới hạn | Số output token tối đa cho mỗi phản hồi LLM. |
 
@@ -126,12 +130,12 @@ Phần thân (sau frontmatter) là hướng dẫn riêng của agent, được n
 
 | Thứ | Khi frontmatter bỏ trống |
 |---|---|
-| `tools` | Tất cả tool active của session (trừ tool bị cấm cho sub-agent). |
+| `tools` | Theo `loadToolsImplicitly` (mặc định `true`: pi áp dụng `defaultTools`; `false`: không có tool). |
 | `skills` | Theo `loadSkillsImplicitly` (mặc định `true` = load tất cả). |
 | `extensions` | Theo `loadExtensionsImplicitly` (mặc định `true` = load tất cả). |
 
 Agent chỉ có `name` và `description` sẽ có đầy đủ quyền như `general-purpose`.
-Muốn agent "trống" hoặc chỉ đọc, hãy khai báo tường minh:
+Muốn giới hạn tool, hãy khai báo tường minh (lưu ý `bash` vẫn có thể sửa file, nên đây không phải sandbox chỉ đọc):
 
 ```yaml
 tools: [read, bash, grep, find, ls]
@@ -139,17 +143,23 @@ skills: false
 extensions: false
 ```
 
-Tắt `loadSkillsImplicitly` / `loadExtensionsImplicitly` trong `/agents` > System prompt
-để mọi agent không khai báo sẽ mặc định không nhận gì.
+Các tùy chọn `loadToolsImplicitly`, `loadSkillsImplicitly` và `loadExtensionsImplicitly`
+độc lập với nhau: tắt từng tùy chọn để agent không khai báo tương ứng mặc định không nhận tool, skill hoặc extension.
 
 ## 5. Agent trong thư mục này
 
 | File | Vai trò | Ghi chú |
 |---|---|---|
-| `Explore.md` | Khám phá codebase, chỉ đọc | Ghi đè built-in `Explore`. |
+| `Explore.md` | Khám phá codebase, chỉ đọc | Ghi đè built-in `Explore`; có `bash`, không phải sandbox. |
 | `general-purpose.md` | Tác vụ chung | Ghi đè built-in, `include_system_prompt: true`. |
-| `Spec-Review.md` | Review độ khớp spec | `tools` chỉ đọc, `skills: false`, `extensions: false`. |
-| `Standards-Review.md` | Review chất lượng code | `tools` chỉ đọc, `skills: false`, `extensions: false`. |
+| `Spec-Review.md` | Review độ khớp spec | Dùng codemode với các tool phục vụ đọc, `skills: false`. |
+| `Standards-Review.md` | Review chất lượng code | Dùng codemode với các tool phục vụ đọc, có khai báo skills. |
+
+Hai agent review khai báo `codemode` cùng các tool đọc để gọi lồng nhau. Để chỉ
+hiện codemode như tool trực tiếp, bật profile `advance/code-mode-only` (hoặc cấu hình
+tương đương: load extension codemode và `codemode.mode: only`). Frontmatter không tự
+đặt mode này. `bash` và codemode không phải sandbox: chỉ đọc là quy tắc trong prompt,
+không phải bảo vệ cưỡng chế.
 
 Tắt agent built-in: `/agents`, hoặc đặt `disableDefaultAgents` trong config global.
 
@@ -161,7 +171,7 @@ Tắt agent built-in: `/agents`, hoặc đặt `disableDefaultAgents` trong conf
 - **Project**: `.pi/subagents-lite.json`, chỉ là lớp ghi đè cho **model** và **concurrency**
   (`agent.default`, model theo từng loại, `concurrency`). Các cài đặt khác luôn lấy từ global.
 - Thứ tự hiệu lực: session override > project file > global file > mặc định built-in.
-- Repo đích không được trust thì `.pi/subagents-lite.json` và `.pi/agents` của repo đó không được nạp.
+- Với `worktree_path` trỏ sang repo khác, repo đích không được trust thì `.pi/subagents-lite.json`, `.pi/agents` và các project resource của repo đó không được nạp; agent vẫn chạy. Đường dẫn trong cùng repo không bị kiểm tra này.
 
 > `.pi/subagents.json` của extension cũ không còn được đọc.
 
@@ -176,10 +186,18 @@ Tắt agent built-in: `/agents`, hoặc đặt `disableDefaultAgents` trong conf
 
 Vì vậy `model` trong frontmatter chỉ là mặc định thấp; config hoặc session có thể ghi đè.
 
-### 6.3 Concurrency
+### 6.3 Thinking level
+
+Thứ tự chọn: lựa chọn khi spawn từ `/agents` > frontmatter `thinking` >
+`modelThinkingLevels` của pi cho model đã chọn > `defaultThinking` của subagent
+(project trước global) > `defaultThinkingLevel` của pi (nếu không có thì `medium`).
+Kết quả được giới hạn theo các mức model hỗ trợ. `parent` trong frontmatter hoặc
+`defaultThinking` dùng mức hiện tại của agent cha.
+
+### 6.4 Concurrency
 
 Giới hạn số agent chạy song song; agent vượt giới hạn sẽ xếp hàng (`queued`) và tự chạy khi có slot.
-Ưu tiên: **model** > **provider** > **default**.
+Ưu tiên: **model** > **provider** > **default** (giới hạn mặc định theo từng model).
 
 ```json
 {
@@ -191,7 +209,7 @@ Giới hạn số agent chạy song song; agent vượt giới hạn sẽ xếp 
 }
 ```
 
-### 6.4 System prompt mode (`systemPromptMode`)
+### 6.5 System prompt mode (`systemPromptMode`)
 
 | Giá trị | Hành vi |
 |---|---|
@@ -202,7 +220,7 @@ Giới hạn số agent chạy song song; agent vượt giới hạn sẽ xếp 
 `includeContextFiles` (mặc định `true`) nạp `AGENTS.md` làm context chung trước hướng dẫn agent,
 giúp tăng tỉ lệ trúng KV cache.
 
-### 6.5 Các key `agent.*` đáng chú ý
+### 6.6 Các key `agent.*` đáng chú ý
 
 | Key | Ý nghĩa |
 |---|---|
@@ -210,14 +228,14 @@ giúp tăng tỉ lệ trúng KV cache.
 | `defaultThinking`, `defaultMaxTurns` | Thinking và số lượt mặc định. |
 | `graceTurns` | Số lượt gia hạn sau khi chạm `max_turns`. |
 | `forceBackground` | Ép mọi agent chạy nền. |
-| `loadSkillsImplicitly`, `loadExtensionsImplicitly` | Mặc định skills/extensions khi frontmatter bỏ trống. |
+| `loadToolsImplicitly`, `loadSkillsImplicitly`, `loadExtensionsImplicitly` | Mặc định tools/skills/extensions khi frontmatter bỏ trống. |
 | `disableDefaultAgents` | Bỏ qua agent built-in. |
 | `outputTranscript` | Bật transcript toàn cục. |
-| `toolTimeoutMinutes`, `idleTimeoutMinutes` | Watchdog (xem 6.6). |
+| `toolTimeoutMinutes`, `idleTimeoutMinutes` | Watchdog (xem 6.7). |
 | `finishedRetentionMinutes`, `agentStatusLimit` | Thời gian giữ agent đã xong, số agent hiện trong `AgentStatus`. |
 | `widget*`, `show*`, `statusBarFormat`, `modelDisplayStyle` | Tuỳ biến widget. |
 
-### 6.6 Watchdog
+### 6.7 Watchdog
 
 Dừng agent bị treo; mặc định 45 phút, `0` là tắt:
 
@@ -235,11 +253,14 @@ Khi dừng agent, watchdog báo cho session chính.
 | `prompt` | Nhiệm vụ (bắt buộc). |
 | `description` | Nhãn ngắn cho widget. |
 | `agent` | Loại agent, mặc định `general-purpose`. |
-| `run_in_background` | Chạy nền, tự báo khi xong. |
-| `worktree_path` | Thư mục git repo làm working dir (worktree, main checkout hoặc repo khác). |
+| `run_in_background` | Yêu cầu chạy nền, tự báo khi xong. Nếu `MessageAgent` active trong child thì luôn chạy nền, kể cả khi truyền `false`. |
+| `worktree_path` | Thư mục bên trong git repo làm working dir; đường dẫn tương đối tính từ working dir của agent cha. Có thể là worktree, main checkout hoặc repo khác. |
 
 `model`, `thinking`, `max_turns`, `max_tokens` lấy từ config/frontmatter, LLM không truyền.
-Tool khác: `StopAgent` (dừng theo ID), `AgentStatus` (liệt kê agent).
+Tool khác: `StopAgent` (dừng theo ID), `AgentStatus` (liệt kê agent),
+`MessageAgent` (gửi chỉ dẫn cho agent đang chạy hoặc tiếp tục agent đã kết thúc
+nếu session còn sống và có slot). Subagent cũng có thể gửi tin cho agent khác;
+bỏ `agent_id` hoặc đặt `null` để gửi cho agent cha. Tin nhắn không đảm bảo đã được nhận.
 
 Menu `/agents`: xem, steer, continue, stop, clear agent; spawn thủ công; cấu hình model,
 concurrency, widget, system prompt, watchdog.
