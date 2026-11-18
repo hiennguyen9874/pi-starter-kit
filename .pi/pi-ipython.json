@@ -1,0 +1,20 @@
+{
+    "confirmEachCell": false,
+    "python": {
+        "source": "uv",
+        "version": "3.13"
+    },
+    "output": {
+        "maxBytes": 51200,
+        "maxLines": 2000
+    },
+    "piTools": {
+        "list": true,
+        "search": true
+    },
+    "prelude": {
+        "defaults": true,
+        "imports": [],
+        "prompt": false
+    }
+}
