@@ -90,11 +90,11 @@ print((workdir / "tables.md").read_text(encoding="utf-8"))
 ```
 
 
-Runner shell hiện có có thể che exit status của chart; vì vậy kiểm tra đủ file như trên là tiêu chí hoàn tất, không chỉ exit code.
+Runner kiểm tra đủ bảng, chỉ số và 9 PNG mới trước khi cập nhật output. Biểu đồ báo thiếu dữ liệu được ghi thành giới hạn, không dùng để nhận định.
 
 ## Look
 
-phát từng PNG ra output để xem bằng mắt, không chỉ in đường dẫn:
+Phát PNG để xem bằng mắt, không chỉ in đường dẫn; tránh gộp cả 9 ảnh vào một cell vì output có thể bỏ ảnh:
 
 ```python
 import base64

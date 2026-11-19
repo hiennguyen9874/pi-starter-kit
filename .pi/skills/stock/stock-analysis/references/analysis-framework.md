@@ -18,12 +18,12 @@
 
 ## 3. Doanh nghiệp: KPI theo cấu trúc BCTC
 
-Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analyze.py` cho +1 điểm khi LNST ≥ 15% và doanh thu ≥ 10%), đối chiếu với dòng "Lũy kế năm so với cùng kỳ" khi lợi nhuận quý dao động mạnh vì nền so sánh, ROE TTM (≥15% tốt, ≤8% yếu), xu hướng 8 quý chứ không chỉ quý mới nhất, và tách lợi nhuận một lần ra khỏi lợi nhuận cốt lõi (`financialProfit` / `otherProfit` đột biến).
+Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analyze.py` cho +1 điểm khi LNST ≥ 15% và doanh thu ≥ 10%), đối chiếu với dòng "Lũy kế năm so với cùng kỳ" khi lợi nhuận quý dao động mạnh vì nền so sánh, ROE TTM (≥15% tốt, ≤8% yếu), xu hướng 8 quý chứ không chỉ quý mới nhất, và kiểm tra tính lặp lại của `financialProfit` / `otherProfit` trước khi chuẩn hóa lợi nhuận.
 
 **Phi tài chính** (`nonfinancial`)
 - Biên gộp/ròng TTM tăng nghĩa là sức mạnh định giá cải thiện hoặc chu kỳ đang thuận. Với ngành chu kỳ (thép, phân bón, hóa chất, BĐS, vận tải biển), luôn so với đỉnh và đáy chu kỳ trong bảng theo năm.
 - Bảng cân đối: `debt` là nợ vay chịu lãi, `appropriatedDebt` là nợ chiếm dụng (phải trả, người mua trả trước). Nợ vay ròng/VCSH ≤30% là tốt, ≥100% là rủi ro. EBIT/chi phí tài chính TTM nên ≥3x.
-- Dòng tiền: CFO TTM/LNST TTM ≥0,8 cho thấy lợi nhuận là tiền thật. Đầu tư (investing) âm lớn là đang trong chu kỳ capex; khi XDCB dở dang chuyển sang TSCĐ thì công suất mới bắt đầu ghi nhận doanh thu.
+- Dòng tiền: CFO TTM/LNST TTM ≥0,8 là dấu hiệu chuyển đổi tiền tốt; xem [chất lượng lợi nhuận](nonfinancial-quality.md) khi lệch. LCTT đầu tư ròng khác capex; đọc thuyết minh để xác nhận chi mua/xây TSCĐ hoặc thời điểm công suất vận hành.
 - Tồn kho/Tổng tài sản tăng nhanh hơn doanh thu là rủi ro giảm giá hàng tồn. Người mua trả trước tăng là đơn hàng tốt (BĐS, xây dựng).
 - Vốn điều lệ tăng nghĩa là pha loãng, cần so EPS với LNST.
 

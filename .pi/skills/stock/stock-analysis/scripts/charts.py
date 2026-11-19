@@ -18,7 +18,7 @@ import pandas as pd
 import seaborn as sns
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sstock_lib import BIL, Work, axis_series, bogus_annual_ttm, fa_frames, flow_frame, macd, price_frame, rsi, sma
+from sstock_lib import BIL, Work, axis_series, benchmark_prices, bogus_annual_ttm, fa_frames, flow_frame, macd, price_frame, rsi, sma, valuation_series
 
 sns.set_theme(style="whitegrid", context="notebook", font="DejaVu Sans")
 plt.rcParams.update({"figure.dpi": 110, "savefig.dpi": 130, "axes.titlesize": 11, "axes.titleweight": "bold",
@@ -46,7 +46,7 @@ def save(fig, out: Path, name: str):
     out.mkdir(parents=True, exist_ok=True)
     fig.savefig(out / name, bbox_inches="tight")
     plt.close(fig)
-    print("chart:", out / name)
+    print("chart:", name)
 
 
 def plot_fa(ax, df: pd.DataFrame, title: str, cid: str):
@@ -122,9 +122,18 @@ def repair_profit_performance(frames, labels, quarterly: bool):
     return frames, labels
 
 
+def unavailable(out, name, title, source):
+    fig, ax = plt.subplots(figsize=(9, 2.5))
+    ax.axis("off")
+    ax.set_title(title)
+    ax.text(0.5, 0.5, f"Không có dữ liệu để vẽ · nguồn: {source}", ha="center", va="center")
+    save(fig, out, name)
+
+
 def fa_grid(frames, labels, ids, out, name, title, ncols=3):
     ids = [i for i in ids if i in frames]
     if not ids:
+        unavailable(out, name, title, "BCTC")
         return
     nrows = int(np.ceil(len(ids) / ncols))
     fig, axes = plt.subplots(nrows, ncols, figsize=(6.2 * ncols, 4.0 * nrows), squeeze=False)
@@ -137,10 +146,10 @@ def fa_grid(frames, labels, ids, out, name, title, ncols=3):
     save(fig, out, name)
 
 
-def main(workdir):
+def main(workdir, chart_dir=None):
     W = Work(workdir)
     sym, st = W.symbol, W.structure
-    out = Path(workdir) / "charts"
+    out = Path(chart_dir) if chart_dir else Path(workdir) / "charts"
     px, vn = price_frame(W.load("price")), price_frame(W.load("vnindex"))
 
     # 01 price + technicals
@@ -177,19 +186,26 @@ def main(workdir):
         ax[3].set_ylabel("MACD"); ax[3].legend(loc="upper left")
         ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%m/%y"))
         fig.tight_layout(); save(fig, out, "01_price_technical.png")
+    else:
+        unavailable(out, "01_price_technical.png", "Giá & kỹ thuật", "price")
 
     # 02 relative performance + power scores
     fig, ax = plt.subplots(2, 1, figsize=(14, 8))
-    if not px.empty and not vn.empty:
-        j = pd.concat([px["adjClose"], vn["close"]], axis=1, keys=[sym, "VNINDEX"]).dropna().iloc[-252:]
+    j = benchmark_prices(px["adjClose"], vn["close"]).tail(253) if not px.empty and not vn.empty else pd.DataFrame()
+    if not j.empty and j.index[-1] == px.index[-1]:
+        j = j.rename(columns={"stock": sym, "market": "VNINDEX"})
         n = j / j.iloc[0] * 100
         ax[0].plot(n.index, n[sym], color=ACC, lw=1.6, label=sym)
         ax[0].plot(n.index, n["VNINDEX"], color=GREY, lw=1.4, label="VNINDEX")
         ax[0].fill_between(n.index, n[sym], n["VNINDEX"], where=n[sym] >= n["VNINDEX"], color=UP, alpha=0.15)
         ax[0].fill_between(n.index, n[sym], n["VNINDEX"], where=n[sym] < n["VNINDEX"], color=DOWN, alpha=0.15)
         ax[0].axhline(100, color="#555", lw=0.6)
-        ax[0].set_title(f"Hiệu suất 1 năm (gốc 100): {sym} {n[sym].iloc[-1]-100:+.1f}% vs VNINDEX {n['VNINDEX'].iloc[-1]-100:+.1f}%")
+        label = "1 năm" if len(j) == 253 else "cửa sổ chung ngắn (không đủ 1 năm)"
+        ax[0].set_title(f"Hiệu suất {label}: {sym} {n[sym].iloc[-1]-100:+.1f}% vs VNINDEX {n['VNINDEX'].iloc[-1]-100:+.1f}%"
+                        f"\n{j.index[0]:%Y-%m-%d} → {j.index[-1]:%Y-%m-%d} ({len(j)} điểm)")
         ax[0].legend(loc="upper left")
+    else:
+        ax[0].set_title("Không có giá VNINDEX và cổ phiếu cùng phiên chốt")
     for rt, ls in (("rs6", "-"), ("rs3", "--")):
         ps = W.load(f"power_{rt}")
         if ps and ps.get("stock"):
@@ -223,6 +239,8 @@ def main(workdir):
             ax[2].set_title(f"Tự doanh ròng (tỷ) — 20 phiên: {pt.iloc[-20:].sum():+,.0f} tỷ")
         ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m/%y"))
         fig.tight_layout(); save(fig, out, "03_money_flow.png")
+    else:
+        unavailable(out, "03_money_flow.png", "Dòng tiền", "price")
 
     # 04/05/06 fundamentals
     fqd, fyd = W.load("fa_q"), W.load("fa_y")
@@ -238,16 +256,19 @@ def main(workdir):
 
     # 07 valuation
     v = W.load("valuation_1m")
-    if v:
-        dates = v["dates"]
+    as_of = px.index[-1].normalize() if not px.empty else None
+    monthly = {k: valuation_series(v, k, as_of) for k in ("pe", "pb")}
+    if any(s.notna().any() for s in monthly.values()):
         fig, ax = plt.subplots(2, 2, figsize=(15, 9))
         sh = W.load("sector_val_hist") or {}
         sec = pd.DataFrame(sh.get("history", []))
         if len(sec):
             sec["date"] = pd.to_datetime(sec["date"]); sec = sec.set_index("date").sort_index()
+            sec = sec.loc[sec.index <= as_of]
+        mvd = W.load("market_val")
         for i, (k, lab) in enumerate((("pe", "P/E"), ("pb", "P/B"))):
-            s = axis_series(dates, v["charts"][k][k])
-            a3 = axis_series(dates, v["charts"][k][f"avg3Y{k.capitalize()}"])
+            s = monthly[k]
+            a3 = valuation_series(v, k, as_of, f"avg3Y{k.capitalize()}")
             sp = s[s > 0]
             med = sp.median()
             cap = sp.quantile(0.95) * 1.3
@@ -258,27 +279,39 @@ def main(workdir):
             a.axhline(med, color=UP, lw=1, label=f"Trung vị 10N {med:.2f}")
             q1, q3 = sp.quantile(0.25), sp.quantile(0.75)
             a.axhspan(q1, q3, color=UP, alpha=0.08, label=f"IQR {q1:.2f}–{q3:.2f}")
-            a.set_ylim(0, cap)
-            a.set_title(f"{lab} 10 năm — hiện tại {s.dropna().iloc[-1]:.2f}" + (" (bỏ kỳ lỗ / vượt p95×1.3)" if s.isna().any() else ""))
+            if np.isfinite(cap):
+                a.set_ylim(0, cap)
+            visible = s.dropna()
+            last = f"{visible.iloc[-1]:.2f} ({visible.index[-1]:%Y-%m-%d})" if not visible.empty else "—"
+            a.set_title(f"{lab} lịch sử — điểm tháng cuối hiển thị: {last}"
+                        + ("\nCó điểm bị lọc (≤0 hoặc >p95×1,3)" if s.isna().any() else ""))
             a.legend(loc="upper left")
             b = ax[1, i]
             b.plot(s.index, s.clip(upper=cap), color=ACC, lw=1.5, label=f"{lab} {sym}")
             if len(sec):
                 b.plot(sec.index, sec[k].where((sec[k] > 0) & (sec[k] <= cap)), color="#e76f51", lw=1.3, label=f"{lab} ngành {sh.get('sectorName','')}")
-            mvd = W.load("market_val")
             if mvd:
-                b.plot(axis_series(mvd["dates"], mvd["series"][k]), color=GREY, lw=1.2, label=f"{lab} VNINDEX")
-            b.set_ylim(0, cap); b.set_title(f"{lab}: cổ phiếu vs ngành vs thị trường"); b.legend(loc="upper left")
+                mkt = axis_series(mvd["dates"], mvd["series"][k])
+                b.plot(mkt.loc[mkt.index <= as_of], color=GREY, lw=1.2, label=f"{lab} VNINDEX")
+            if np.isfinite(cap):
+                b.set_ylim(0, cap)
+            b.set_title(f"{lab}: cổ phiếu vs ngành vs thị trường"); b.legend(loc="upper left")
         fig.tight_layout(); save(fig, out, "07_valuation.png")
+    else:
+        unavailable(out, "07_valuation.png", "Định giá đến phiên chốt", "price / valuation_1m")
 
     # 08 RRG: sectors + peers
     srrg = (W.load("sector_rrg") or {}).get("sectors", [])
     peers = (W.load("peers_rrg") or {}).get("stocks", [])
     srow = next(iter((W.load("stock_rrg") or {}).get("stocks", [])), None)
-    if srrg:
+    tail = (srow or {}).get("tail")
+    if srrg or peers or tail:
         fig, ax = plt.subplots(1, 2, figsize=(16, 7.5))
         sid = W.manifest.get("sectorId")
-        for a in ax:
+        for a, has_data in zip(ax, (srrg, peers or tail)):
+            if not has_data:
+                a.set_axis_off()
+                continue
             a.axhline(50, color="#555", lw=0.7); a.axvline(50, color="#555", lw=0.7)
             a.set_xlim(0, 100); a.set_ylim(0, 100); a.set_xlabel("RS6 (dài hạn)"); a.set_ylabel("RS3 (động lượng)")
             for (x, y, t) in ((97, 97, "LEADING"), (3, 97, "IMPROVING"), (97, 3, "WEAKENING"), (3, 3, "LAGGING")):
@@ -292,19 +325,28 @@ def main(workdir):
             if hl and s.get("tail"):
                 t = pd.DataFrame(s["tail"]).sort_values("weeksAgo", ascending=False)
                 ax[0].plot(t["rs6"], t["rs3"], color="black", lw=1, marker=".", alpha=0.7)
-        ax[0].set_title(f"RRG ngành ({len(srrg)} ngành) — đường đen: quỹ đạo ngành của {sym}")
+        if srrg:
+            ax[0].set_title(f"RRG ngành ({len(srrg)} ngành) — đường đen: quỹ đạo ngành của {sym}")
+        else:
+            ax[0].set_title("Thiếu dữ liệu RRG ngành · nguồn: sector_rrg")
         for s in peers:
             me = s["symbol"] == W.symbol
             ax[1].scatter(s["rs6"], s["rs3"], s=50 + (s.get("gtgdAvg20") or 0) / 2e9, color=QCOL.get(s["quadrant"], GREY),
                           edgecolor="black" if me else "white", lw=1.8 if me else 0.5, alpha=0.9, zorder=3)
             ax[1].annotate(s["symbol"], (s["rs6"], s["rs3"]), fontsize=8 if not me else 10, fontweight="bold" if me else None,
                            xytext=(4, 3), textcoords="offset points")
-        if srow and srow.get("tail"):
-            t = pd.DataFrame(srow["tail"]).sort_values("weeksAgo", ascending=False)
+        if tail:
+            t = pd.DataFrame(tail).sort_values("weeksAgo", ascending=False)
             ax[1].plot(t["rs6"], t["rs3"], color="black", lw=1, marker=".", alpha=0.7, label=f"Quỹ đạo {W.symbol}")
             ax[1].legend(loc="lower right")
-        ax[1].set_title(f"RRG cổ phiếu cùng ngành (bubble = GTGD20)")
+        if peers or tail:
+            ax[1].set_title("RRG cổ phiếu cùng ngành (bubble = GTGD20)" if peers
+                            else f"Quỹ đạo {sym} · thiếu dữ liệu cổ phiếu cùng ngành (peers_rrg)")
+        else:
+            ax[1].set_title("Thiếu dữ liệu RRG cổ phiếu · nguồn: peers_rrg / stock_rrg")
         fig.tight_layout(); save(fig, out, "08_rrg.png")
+    else:
+        unavailable(out, "08_rrg.png", "RRG ngành và cổ phiếu", "sector_rrg / peers_rrg / stock_rrg")
 
     # 09 market context
     ms = W.load("market_state") or {}
@@ -340,7 +382,9 @@ def main(workdir):
             ax[2].set_ylim(0, 100); ax[2].legend(loc="upper left"); ax[2].set_title("Dòng tiền lan tỏa theo nhóm vốn hóa (0-100)")
         ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m/%y"))
         fig.tight_layout(); save(fig, out, "09_market.png")
+    else:
+        unavailable(out, "09_market.png", "Thị trường", "vnindex")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:])

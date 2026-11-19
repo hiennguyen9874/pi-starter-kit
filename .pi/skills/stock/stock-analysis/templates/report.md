@@ -25,10 +25,11 @@
 ## 3. Kết quả kinh doanh & sức khỏe tài chính
 <!-- bảng 5 quý gần nhất với các KPI chính của cấu trúc BCTC; giải thích từng biến động lớn; so sánh với chu kỳ (bảng theo năm); bảng cân đối; dòng tiền; pha loãng -->
 ![fa key](charts/04_fa_key.png)
+![fa dashboard](charts/05_fa_dashboard.png)
 ![fa annual](charts/06_fa_annual.png)
 
 ## 4. Định giá
-<!-- P/E, P/B: hiện tại / trung vị 10N / percentile / ngành / VNINDEX; caveat avg3Y bị méo, peSstock bị giữ nguyên; vùng giá tham chiếu kèm giả định -->
+<!-- P/E, P/B: phiên chốt (ghi thiếu nếu không có dữ liệu đúng ngày) / trung vị 10N / percentile / ngành / VNINDEX; caveat avg3Y bị méo, P/E/P/B SSTOCK dự phóng bị giữ nguyên; vùng giá tham chiếu kèm giả định -->
 ![valuation](charts/07_valuation.png)
 
 ## 5. Kỹ thuật & xu hướng giá
@@ -59,4 +60,6 @@
 | Tiêu cực | {mức vô hiệu hóa} | {…} |
 
 ---
-*Phụ lục:* dữ liệu thô ở `raw/`, chỉ số ở `metrics.json`, bảng đầy đủ ở `tables.md`, biểu đồ ở `charts/` (gồm cả [05_fa_dashboard](charts/05_fa_dashboard.png)).
+*Phụ lục:* dữ liệu thô ở `raw/`, chỉ số ở `metrics.json`, bảng đầy đủ ở `tables.md`, biểu đồ ở `charts/`.
+
+Báo cáo này không phải khuyến nghị đầu tư.

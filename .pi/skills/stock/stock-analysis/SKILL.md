@@ -5,77 +5,53 @@ description: Phân tích toàn diện một cổ phiếu Việt Nam bằng MCP s
 
 # Phân tích cổ phiếu với sstock
 
-Pipeline có 4 tầng: **fetch** (ipython hoặc codemode gọi MCP rồi ghi JSON thô) → **compute** (Python tính metrics, scorecard, bảng) → **look** (đọc bảng và xem từng biểu đồ) → **write** (báo cáo theo template). Mọi nhận định trong báo cáo phải là **evidence**: có con số, có ngày, có nguồn.
+Chạy **fetch → compute → look → đào sâu khi cần → write**. Mỗi nhận định có số, kỳ và nguồn; tách quan sát, giả thuyết và điều kiện xác nhận.
 
-Tham chiếu dùng khi cần:
-- **ipython:** khi có tool `ipython`, đọc [references/runtime-ipython.md](references/runtime-ipython.md) trước bước 1: fetch Python qua `pi`, điều phối compute và phát PNG từ kernel.
-- **codemode:** khi dùng codemode, đọc [references/runtime-codemode.md](references/runtime-codemode.md) trước bước 1: fetch JavaScript qua `tools`, chạy compute và xem PNG. Chỉ đọc file khớp runtime đang dùng.
-- [references/sstock-tools.md](references/sstock-tools.md): 26 tool, đơn vị, thứ tự trục, giới hạn gói/rate-limit, các gotcha dữ liệu. Đọc khi gọi tool ngoài pipeline hoặc khi một số liệu trông bất thường.
-- **Đối chiếu dữ liệu:** đọc [references/data-reconciliation.md](references/data-reconciliation.md) trước kết luận khi `structure = bank` (nhãn nhóm nợ, dư nợ gộp/ròng, chất lượng tăng trưởng), metadata doanh nghiệp mâu thuẫn hoặc lợi suất bảng/biểu đồ lệch nhau. Mỗi nhánh có tiêu chí hoàn tất; công thức ngân hàng chỉ áp dụng `bank`.
-- [references/analysis-framework.md](references/analysis-framework.md): cách đọc từng khía cạnh, KPI và ngưỡng theo 4 cấu trúc BCTC (phi tài chính / ngân hàng / chứng khoán / bảo hiểm), cách diễn giải scorecard. Đọc trước bước 4.
-- [references/securities.md](references/securities.md): đọc trước bước 3 khi `structure` = securities (công ty chứng khoán). Gồm lợi nhuận theo mảng và chi phí không phân bổ, NIM/COF, nền cao theo chu kỳ, phân loại sự kiện tăng vốn, nguồn vốn/tự doanh/đòn bẩy, P/B đi cùng ROE.
-- **Ngân hàng** (`structure = bank`): đọc [references/banking.md](references/banking.md) và [references/banking-checks.md](references/banking-checks.md) trước bước 3. File đầu là khung phân tích; file sau kiểm chứng số dư/chi phí dự phòng, NPL cuối năm, độ nhạy LLR, khoản mục tổng hợp, sự kiện quyền lệch nguồn và override điểm.
-- [references/industrial-park.md](references/industrial-park.md): đọc trước bước 3 khi ngành là Khu công nghiệp (sectorId 4). Gồm doanh thu ghi nhận theo đợt (lumpy), quỹ đất trên bảng cân đối, phân loại lại XDCB/tồn kho, định giá khi không có RNAV.
-- [references/retail.md](references/retail.md): đọc trước bước 3 khi ngành là Bán lẻ (sectorId 1). Gồm đòn bẩy hoạt động (chi phí bán hàng/doanh thu), tồn kho và vốn lưu động, LCTT đầu tư là gửi tiền hay capex, ROE theo đòn bẩy, EV/EBITDA.
-- [references/conglomerate-power.md](references/conglomerate-power.md): đọc trước bước 3 khi ngành là Đa ngành (sectorId 5555), Điện (13), Nước (26) hoặc Thiết bị điện & điện tử (32), hoặc khi doanh nghiệp ở ngành khác nhưng có mảng điện/M&E lớn. Gồm ngành proxy theo mảng (`fetch_proxy.py` / `fetch_proxy.js` + `proxy_sectors.py`), lãi liên kết nằm trong `financialProfit`, thủy văn và capex nguồn điện, backlog M&E/thiết bị, P/E sau tái định giá.
-- [templates/report.md](templates/report.md) là khung báo cáo; [examples/HPG-report.md](examples/HPG-report.md) là một báo cáo mẫu hoàn chỉnh.
+## 1. Fetch
 
-Đường dẫn script tính từ thư mục skill này: `.pi/skills/stock/stock-analysis/scripts/`.
+Chọn đúng một runtime: [ipython](references/runtime-ipython.md) khi có `ipython`, hoặc [codemode](references/runtime-codemode.md) khi dùng `tools`. Theo mục **Fetch một mã** để lấy `structure`, `sectorId`, raw và `manifest.json` vào `stock-reports/<MÃ>-<YYYY-MM-DD>/`. Giữ notes/lỗi qua các lượt retry. Khi gọi MCP ngoài pipeline hoặc gặp số bất thường, đọc [sstock-tools](references/sstock-tools.md) để kiểm tra đơn vị và giới hạn gói.
 
-## Bước 1 — Fetch dữ liệu thô
+**Xong khi:** xác định được mã và cấu trúc BCTC; mỗi job lỗi được retry một lần hoặc ghi rõ giới hạn cố định của gói; lưu lỗi còn lại cho báo cáo.
 
-Workdir mặc định: `stock-reports/<MÃ>-<YYYY-MM-DD>/` (tính từ cwd). Dùng mục **Fetch một mã** trong file runtime đã chọn ở trên. Cả hai ghi cùng định dạng raw cho bước 2; chỉ chạy một fetcher cho mỗi lượt lấy dữ liệu. Fetcher tự throttle ở 25 lần gọi/phút và retry khi gặp 429. Một mã tốn khoảng 27 lần gọi MCP và khoảng 60 giây.
-
-Kết quả gồm `structure` (nonfinancial | bank | securities | insurance), `failed` và `notes` (giới hạn gói). Tên job trong `manifest.json`; cách retry và giới hạn manifest nằm trong file runtime đã chọn. Giữ các lỗi/notes từ lượt đầu để báo cáo đủ giới hạn.
-
-**Xong khi:** `failed` rỗng, hoặc mỗi job lỗi đã được retry một lần và lỗi còn lại được ghi vào phần giới hạn của báo cáo. Lỗi "không có trong gói" là cố định, không retry.
-
-## Bước 2 — Compute và vẽ biểu đồ
+## 2. Compute
 
 ```bash
-.pi/skills/stock/stock-analysis/scripts/run_pipeline.sh stock-reports/HPG-2026-11-14
+.pi/skills/stock/stock-analysis/scripts/run_pipeline.sh "$WORKDIR"
 ```
 
-Thực thi và kiểm tra output theo mục **Compute** trong file runtime đã chọn.
+Theo mục **Compute** của runtime. Đặt `WORKDIR` thành thư mục đã fetch. Runner dùng `uv` và chỉ cập nhật bảng, chỉ số, biểu đồ sau khi kiểm tra đủ output. Biểu đồ báo thiếu nguồn là artefact hợp lệ, không phải bằng chứng.
 
-Lệnh này dùng `uv run --with pandas numpy matplotlib seaborn`, không cài gì ra global. Output:
-- `metrics.json`: toàn bộ chỉ số (price, flows, rs, elite, fa, valuation, sector, peers, market, signals).
-- `tables.md`: các bảng markdown dựng sẵn, gồm scorecard và cảnh báo dữ liệu.
-- `charts/01…09_*.png`: giá & kỹ thuật, sức mạnh tương đối, dòng tiền, FA chính, dashboard FA, FA theo năm, định giá, RRG, thị trường.
+**Xong khi:** exit code 0, stdout có score/verdict, có `metrics.json`, `tables.md` và 9 PNG của lượt chạy.
 
-**Xong khi:** đủ 2 file và 9 PNG, dòng cuối stdout in ra score và verdict.
+## 3. Look
 
-## Bước 3 — Look: đọc bảng và từng biểu đồ
+1. Đọc toàn bộ `tables.md` và các cảnh báo. Mở từng PNG theo mục **Look** của runtime. Ghi một quan sát mà bảng không thể hiện cho mỗi ảnh; với ảnh báo thiếu nguồn, ghi giới hạn thay cho nhận định.
+2. **Cấu trúc/ngành:** mở các nhánh phù hợp trước khi diễn giải BCTC:
+   - **Ngân hàng** (`bank`): [khung ngân hàng](references/banking.md), [kiểm chứng ngân hàng](references/banking-checks.md) và [đối chiếu](references/data-reconciliation.md) — chất lượng tài sản, dự phòng, tài trợ, quyền.
+   - **Chứng khoán** (`securities`): [mảng lợi nhuận, margin, vốn và chu kỳ](references/securities.md).
+   - **KCN** (4): [ghi nhận theo đợt, quỹ đất, định giá](references/industrial-park.md).
+   - **Bán lẻ** (1): [đòn bẩy hoạt động, tồn kho, vốn lưu động](references/retail.md).
+   - **May mặc** (23) hoặc có mảng may xuất khẩu trọng yếu: [đơn hàng, biên, vòng quay và dòng tiền](references/apparel.md).
+   - **Đa ngành/điện/nước/thiết bị** (5555/13/26/32) hoặc có mảng điện/M&E lớn: [proxy ngành, lãi liên kết, backlog, công suất](references/conglomerate-power.md).
+3. **Đối chiếu:** trong `tables.md`, đọc mục **Sự kiện quyền** cho mọi mã và **Sự kiện ngân hàng** hoặc **Sự kiện bảng cân đối** theo cấu trúc BCTC, nếu có. Dùng [data-reconciliation](references/data-reconciliation.md) khi metadata xung đột, bảng và chart lệch, hoặc có sự kiện quyền/biến động FA chưa rõ. Dùng `adjClose` cho mức giá lịch sử; lúc quý dao động mạnh so lũy kế cùng kỳ trước khi kết luận.
+4. **Phi tài chính:** kiểm tra mục **Chất lượng lợi nhuận & vốn lưu động** trong `tables.md`; đọc [chất lượng lợi nhuận](references/nonfinancial-quality.md) khi CFO lệch LNST, tồn kho/phải thu phình, LNST tăng ngược LNTT hoặc thiếu số liệu trọng yếu.
 
-1. Đọc toàn bộ `tables.md`. Chú ý các khối `> ⚠️` (giới hạn gói, chuỗi số 0 nghi lỗi, P/E/P/B TB 3 năm bị méo, tháng P/B ngoại lai, GTGD bị giao dịch thỏa thuận thổi phồng).
-2. Mở **từng** PNG theo mục **Look** trong file runtime đã chọn. Với mỗi biểu đồ, ghi một quan sát mà bảng số không cho thấy: điểm gãy xu hướng, biến động bất thường của một chỉ tiêu, quỹ đạo RRG, vùng nền giá, giai đoạn khối ngoại đảo chiều.
-3. Giải thích mọi bước nhảy lớn trong FA bằng chính dữ liệu. Với mọi mã, đọc "Sự kiện quyền" ở mục Giá: hệ số ≥1,1, hoặc dòng có đuôi "khớp vốn điều lệ", là cổ phiếu thưởng/cổ tức CP/chia tách; dòng ghi "phát hành quyền mua" (nhãn này thắng ngưỡng hệ số) là tăng vốn có tiền mới. Cả hai loại đều buộc mọi mức giá trước ngày GDKHQ lấy theo `adjClose`. Với ngân hàng, bắt đầu từ "Sự kiện ngân hàng". Với phi tài chính, bắt đầu từ danh sách "Sự kiện bảng cân đối" trong `tables.md`: XDCB dở dang chuyển sang TSCĐ là nhà máy mới đi vào vận hành, chuyển sang hàng tồn kho là quỹ đất/BĐS chuyển sang để bán (dòng đuôi "(năm)" là lần chuyển trước cửa sổ 17 quý, giải thích nền tồn kho/TSCĐ hiện tại); vốn điều lệ tăng khớp với phần LNGPP giảm, hoặc có đuôi "khớp sự kiện quyền" (đuôi này thắng gợi ý LNGPP), là cổ tức bằng cổ phiếu (pha loãng, không có tiền mới); `financialProfit` đột biến là lợi nhuận một lần (riêng holding có công ty liên kết lớn thì chuỗi này gồm cả lãi liên kết định kỳ, xem sstock-tools); dòng lợi ích CĐ thiểu số là thay đổi sở hữu ở công ty con; dòng "cashBank … tiền cuối kỳ LCTT" là tiền gửi có kỳ hạn, giải thích LCTT đầu tư âm khi TSCĐ không tăng. Khi lợi nhuận quý dao động mạnh, đọc dòng "Lũy kế năm so với cùng kỳ" trước khi kết luận về tăng trưởng.
+**Xong khi:** đủ 9 quan sát/giới hạn; từng sự kiện quyền 12 tháng gần nhất, sự kiện bảng cân đối/ngân hàng và bất thường FA có bằng chứng, hoặc ghi rõ khoản chưa xác nhận và nguồn cần kiểm tra.
 
-**Xong khi:** đủ 9 quan sát (mỗi biểu đồ một), mỗi dòng "Sự kiện bảng cân đối"/"Sự kiện ngân hàng"/"Sự kiện quyền" (12 tháng gần nhất) và mỗi bất thường khác trong FA đều đã có lời giải thích hoặc được đánh dấu "chưa rõ, cần tin doanh nghiệp".
+## 4. Đào sâu khi cần
 
-## Bước 4 — Đào sâu (tùy theo từng mã)
+- **Elite:** dùng `raw/elite_diag.json` để xác định trụ và guard.
+- **Quá khứ:** dùng `asOf` cho RRG; `from`/`to` cho trạng thái thị trường.
+- **Cơ cấu tín dụng năm:** đọc `loanStructureBySector` trong `raw/fa_y.json`.
+- **Vĩ mô/hàng hóa:** kiểm tra quyền trong [sstock-tools](references/sstock-tools.md); ghi giới hạn nếu gói không có, không retry lỗi cố định.
+- **Python tùy biến:** lưu script trong workdir và chạy `uv run -q --with pandas --with numpy python <script>.py`. Loader nhận payload: `price_frame(w.load("price"))`, `fa_frames(w.load("fa_q"))` với `w = Work(workdir)` từ `scripts/sstock_lib.py`.
 
-Gọi thêm tool khi câu hỏi hoặc dữ liệu cần đến. Mỗi trường hợp dưới đây là một nhánh riêng:
-- Muốn biết tại sao mã chưa phải Elite, hoặc guard nào đang chặn: xem `raw/elite_diag.json`, tuyệt đối không suy đoán.
-- So sánh với một thời điểm trong quá khứ: `get_stock_rrg` hoặc `get_sector_rrg` với `asOf`, `get_market_state` với `from`/`to`.
-- Cần FA theo năm cho ngân hàng (cơ cấu cho vay theo ngành / loại hình): đọc thêm chart `loanStructureBySector` trong `raw/fa_y.json`.
-- Cần dữ liệu hàng hóa hoặc vĩ mô (giá thép, quặng…): `search_data_series` chỉ dành cho admin. Gói thường bị từ chối thì ghi vào phần giới hạn.
-- Muốn phân tích thêm bằng Python: lưu script ad-hoc trong workdir và chạy qua runner của runtime bằng `uv run -q --with pandas --with numpy python <script>.py` (giữ dependency phân tích trong môi trường `uv`, không cài vào kernel). Loader nhận payload chứ không nhận `Work`:
-  ```python
-  import sys; sys.path.insert(0, "../../.pi/skills/stock/stock-analysis/scripts")  # từ stock-reports/<MÃ>-<ngày>/
-  from sstock_lib import Work, price_frame, fa_frames, fa_series
-  w = Work(".")
-  px = price_frame(w.load("price"))  # index ngày cũ → mới; có matchedValue / putThroughValue
-  fq = fa_frames(w.load("fa_q"))      # {chartId: DataFrame}; fa_series(fq, "inventory")
-  ```
+**Xong khi:** câu hỏi bổ sung có số liệu hoặc giới hạn cụ thể; nếu không cần đào sâu, chuyển sang viết.
 
-## Bước 5 — Viết báo cáo
+## 5. Write
 
-Copy [templates/report.md](templates/report.md) thành `<workdir>/report.md` rồi điền vào. Mức độ chi tiết tham khảo [examples/HPG-report.md](examples/HPG-report.md). Quy tắc:
-- Mọi con số lấy từ `tables.md`/`metrics.json`/raw và ghi rõ `asOf`. Tiền trình bày theo tỷ đồng, giá theo nghìn đồng.
-- Kết luận dựa trên **ma trận hai trục** (Cơ bản & định giá × Kỹ thuật & dòng tiền) cùng với bối cảnh, như mô tả trong analysis-framework. Scorecard là điểm khởi đầu; được phép override nhưng phải ghi lý do.
-- Kịch bản phải gắn với mức giá và điều kiện kiểm chứng được (MA200, đỉnh/đáy 52 tuần, ngưỡng RS ≥ 80/60 của Elite, GTGD so với TB20; dùng TB20 khớp lệnh khi `tables.md` cảnh báo giao dịch thỏa thuận).
-- Ghi đủ các caveat: giới hạn gói, chuỗi dữ liệu nghi lỗi, P/E SSTOCK bị giữ nguyên từ ngày nào, P/E/P/B TB 3 năm bị méo.
-- Kết thúc bằng câu "không phải khuyến nghị đầu tư".
+Đọc [analysis-framework](references/analysis-framework.md) rồi điền [template](templates/report.md) thành `<workdir>/report.md`; [báo cáo mẫu](examples/HPG-report.md) dùng để tham khảo độ sâu. Kết luận theo ma trận **Cơ bản & định giá × Kỹ thuật & dòng tiền**, sau đó điều chỉnh theo bối cảnh; nếu sửa điểm, ghi tiêu chí, điểm trước/sau và lý do. Gắn mỗi kịch bản với giá, RS và thanh khoản kiểm chứng được; dùng TB20 khớp lệnh nếu thỏa thuận làm méo GTGD. Ghi ngày chốt, kỳ FA và giới hạn nguồn; tỷ đồng cho tiền và nghìn đồng cho giá.
 
-**Xong khi:** đủ 10 mục của template, mỗi biểu đồ được nhúng vào đúng mục, không có placeholder `{…}` nào sót lại. Trả lời người dùng bằng phần Tóm tắt kèm đường dẫn `report.md` và `charts/`.
+Đưa các cảnh báo trong `tables.md` có ảnh hưởng đến kết luận vào đúng mục báo cáo. Nếu trích P/E hoặc P/B SSTOCK dự phóng, ghi ngày giữ nguyên và phân biệt với bội số phiên chốt. Kết thúc bằng “không phải khuyến nghị đầu tư”.
+
+**Xong khi:** 10 mục, 9 ảnh đúng mục, không sót placeholder; trả phần tóm tắt và liên kết `report.md`, `charts/`.

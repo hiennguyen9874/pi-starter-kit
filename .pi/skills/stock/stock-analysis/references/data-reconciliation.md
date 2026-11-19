@@ -100,10 +100,16 @@ Khi tên không khớp mã hoặc website, đối chiếu `code`/`mack`, sàn, `
 
 **Xong khi:** báo cáo nêu trường lệch, cơ sở nhận diện và mức xác minh; mọi phần phụ thuộc nhận diện chưa rõ được hoãn kết luận.
 
-## 4. Mọi cấu trúc: bảng và biểu đồ khác lợi suất
+## 4. Mọi cấu trúc: bảng và chart khác mốc
 
-Khi `metrics`/`tables` khác tiêu đề biểu đồ 02, kiểm tra ngày đầu/cuối, số điểm và số khoảng sinh lời, cách ghép lịch STB–VNINDEX và `close`/`adjClose`. Chọn một cửa sổ làm chuẩn trong lời viết, chú thích cửa sổ còn lại; dùng giá điều chỉnh cho lịch sử có quyền theo khung chung.
+- **Lợi suất:** chart 02 và bảng 1N dùng 253 điểm chung đến phiên chốt (252 khoảng), `adjClose` của mã và `close` của VNINDEX. Xem `price.benchmarkWindows`; nếu không đủ điểm, chart ghi cửa sổ ngắn hoặc thiếu phiên chung, bảng không tính chênh lệch 1N. Với báo cáo cũ, MSH từng lệch do chart 252 điểm và bảng 253 điểm; không áp lời giải đó cho mọi sai lệch.
+- **Định giá:** P/E và P/B phiên chốt lấy đúng ngày từ `raw/valuation_1d.json`; thiếu thì để trống và bỏ giá tham chiếu tương ứng. Thống kê và chart 07 cắt chuỗi tháng tại phiên chốt; tiêu đề chart ghi ngày cuối còn hiển thị sau lọc. Snapshot nguồn và P/E/P/B dự phóng là thông tin riêng, không thay thế bội số phiên chốt. Chỉ tính chênh lệch với ngành khi cùng ngày. P/E ≤0 không phải giá rẻ và không dùng tính giá tham chiếu.
 
-Trong phiên bản pipeline quan sát ở ca STB, chart chuẩn hóa **252 điểm** sau khi ghép hai chuỗi, còn lợi suất 1Y của metrics dùng **độ trễ 252 phiên** (cần 253 điểm). Vì vậy **+42,3%/+5,8%** trên chart và **+45,0%/+8,4%** trong bảng có thể khác dù cùng ngày cuối. Kiểm tra code hiện tại trước khi dùng lời giải thích này cho lượt mới; đây không phải quy tắc rằng mọi sai lệch đều do một phiên gốc.
+**Xong khi:** nêu rõ hai mốc/cơ sở và chuỗi được dùng, hoặc ghi phần chưa giải thích; không trộn cửa sổ.
 
-**Xong khi:** sai lệch đã đối chiếu được với cửa sổ thực tế, hoặc được ghi là chưa giải thích; lời viết không trộn lợi suất từ hai điểm gốc.
+## 5. Sự kiện quyền và biến động bảng cân đối
+
+- **Quyền:** hệ số `close/adjClose` phát hiện điều chỉnh, không tự xác định loại quyền. Đối chiếu thông báo GDKHQ, vốn/vốn góp và (nếu có) tiền thu phát hành. Khớp tăng vốn là bằng chứng hỗ trợ thưởng/cổ tức CP; lời gợi ý quyền mua từ dòng tiền tài chính ròng vẫn cần xác nhận vì bao gồm vay/trả nợ. Hệ số lớn nhưng vốn không tăng là **chưa phân loại**; MSH 01/12/2025 hệ số 1,111 nhưng vốn điều lệ không đổi trong các quý quan sát. `adjClose` vẫn là chuẩn cho mức giá lịch sử.
+- **Tài sản:** số tăng/giảm gần nhau chỉ là biến động đồng thời. XDCB giảm và TSCĐ/tồn kho tăng là giả thuyết chuyển khoản, cần thuyết minh nghiệm thu/phân loại. Số dư thiểu số phản ánh cả kết quả, giao dịch vốn và sở hữu; đối chiếu trước khi suy IPO/bán bớt. Chênh `cashBank` với tiền cuối kỳ là dấu hiệu khác phạm vi (thường có tiền gửi), không xác định chi capex hay tiền bị hạn chế.
+
+**Xong khi:** ghi kỳ và số tiền/hệ số, phân biệt bằng chứng khớp với loại giao dịch còn chưa xác nhận, chỉ rõ thuyết minh/thông báo cần tìm.

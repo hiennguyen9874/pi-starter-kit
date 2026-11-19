@@ -100,6 +100,26 @@ def axis_series(dates: list, values: list, newest_first: bool = False) -> pd.Ser
     return s.sort_index()
 
 
+def valuation_series(payload, multiple, as_of, field=None):
+    """A dated stock-multiple series capped at the last known stock session."""
+    payload = payload or {}
+    dates = payload.get("dates") or []
+    values = ((payload.get("charts") or {}).get(multiple) or {}).get(field or multiple)
+    if not as_of or not dates or values is None or len(values) != len(dates):
+        return pd.Series(dtype="float64", index=pd.DatetimeIndex([]))
+    s = axis_series(dates, values)
+    return s.loc[s.index <= pd.Timestamp(as_of)].replace([np.inf, -np.inf], np.nan)
+
+
+def valuation_at_close(payload, multiple, as_of):
+    """Use only the daily point on the stock session, not a stale or undated snapshot."""
+    if not as_of:
+        return None
+    s = valuation_series(payload, multiple, as_of)
+    v = s.get(pd.Timestamp(as_of)) if s.index.is_unique else None
+    return float(v) if pd.notna(v) else None
+
+
 # ---------- indicators ----------
 def sma(s: pd.Series, n: int) -> pd.Series:
     return s.rolling(n, min_periods=n).mean()
@@ -136,6 +156,12 @@ def ret(s: pd.Series, n: int) -> float | None:
     if len(s) <= n:
         return None
     return float(s.iloc[-1] / s.iloc[-1 - n] - 1) * 100
+
+
+def benchmark_prices(stock: pd.Series, market: pd.Series) -> pd.DataFrame:
+    """Common valid sessions; caller selects a window of N+1 points for N returns."""
+    j = pd.concat([stock.rename("stock"), market.rename("market")], axis=1, sort=True)
+    return j.loc[(np.isfinite(j) & (j > 0)).all(axis=1)]
 
 
 def ytd(s: pd.Series) -> float | None:

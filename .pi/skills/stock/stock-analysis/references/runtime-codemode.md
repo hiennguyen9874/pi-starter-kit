@@ -44,7 +44,7 @@ uv run -q --with pandas --with numpy python .pi/skills/stock/stock-analysis/scri
 
 ## Compute
 
-Gọi `tools.bash` với lệnh trong bước 2 của SKILL.md. `run_pipeline.sh` dùng `uv` để compute/vẽ chart mà không cài dependency toàn cục. Đọc stdout và kiểm tra đủ `metrics.json`, `tables.md`, 9 PNG trong `charts/`. Runner shell hiện có có thể che exit status của chart, nên số file thực tế là tiêu chí hoàn tất.
+Gọi `tools.bash` với lệnh trong bước 2 của SKILL.md. `run_pipeline.sh` dùng `uv` để compute/vẽ chart mà không cài dependency toàn cục. Đọc stdout và kiểm tra đủ `metrics.json`, `tables.md`, 9 PNG trong `charts/`. Runner kiểm tra đủ bảng, chỉ số và 9 PNG mới trước khi cập nhật output. Biểu đồ báo thiếu dữ liệu được ghi thành giới hạn, không dùng để nhận định.
 
 ## Look
 

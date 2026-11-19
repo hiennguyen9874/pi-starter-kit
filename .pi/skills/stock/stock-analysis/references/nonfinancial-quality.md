@@ -1,0 +1,10 @@
+# Phi tài chính — chất lượng lợi nhuận
+
+Dùng khi tiền và lợi nhuận lệch, vốn lưu động phình hoặc LNST tăng trái chiều với LNTT. Đọc `fa.derived` trong `metrics.json` và kiểm tra từng cầu nối bằng `raw/fa_q.json`.
+
+- **CFO/LNST:** tổng CFO 4 quý chia tổng LNST công ty mẹ cùng 4 quý; so thêm cửa sổ cùng kỳ năm trước. CFO thường là dòng hợp nhất còn mẫu số là phần công ty mẹ: dùng như chỉ báo, kiểm tra LNST hợp nhất nếu thiểu số trọng yếu. Chỉ có tỷ lệ khi LNST dương và đủ quý. `cashFlowAfterInvestingTTM` = CFO + LCTT đầu tư ròng, **không phải FCF**; cần dòng chi mua/xây TSCĐ có phạm vi phù hợp để tính CFO − capex.
+- **Vòng quay:** `inventoryDaysProxy` = 365 × tồn kho bình quân 5 cuối quý / giá vốn 4 quý; `receivableDaysProxy` thay bằng phải thu tổng hợp / doanh thu. Đây là proxy, không gọi là DSO chuẩn nếu phải thu gồm khoản ngoài thương mại. `YoYDelta` là số ngày thay đổi so với cửa sổ cùng kỳ. `inventoryVsRevenueGrowthGapPp` so tồn kho cuối quý YoY với doanh thu 4 quý YoY. Cảnh báo ≥20 điểm % là ngưỡng kiểm tra, không phải kết luận giảm giá tồn kho. So cơ cấu, mùa vụ, dự phòng; số dư giảm cùng CFO tăng không định lượng được đóng góp CFO nếu thiếu thuyết minh.
+- **Cầu nối lợi nhuận:** hoạt động + tài chính ròng + khoản khác → LNTT; LNTT − LNST công ty mẹ là phần chênh tổng hợp, không tự quy cho thuế hay CĐ thiểu số. Đột biến tài chính chỉ là tín hiệu kiểm tra tính lặp lại, không mặc định một lần. Dùng cùng kỳ và lũy kế để phân biệt nền so sánh với xu hướng.
+- **Thiếu số:** công thức mới dùng quý liên tiếp có dữ liệu; thiếu/không hợp lệ thì bỏ chỉ tiêu, không dựng từ số 0. Khi thiếu bằng chứng cốt lõi, hạ độ chắc chắn của nhận định thay vì đọc điểm 0 là trung tính.
+
+**Xong khi:** phân biệt lợi nhuận kế toán, chuyển đổi thành tiền và dòng tiền sau đầu tư; giải thích chênh lệch bằng khoản mục hoặc ghi đúng phần chưa xác nhận.

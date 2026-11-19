@@ -13,8 +13,11 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sstock_lib import (BIL, Work, atr, axis_series, bogus_annual_ttm, clean, fa_frames, fa_series, flow_frame, fmt,
-                        fmt_signed, macd, max_drawdown, pct_change, percentile_of, price_frame, ret, rsi, sma, ytd)
+from sstock_lib import (BIL, Work, atr, axis_series, benchmark_prices, bogus_annual_ttm, clean, fa_frames, fa_series, flow_frame, fmt,
+                        fmt_signed, macd, max_drawdown, pct_change, percentile_of, price_frame, ret, rsi, sma,
+                        valuation_at_close, valuation_series, ytd)
+
+from nonfinancial_quality import cash_and_earnings
 
 # KPI spec per report structure: (key, series name, preferred chart, kind, better)
 #   kind: "bil" (tỷ đồng, YoY computed) | "pct" (%, change in pp) ; better: "up" | "down" | None
@@ -175,14 +178,9 @@ def derived_fa(frames, structure):
         ebit, finexp = get("ebit"), get("financialExpense")
         if ebit is not None and finexp is not None:
             d["ebitOverFinExpenseTTM"] = ebit.iloc[-4:].sum() / finexp.iloc[-4:].sum() if finexp.iloc[-4:].sum() else None
-        op, inv = get("operating"), get("investing")
-        if op is not None and inv is not None:
-            d["ocfTTM"] = op.iloc[-4:].sum()
-            d["investingTTM"] = inv.iloc[-4:].sum()
-            d["fcfTTM"] = op.iloc[-4:].sum() + inv.iloc[-4:].sum()
-        np_ttm = get("netProfitParentTTM")
-        if np_ttm is not None and op is not None and np_ttm.iloc[-1]:
-            d["ocfToNetProfitTTM"] = op.iloc[-4:].sum() / np_ttm.iloc[-1]
+        if frames:
+            latest_period = next(iter(frames.values())).index[-1]
+            d.update(cash_and_earnings(frames, latest_period))
     ttm_name = {"nonfinancial": "netProfitParentTTM"}.get(structure, "netProfitParentTTM")
     s = fa_series(frames, ttm_name)
     if s is not None and len(s.dropna()) > 4:
@@ -268,8 +266,7 @@ def _prev_quarter(per: str) -> str:
 
 
 def reclass_events(a, periods, tag=""):
-    """Offsetting asset moves in one period (>=5% of prior total assets, the other side within ±30%) = reclassification:
-    XDCB -> TSCĐ: plant goes live; XDCB -> tồn kho: land bank / infrastructure turned saleable (KCN, BĐS)."""
+    """Flag coincident asset moves; similar magnitude does not prove a transfer."""
     ev = []
     if a is None or "totalAssets" not in a:
         return ev
@@ -283,11 +280,11 @@ def reclass_events(a, periods, tag=""):
             pair = row[(row >= 0.7 * -dv) & (row <= 1.3 * -dv)]
             for inc, iv in pair.items():
                 ev.append(f"{per}{tag}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {ASSET_VI[inc]} {iv:+,.0f} tỷ "
-                          f"(bù trừ nhau, khả năng phân loại lại tài sản)")
+                          f"(biến động đồng thời, chưa xác nhận luồng chuyển)")
             split = row[row >= 0.3 * -dv]  # one source into several lines (SZC 2022: XDCB -2,156 -> tồn kho +1,337, TS khác +1,143)
             if pair.empty and len(split) >= 2 and 0.7 * -dv <= split.sum() <= 1.5 * -dv:
                 parts = " + ".join(f"{ASSET_VI[i]} {v:+,.0f}" for i, v in split.items())
-                ev.append(f"{per}{tag}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {parts} tỷ (tách sang nhiều khoản, khả năng phân loại lại tài sản)")
+                ev.append(f"{per}{tag}: {ASSET_VI[dec]} {dv:+,.0f} ↔ {parts} tỷ (nhiều khoản biến động đồng thời, chưa xác nhận luồng chuyển)")
     return ev
 
 
@@ -371,16 +368,14 @@ def balance_sheet_events(frames, n=8, actions=None, structure="nonfinancial"):
 
 
 def minority_events(frames, n=8):
-    """Minority-interest jumps (>=30% QoQ and material vs total capital): a subsidiary sold a stake / IPO'd / raised
-    outside capital, or was bought back. Profit to the parent's holders is diluted. Shared by bank and nonfinancial."""
+    """Material minority-interest movements warrant a reconciliation, not an ownership inference."""
     ev = []
     mi, tc = fa_series(frames, "minorityInterest", "capital"), fa_series(frames, "totalCapital", "capital")
     if mi is not None and tc is not None:
         for i in range(max(1, len(mi) - n), len(mi)):
             a, b = mi.iloc[i - 1], mi.iloc[i]
             if pd.notna(a) and pd.notna(b) and a > 0 and abs(b - a) / a >= 0.3 and abs(b - a) >= 0.003 * tc.iloc[i]:
-                ev.append(f"{mi.index[i]}: lợi ích CĐ thiểu số {a:,.0f}→{b:,.0f} tỷ — thay đổi sở hữu ở công ty con "
-                          "(bán bớt/IPO hoặc mua lại), cần tin DN")
+                ev.append(f"{mi.index[i]}: lợi ích CĐ thiểu số {a:,.0f}→{b:,.0f} tỷ — đối chiếu kết quả, vốn và thay đổi sở hữu tại công ty con; cần thuyết minh")
     return ev
 
 
@@ -395,22 +390,22 @@ def cash_gap_event(frames):
     per, gap = cb.index[-1], cb.iloc[-1] - ce.iloc[-1]
     if gap < 0.3 * cb.iloc[-1] or gap < 0.05 * ta.iloc[-1]:
         return []
-    msg = (f"{per}: cashBank {cb.iloc[-1]:,.0f} vs tiền cuối kỳ LCTT {ce.iloc[-1]:,.0f} tỷ → ~{gap:,.0f} tỷ là tiền gửi "
-           "có kỳ hạn/đầu tư ngắn hạn gộp trong cashBank (vẫn trừ vào nợ vay ròng)")
+    msg = (f"{per}: cashBank {cb.iloc[-1]:,.0f} vs tiền cuối kỳ LCTT {ce.iloc[-1]:,.0f} tỷ → chênh ~{gap:,.0f} tỷ, "
+           "có thể gồm tiền gửi có kỳ hạn/đầu tư ngắn hạn; đối chiếu thuyết minh")
     fixed = [s for s in (g("fixedAssets", "asset"), g("constructionWip", "asset")) if s is not None]
     if inv is not None and len(inv.dropna()) >= 4 and fixed and len(cb) > 4:
         inv4 = inv.iloc[-4:].sum()
         dfix = sum(s.iloc[-1] - s.iloc[-5] for s in fixed if len(s) > 4 and pd.notna(s.iloc[-5]))
         msg += f"; LCTT đầu tư 4Q {inv4:+,.0f} tỷ, Δ(TSCĐ+XDCB) 4Q {dfix:+,.0f} tỷ"
         if inv4 < 0 and dfix < 0.3 * -inv4:
-            msg += " → phần lớn LCTT đầu tư là gửi tiền có kỳ hạn, không phải capex; FCF TTM bị đánh giá thấp tương ứng"
+            msg += " → kiểm tra luồng gửi/rút tiền và capex thực tế; không suy FCF từ LCTT đầu tư ròng"
     return [msg]
 
 
 def corporate_actions(px: pd.DataFrame) -> list[dict]:
     """Ex-right sessions: close/adjClose steps down on the first ex-date (adjClose is back-adjusted).
-    factor = price adjustment ratio. >=1.10 is a stock bonus/dividend/split (dilution, no new money);
-    <1.05 is a cash dividend; in between could be either. A 5% stock dividend prints 1.0499x (like 10% -> 1.0999x),
+    factor = price adjustment ratio. A large uncorroborated factor is unclassified;
+    small factors suggest possible cash dividends or small stock entitlements. A 5% stock dividend prints 1.0499x (like 10% -> 1.0999x),
     so the cash cut sits at 1.0495; balance_sheet_events relabels any factor that matches a charter-capital rise, and a
     factor well below the rise with a financing inflow as a rights issue (SZC 2024-01-05: 1.219 is not a bonus). A hint for the report, confirm with company news."""
     if px.empty or "adjClose" not in px or "close" not in px:
@@ -421,8 +416,8 @@ def corporate_actions(px: pd.DataFrame) -> list[dict]:
     for d, k in f[f > 1.003].items():
         prev = float(px["close"].shift(1)[d])
         cash = f" ~{prev * (1 - 1 / k) * 1000:,.0f} đ/cp"  # dividend implied by the factor: P_prev × (1 − 1/k)
-        kind = ("cổ phiếu thưởng/cổ tức CP/chia tách — pha loãng, không có tiền mới" if k >= 1.0995  # 10% bonus prints 1.0999x
-                else "cổ tức tiền" + cash if k < 1.0495 else f"cổ tức tiền lớn ({cash.strip()}) hoặc CP thưởng nhỏ")
+        kind = ("chưa phân loại; hệ số lớn, đối chiếu vốn và thông báo GDKHQ" if k >= 1.0995  # 10% bonus prints 1.0999x
+                else "gợi ý cổ tức tiền" + cash if k < 1.0495 else f"cổ tức tiền lớn ({cash.strip()}) hoặc CP thưởng nhỏ")
         ev.append({"date": str(d.date()), "factor": float(k), "prev_close": prev,
                    "close": float(px["close"][d]), "kind": kind})
     return ev
@@ -584,7 +579,7 @@ def bank_events(frames, n=4):
     return sorted(ev), dq  # "YYYYQn: ..." sorts chronologically
 
 
-def main(workdir):
+def main(workdir, output_dir=None):
     W = Work(workdir)
     sym, structure = W.symbol, W.structure
     M: dict = {"meta": {}, "price": {}, "flows": {}, "rs": {}, "elite": {}, "fa": {}, "valuation": {},
@@ -606,14 +601,23 @@ def main(workdir):
         M["meta"]["asOf"] = str(px.index[-1].date())
         P.update({"date": str(px.index[-1].date()), "close": last["close"], "changePct": last["changePct"],
                   "marketCapBil": last["marketCap"] / BIL if pd.notna(last["marketCap"]) else None})
+        j = benchmark_prices(c, vn["close"]) if not vn.empty else pd.DataFrame()
+        P["benchmarkWindows"] = {}
         for k, n in {"1w": 5, "1m": 21, "3m": 63, "6m": 126, "1y": 252}.items():
-            P[f"ret_{k}"] = ret(c, n)
-            if not vn.empty:
-                P[f"vnindex_ret_{k}"] = ret(vn["close"], n)
-                P[f"rel_{k}"] = None if P[f"ret_{k}"] is None or P[f"vnindex_ret_{k}"] is None else P[f"ret_{k}"] - P[f"vnindex_ret_{k}"]
+            P[f"ret_{k}"] = ret(c, n)  # standalone stock return if benchmark is unavailable
+            if len(j) > n and j.index[-1] == px.index[-1]:
+                window = j.iloc[-n - 1:]
+                P[f"ret_{k}"] = ret(window["stock"], n)
+                P[f"vnindex_ret_{k}"] = ret(window["market"], n)
+                P[f"rel_{k}"] = P[f"ret_{k}"] - P[f"vnindex_ret_{k}"]
+                P["benchmarkWindows"][k] = {"from": str(window.index[0].date()), "to": P["date"], "points": len(window)}
         P["corporate_actions"] = corporate_actions(px)
         P["ret_ytd"] = ytd(c)
-        P["vnindex_ret_ytd"] = ytd(vn["close"]) if not vn.empty else None
+        if not j.empty and j.index[-1] == px.index[-1]:
+            prev = j[j.index.year < j.index[-1].year]
+            if not prev.empty:
+                P["ret_ytd"], P["vnindex_ret_ytd"] = ytd(j["stock"]), ytd(j["market"])
+                P["benchmarkWindows"]["ytd"] = {"from": str(prev.index[-1].date()), "to": P["date"]}
         w = c.iloc[-252:]
         P["high_52w"], P["low_52w"] = float(w.max()), float(w.min())
         P["from_high_pct"] = (c.iloc[-1] / w.max() - 1) * 100
@@ -791,24 +795,27 @@ def main(workdir):
 
     # ---------------- Valuation ----------------
     V = M["valuation"]
-    v1m = W.load("valuation_1m")
-    if v1m:
-        snap = v1m.get("snapshot") or {}
-        V["snapshot"] = snap
-        V["peSstock"], V["pbSstock"] = v1m.get("peSstock"), v1m.get("pbSstock")
-        V["peSstockFrozenSince"] = v1m.get("peSstockLastComputableDate")
-        dates = v1m["dates"]
-        ch = v1m["charts"]
-        pe = axis_series(dates, ch["pe"]["pe"])
-        pb = axis_series(dates, ch["pb"]["pb"])
-        a3pe = axis_series(dates, ch["pe"]["avg3YPe"]).dropna()
-        a3pb = axis_series(dates, ch["pb"]["avg3YPb"]).dropna()
-        cur_pe, cur_pb = snap.get("pe"), snap.get("pb")
+    as_of = M["meta"].get("asOf")
+    v1m, v1d = W.load("valuation_1m"), W.load("valuation_1d")
+    if v1m or v1d:
+        ancillary = v1m or v1d
+        # Ancillary vendor fields are not the dated P/E and P/B used for scoring.
+        V["snapshot"] = ancillary.get("snapshot") or {}
+        for k in ("pe", "pb"):
+            field = f"{k}Sstock"
+            V[field] = ancillary.get(field)
+            V[f"{field}FrozenSince"] = ancillary.get(f"{field}LastComputableDate")
+        pe, pb = (valuation_series(v1m, k, as_of) for k in ("pe", "pb"))
+        a3pe, a3pb = (valuation_series(v1m, k, as_of, f"avg3Y{k.capitalize()}").dropna() for k in ("pe", "pb"))
+        cur_pe, cur_pb = (valuation_at_close(v1d, k, as_of) for k in ("pe", "pb"))
+        V["currentDate"] = as_of if cur_pe is not None or cur_pb is not None else None
+        dates = pe.dropna().index.union(pb.dropna().index)
+        V["historyLastDate"] = str(dates[-1].date()) if len(dates) else None
         pe_raw = pe
         pe = pe[pe > 0]  # loss quarters give negative / exploding P/E: judge on positive values only
         V["pe"] = {"current": cur_pe, "avg3Y": a3pe.iloc[-1] if len(a3pe) else None,
                    "median10y": pe.median(), "mean10y": pe.mean(), "std10y": pe.std(),
-                   "min10y": pe.min(), "max10y": pe.max(), "pctile10y": percentile_of(pe, cur_pe),
+                   "min10y": pe.min(), "max10y": pe.max(), "pctile10y": percentile_of(pe, cur_pe) if (cur_pe or 0) > 0 else None,
                    "negative_months": int((pe_raw <= 0).sum())}
         V["pb"] = {"current": cur_pb, "avg3Y": a3pb.iloc[-1] if len(a3pb) else None,
                    "median10y": pb.median(), "mean10y": pb.mean(), "std10y": pb.std(),
@@ -832,20 +839,22 @@ def main(workdir):
             yrs = range(int(om[0][:4]) - 1, int(om[-1][:4]) + 1)
             V["pb"]["loss_years_near_outliers"] = [str(y) for y in yrs if str(y) in npy.index and npy[str(y)] < 0]
         price = M["price"].get("close")
-        if price and cur_pe and cur_pb:
-            V["implied_price"] = {
-                "at_pe_avg3Y": price * V["pe"]["avg3Y"] / cur_pe if V["pe"]["avg3Y"] and not V["pe"]["avg3Y_distorted"] else None,
-                "at_pe_median10y": price * V["pe"]["median10y"] / cur_pe,
-                "at_pb_avg3Y": price * V["pb"]["avg3Y"] / cur_pb if V["pb"]["avg3Y"] and not V["pb"]["avg3Y_distorted"] else None,
-                "at_pb_median10y": price * V["pb"]["median10y"] / cur_pb,
-            }
+        if price:
+            V["implied_price"] = {}
+            for k in ("pe", "pb"):
+                b = V[k]
+                if b["current"] is not None and b["current"] > 0:
+                    for stat in ("avg3Y", "median10y"):
+                        v = b[stat]
+                        if pd.notna(v) and v > 0 and not (stat == "avg3Y" and b["avg3Y_distorted"]):
+                            V["implied_price"][f"at_{k}_{stat}"] = price * v / b["current"]
     sva = (W.load("sector_val_all") or {}).get("sectors", [])
     me = next((s for s in sva if s["sectorId"] == M["meta"]["sectorId"]), None)
     if me:
         V["sector"] = {k: me.get(k) for k in ("pe", "pb", "avg3YPe", "avg3YPb", "date")}
-        if V.get("pe", {}).get("current") and me.get("pe"):
+        if me.get("date") == as_of and (V.get("pe", {}).get("current") or 0) > 0 and (me.get("pe") or 0) > 0:
             V["pe_vs_sector_pct"] = (V["pe"]["current"] / me["pe"] - 1) * 100
-        if V.get("pb", {}).get("current") and me.get("pb"):
+        if me.get("date") == as_of and V.get("pb", {}).get("current") and me.get("pb"):
             V["pb_vs_sector_pct"] = (V["pb"]["current"] / me["pb"] - 1) * 100
         dfv = pd.DataFrame(sva).dropna(subset=["pe", "avg3YPe"])
         dfv["pe_disc"] = dfv["pe"] / dfv["avg3YPe"] - 1
@@ -899,7 +908,7 @@ def main(workdir):
 
     M["signals"] = scorecard(M)
     M = clean(M, 3)
-    out = Path(workdir)
+    out = Path(output_dir or workdir)
     (out / "metrics.json").write_text(json.dumps(M, ensure_ascii=False, indent=1))
     (out / "tables.md").write_text(tables_md(M))
     print(f"wrote {out/'metrics.json'} and {out/'tables.md'}")
@@ -925,7 +934,7 @@ def scorecard(M):
         return 0 if x is None else (1 if x >= hi else -1 if x <= lo else 0)
 
     g("Xu hướng giá", [
-        ck("Giá vs MA50", P.get("above_ma50"), 1 if P.get("above_ma50") else -1, "+1 trên MA50 / -1 dưới"),
+        ck("Giá vs MA50", P.get("above_ma50"), 1 if P.get("above_ma50") else -1, "+1 trên MA50 / -1 dưới") if P.get("above_ma50") is not None else None,
         ck("Giá vs MA200", P.get("above_ma200"), 1 if P.get("above_ma200") else -1, "+1 trên MA200 / -1 dưới") if P.get("above_ma200") is not None else None,
         ck("MA50 dốc 20 phiên %", P.get("ma50_slope_20d_pct"), tri(P.get("ma50_slope_20d_pct"), 1, -1), "+1 ≥+1% / -1 ≤-1%"),
     ])
@@ -979,9 +988,9 @@ def scorecard(M):
         qual.append(ck("Margin/VCSH %", me, -1 if me is not None and me > 180 else 0, "-1 nếu >180% (gần trần 200%)"))
     g("Chất lượng", qual)
     pe, pb = V.get("pe", {}), V.get("pb", {})
+    pe_rel = pe["current"] / pe["median10y"] if (pe.get("current") or 0) > 0 and (pe.get("median10y") or 0) > 0 else None
     g("Định giá", [
-        ck("P/E / trung vị 10N (P/E>0)", pe.get("current") / pe["median10y"] if pe.get("current") and pe.get("median10y") else None,
-           -tri(pe["current"] / pe["median10y"], 1.2, 0.8) if pe.get("current") and pe.get("median10y") else 0, "+1 ≤0.8x / -1 ≥1.2x"),
+        ck("P/E / trung vị 10N (P/E>0)", pe_rel, -tri(pe_rel, 1.2, 0.8), "+1 ≤0.8x / -1 ≥1.2x"),
         ck("P/B percentile 10 năm", pb.get("pctile10y"), -tri(pb.get("pctile10y"), 80, 20) if pb.get("pctile10y") is not None else 0, "+1 ≤20 / -1 ≥80"),
         ck("P/E vs ngành %", V.get("pe_vs_sector_pct"), -tri(V.get("pe_vs_sector_pct"), 30, -20) if V.get("pe_vs_sector_pct") is not None else 0, "+1 rẻ hơn ≥20% / -1 đắt hơn ≥30%"),
     ])
@@ -1010,6 +1019,8 @@ def tables_md(M):
     meta = M["meta"]
     L = [f"# Bảng số liệu — {meta['symbol']} ({meta.get('name')})",
          f"Ngành: {meta.get('sectorName')} (id {meta.get('sectorId')}) · cấu trúc BCTC: {meta['structure']} · dữ liệu tới {meta.get('asOf')}", ""]
+    if meta.get("failedJobs"):
+        L += ["> ⚠️ Job thiếu/lấy không đủ: " + "; ".join(f"{k}: {v}" for k, v in meta["failedJobs"].items()), ""]
     if meta.get("packageNotes"):
         L += ["> Giới hạn gói: " + "; ".join(f"{k}: {v}" for k, v in meta["packageNotes"].items()), ""]
     L += ["## Giá & kỹ thuật", "| Chỉ tiêu | Giá trị |", "|---|---|",
@@ -1038,6 +1049,11 @@ def tables_md(M):
     for k in ("1w", "1m", "3m", "6m", "ytd", "1y"):
         L.append(f"| {k.upper()} | {fmt_signed(P.get('ret_'+k))} | {fmt_signed(P.get('vnindex_ret_'+k))} | "
                  f"{fmt_signed(P.get('rel_'+k) if k!='ytd' else (P.get('ret_ytd') - P.get('vnindex_ret_ytd') if P.get('ret_ytd') is not None and P.get('vnindex_ret_ytd') is not None else None), 1, '')} |")
+    bw = (P.get("benchmarkWindows") or {}).get("1y")
+    if bw:
+        L += ["", f"Lợi suất 1N cùng lịch ({bw['points']} điểm): {bw['from']} → {bw['to']}. Dòng thiếu VNINDEX chỉ là lợi suất riêng mã."]
+    else:
+        L += ["", "> ⚠️ Không đủ 253 điểm chung đến phiên chốt để so lợi suất 1N với VNINDEX."]
     L += ["", "## Dòng tiền (tỷ đồng)", "| Cửa sổ | Khối ngoại ròng | Tự doanh ròng | Chủ động ròng | Tỷ lệ chủ động |", "|---|---|---|---|---|"]
     for n in (5, 20, 60, 250):
         L.append(f"| {n} phiên | {fmt_signed(F.get(f'foreign_net_{n}_bil'),1,'')} | {fmt_signed(F.get(f'proprietary_net_{n}_bil'),1,'')} | "
@@ -1073,7 +1089,35 @@ def tables_md(M):
             L += ["", "> ⚠️ Chất lượng dữ liệu: " + "; ".join(FA["dataQuality"])
                   + f". ROE snapshot (get_stock_valuation): {fmt((V.get('snapshot') or {}).get('roe'))}%"]
         if FA.get("derived"):
-            L += ["", "Chỉ tiêu suy ra: " + " · ".join(f"{k}={fmt(v, 2)}" for k, v in FA["derived"].items())]
+            d = FA["derived"]
+            quality_rows = {
+                "ocfTTM": ("CFO 4 quý (tỷ)", "priorOcfTTM"),
+                "ocfToNetProfitTTM": ("CFO / LNST công ty mẹ 4 quý (x)", "priorOcfToNetProfitTTM"),
+                "inventoryDaysProxy": ("Số ngày tồn kho (ước tính)", "inventoryDaysProxyYoYDelta"),
+                "receivableDaysProxy": ("Số ngày phải thu tổng hợp (ước tính)", "receivableDaysProxyYoYDelta"),
+                "operatingProfitQ": ("Lợi nhuận hoạt động quý (tỷ)", "operatingProfitQYoYDelta"),
+                "financialProfitQ": ("Lãi tài chính ròng quý (tỷ)", "financialProfitQYoYDelta"),
+                "ebtQ": ("Lợi nhuận trước thuế quý (tỷ)", "ebtQYoYDelta"),
+                "ebtToParentProfitResidualQ": ("LNTT trừ LNST công ty mẹ quý (tỷ)", "ebtToParentProfitResidualQYoYDelta"),
+                "cashFlowAfterInvestingTTM": ("CFO + LCTT đầu tư 4 quý (tỷ; không phải FCF)", None),
+            } if meta["structure"] == "nonfinancial" else {}
+            table_keys = set(quality_rows) | {comparison for _, comparison in quality_rows.values()}
+            rest = [f"{k}={fmt(v, 2)}" for k, v in d.items() if k not in table_keys]
+            if rest:
+                L += ["", "Chỉ tiêu suy ra: " + " · ".join(rest)]
+            if quality_rows:
+                L += ["", "Chất lượng lợi nhuận & vốn lưu động:", "", "| Chỉ tiêu | Hiện tại | Đối chiếu |", "|---|---:|---:|"]
+                for key, (label, comparison) in quality_rows.items():
+                    comp = (f"{fmt(d[comparison], 2)} cùng kỳ" if comparison.startswith("prior")
+                            else f"{fmt_signed(d[comparison], 2, '')} YoY") if comparison in d else "—"
+                    L.append(f"| {label} | {fmt(d.get(key), 2)} | {comp} |")
+            if meta["structure"] == "nonfinancial":
+                if (d.get("ocfToNetProfitTTM") is not None and d["ocfToNetProfitTTM"] <= 0.3
+                        and (d.get("netProfitTTMYoYPct") or 0) > 0):
+                    L += ["", "> ⚠️ LNST 4 quý tăng nhưng CFO/LNST ≤0,3x; đối chiếu tồn kho, phải thu và cùng kỳ. CFO + LCTT đầu tư không phải FCF."]
+                if d.get("inventoryVsRevenueGrowthGapPp", 0) >= 20:
+                    L += ["", f"> ⚠️ Tăng tồn kho cuối quý vượt tăng doanh thu TTM {fmt(d['inventoryVsRevenueGrowthGapPp'])} điểm %; "
+                          "kiểm tra số ngày tồn kho, cơ cấu và mùa vụ trước khi kết luận."]
         if FA.get("ytd"):
             L += ["", "Lũy kế năm so với cùng kỳ: " + " · ".join(
                 f"{SERIES_VI.get(k, k)} {v['label']} {fmt(v['value'], 0)} vs {fmt(v['prev'], 0)} ({fmt_signed(v['yoyPct'])})"
@@ -1098,14 +1142,24 @@ def tables_md(M):
             L += ["", "> ⚠️ Chất lượng dữ liệu (theo năm): " + "; ".join(FA["annual_dataQuality"])]
     pe, pb = V.get("pe", {}), V.get("pb", {})
     if pe:
-        L += ["", "## Định giá", "| | Hiện tại | TB 3 năm | Trung vị 10N | Min–Max 10N | Percentile 10N | Ngành | Thị trường |", "|---|---|---|---|---|---|---|---|",
+        L += ["", "## Định giá", "| | Phiên chốt | TB 3 năm | Trung vị 10N | Min–Max 10N | Percentile 10N | Ngành | Thị trường |", "|---|---|---|---|---|---|---|---|",
               f"| P/E | {fmt(pe.get('current'),2)} | {fmt(pe.get('avg3Y'),2)} | {fmt(pe.get('median10y'),2)} | {fmt(pe.get('min10y'),1)}–{fmt(pe.get('max10y'),1)} | {fmt(pe.get('pctile10y'),0)} | {fmt(V.get('sector',{}).get('pe'),2)} (TB3N {fmt(V.get('sector',{}).get('avg3YPe'),2)}) | {fmt(V.get('market',{}).get('pe'),2)} (TB3N {fmt(V.get('market',{}).get('pe_avg3Y'),2)}) |",
               f"| P/B | {fmt(pb.get('current'),2)} | {fmt(pb.get('avg3Y'),2)} | {fmt(pb.get('median10y'),2)} | {fmt(pb.get('min10y'),2)}–{fmt(pb.get('max10y'),2)} | {fmt(pb.get('pctile10y'),0)} | {fmt(V.get('sector',{}).get('pb'),2)} (TB3N {fmt(V.get('sector',{}).get('avg3YPb'),2)}) | {fmt(V.get('market',{}).get('pb'),2)} (TB3N {fmt(V.get('market',{}).get('pb_avg3Y'),2)}) |"]
         sn = V.get("snapshot", {})
-        L.append(f"\nEPS 4Q: {fmt(sn.get('eps'),0)} đ · ROE: {fmt(sn.get('roe'))}% · P/E SSTOCK (dự phóng): {fmt(V.get('peSstock'),2)} (đóng băng từ {V.get('peSstockFrozenSince')}) · P/B SSTOCK: {fmt(V.get('pbSstock'),2)}")
+        L.append(f"\nSnapshot nguồn (không xác nhận mốc phiên) — EPS 4Q: {fmt(sn.get('eps'),0)} đ · ROE: {fmt(sn.get('roe'))}% · P/E SSTOCK (dự phóng): {fmt(V.get('peSstock'),2)} (đóng băng từ {V.get('peSstockFrozenSince')}) · P/B SSTOCK: {fmt(V.get('pbSstock'),2)} (đóng băng từ {V.get('pbSstockFrozenSince')})")
+        if V.get("currentDate"):
+            L.append(f"\nP/E và P/B phiên chốt lấy từ chuỗi ngày: {V['currentDate']}.")
+        if pe.get("current") is None or pb.get("current") is None:
+            L.append("> ⚠️ Thiếu P/E hoặc P/B có dữ liệu đúng phiên chốt; bỏ so sánh và giá tham chiếu cho bội số thiếu.")
+        if V.get("historyLastDate"):
+            L.append(f"Điểm cuối có dữ liệu trong chuỗi tháng (đã cắt tại phiên chốt): {V['historyLastDate']}.")
+        if V.get("sector") or V.get("market"):
+            L.append(f"Mốc tham chiếu ngành: {V.get('sector', {}).get('date') or '—'}; thị trường: {V.get('market', {}).get('date') or '—'}.")
         ip = V.get("implied_price") or {}
         if ip:
             L.append("Giá tham chiếu (nghìn đ): " + " · ".join(f"{k}={fmt(v, 2)}" for k, v in ip.items()))
+    else:
+        L += ["", "## Định giá", "> ⚠️ Không có nguồn định giá cổ phiếu (valuation_1d / valuation_1m)."]
     if M["peers"]:
         L += ["", "## So sánh cùng ngành (mã được RRG theo dõi)", "| Mã | Sàn | Vốn hóa (tỷ) | RS3 | RS6 | Góc | VCR | AMFI | GTGD20 (tỷ) |", "|---|---|---|---|---|---|---|---|---|"]
         shown = M["peers"][:12]
@@ -1152,4 +1206,4 @@ def tables_md(M):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:])
