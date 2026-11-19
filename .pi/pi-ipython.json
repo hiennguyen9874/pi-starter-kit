@@ -1,8 +1,11 @@
 {
     "confirmEachCell": false,
+    "backgroundNotices": true,
     "python": {
         "source": "uv",
-        "version": "3.13"
+        "version": "3.13",
+        "defaultPackages": true,
+        "packages": []
     },
     "output": {
         "maxBytes": 51200,
@@ -15,6 +18,6 @@
     "prelude": {
         "defaults": true,
         "imports": [],
-        "prompt": false
+        "prompt": true
     }
 }
