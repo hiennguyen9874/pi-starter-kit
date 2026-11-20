@@ -19,5 +19,10 @@
         "defaults": true,
         "imports": [],
         "prompt": true
+    },
+    "systemPrompt": {
+        "ipythonAfter": [
+            "rules"
+        ]
     }
 }

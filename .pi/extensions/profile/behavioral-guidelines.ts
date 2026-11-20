@@ -45,6 +45,14 @@ export interface LoadBehavioralGuidelineRegistryResult {
 
 const PRIMARY_MARKER = /(?:^|\n)<docs>/;
 const FALLBACK_MARKER = /(?:^|\n)<project_context>/;
+/** Closing tag of the `<ipython>` section added by pi-ipython (git:github.com/hiennguyen9874/pi-ipython). */
+const IPYTHON_SECTION_END = /(?:^|\n)<\/ipython>/;
+
+function findIpythonSectionEnd(systemPrompt: string): number {
+  const match = systemPrompt.match(IPYTHON_SECTION_END);
+  if (!match || match.index === undefined) return -1;
+  return match.index + match[0].length;
+}
 
 function findInsertionMarkerIndex(systemPrompt: string): number {
   return systemPrompt.match(PRIMARY_MARKER)?.index ?? systemPrompt.match(FALLBACK_MARKER)?.index ?? -1;
@@ -183,6 +191,16 @@ function injectGuidelines(
 ): string {
   const guidelines = getEnabledGuidelines(registry, config, systemPrompt);
   if (!guidelines) return systemPrompt;
+
+  // Guidelines reference the ipython REPL, so they follow its section when it is already present.
+  // pi-ipython usually runs later (packages load after local extensions); with
+  // "systemPrompt.ipythonAfter": ["rules"] in .pi/pi-ipython.json it inserts <ipython> right after
+  // </rules>, i.e. ahead of the guidelines inserted below.
+  const ipythonEnd = findIpythonSectionEnd(systemPrompt);
+  if (ipythonEnd !== -1) {
+    const rest = systemPrompt.slice(ipythonEnd).replace(/^\n+/, "");
+    return `${systemPrompt.slice(0, ipythonEnd)}\n\n${guidelines.trimEnd()}${rest ? `\n\n${rest}` : "\n"}`;
+  }
 
   const markerIndex = findInsertionMarkerIndex(systemPrompt);
   if (markerIndex === -1) {

@@ -37,6 +37,8 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
       "validation",
       "finalResponse",
       "communicationAndToolUseMinimal",
+      "communicationAndToolUseIpython",
+      "communicationAndToolUseIpythonMinimal",
       "repositoryInstructionsMinimal",
       "executionPolicyMinimal",
       "evidenceDisciplineMinimal",
@@ -115,4 +117,40 @@ test("injectBehavioralGuidelines supports explicit include lists", () => {
 
   assert.match(result, /<planning_discipline>/);
   assert.doesNotMatch(result, /<communication_and_tool_use>/);
+});
+
+// Simulates pi-ipython with "systemPrompt.ipythonAfter": ["rules"]: <ipython> right after </rules>.
+function simulateIpythonAfterRules(prompt: string): string {
+  const end = prompt.indexOf("</rules>") + "</rules>".length;
+  const rest = prompt.slice(end).replace(/^\n+/, "");
+  return `${prompt.slice(0, end)}\n\n<ipython>\nREPL\n</ipython>${rest ? `\n\n${rest}` : ""}`;
+}
+
+const IPYTHON_CONFIG = {
+  enabled: true,
+  sections: { communicationAndToolUse: false, communicationAndToolUseIpython: true },
+};
+
+test("guidelines go right after an existing <ipython> section", () => {
+  const prompt = simulateIpythonAfterRules(SYSTEM_PROMPT);
+  const result = injectBehavioralGuidelines(prompt, IPYTHON_CONFIG, REGISTRY);
+  assert.match(result, /<\/ipython>\n\n<execution_policy>/);
+  assert.ok(result.indexOf("<final_response>") < result.indexOf("<docs>"));
+});
+
+test("when pi-ipython runs later and <docs> is removed in between, ipython still precedes the guidelines", () => {
+  const prompt = `${SYSTEM_PROMPT}\n\n<cwd>\n/tmp\n</cwd>`;
+  const injected = injectBehavioralGuidelines(prompt, IPYTHON_CONFIG, REGISTRY);
+  // pi-documentation removes <docs>, then pi-ipython adds <ipython> after </rules>.
+  const result = simulateIpythonAfterRules(injected.replace(/<docs>[\s\S]*?<\/docs>\n*/, ""));
+  const ipythonEnd = result.indexOf("</ipython>");
+  assert.ok(result.indexOf("</rules>") < result.indexOf("<ipython>"));
+  assert.ok(ipythonEnd < result.indexOf("<execution_policy>"));
+  assert.ok(ipythonEnd < result.indexOf("<communication_and_tool_use>"));
+  assert.ok(result.indexOf("</communication_and_tool_use>") < result.indexOf("<cwd>"));
+});
+
+test("without ipython the docs insertion point is unchanged", () => {
+  const result = injectBehavioralGuidelines(SYSTEM_PROMPT, { enabled: true }, REGISTRY);
+  assert.ok(result.indexOf("<execution_policy>") < result.indexOf("<docs>"));
 });
