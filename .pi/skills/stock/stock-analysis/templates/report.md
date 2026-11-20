@@ -46,7 +46,7 @@
 ![rrg](charts/08_rrg.png)
 
 ## 8. Scorecard
-<!-- bảng 8 nhóm kèm ghi chú ngắn; nêu rõ nếu override và lý do -->
+<!-- bảng 8 nhóm; ghi độ phủ, tiêu chí thiếu/treo có thể đổi kết luận và trước/sau nếu đổi điểm -->
 
 ## 9. Rủi ro & catalyst
 <!-- rủi ro đặc thù ngành / bảng cân đối / dòng tiền; catalyst; giới hạn dữ liệu (gói, tool admin-only, chuỗi nghi lỗi) -->

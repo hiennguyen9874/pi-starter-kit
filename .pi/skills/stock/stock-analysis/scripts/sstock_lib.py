@@ -111,11 +111,11 @@ def valuation_series(payload, multiple, as_of, field=None):
     return s.loc[s.index <= pd.Timestamp(as_of)].replace([np.inf, -np.inf], np.nan)
 
 
-def valuation_at_close(payload, multiple, as_of):
+def valuation_at_close(payload, multiple, as_of, field=None):
     """Use only the daily point on the stock session, not a stale or undated snapshot."""
     if not as_of:
         return None
-    s = valuation_series(payload, multiple, as_of)
+    s = valuation_series(payload, multiple, as_of, field)
     v = s.get(pd.Timestamp(as_of)) if s.index.is_unique else None
     return float(v) if pd.notna(v) else None
 
@@ -175,6 +175,12 @@ def ytd(s: pd.Series) -> float | None:
 def max_drawdown(s: pd.Series) -> float:
     s = s.dropna()
     return float((s / s.cummax() - 1).min() * 100)
+
+
+def complete_window_sum(s: pd.Series, n: int) -> float | None:
+    """Sum the last n session slots only when all n values are finite."""
+    window = s.iloc[-n:]
+    return float(window.sum()) if len(window) == n and np.isfinite(window).all() else None
 
 
 def percentile_of(hist: pd.Series, x: float | None) -> float | None:

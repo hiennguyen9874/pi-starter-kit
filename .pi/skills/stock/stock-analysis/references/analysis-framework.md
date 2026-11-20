@@ -24,7 +24,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - Biên gộp/ròng TTM tăng nghĩa là sức mạnh định giá cải thiện hoặc chu kỳ đang thuận. Với ngành chu kỳ (thép, phân bón, hóa chất, BĐS, vận tải biển), luôn so với đỉnh và đáy chu kỳ trong bảng theo năm.
 - Bảng cân đối: `debt` là nợ vay chịu lãi, `appropriatedDebt` là nợ chiếm dụng (phải trả, người mua trả trước). Nợ vay ròng/VCSH ≤30% là tốt, ≥100% là rủi ro. EBIT/chi phí tài chính TTM nên ≥3x.
 - Dòng tiền: CFO TTM/LNST TTM ≥0,8 là dấu hiệu chuyển đổi tiền tốt; xem [chất lượng lợi nhuận](nonfinancial-quality.md) khi lệch. LCTT đầu tư ròng khác capex; đọc thuyết minh để xác nhận chi mua/xây TSCĐ hoặc thời điểm công suất vận hành.
-- Tồn kho/Tổng tài sản tăng nhanh hơn doanh thu là rủi ro giảm giá hàng tồn. Người mua trả trước tăng là đơn hàng tốt (BĐS, xây dựng).
+- Tồn kho tăng nhanh hơn doanh thu là tín hiệu kiểm tra cơ cấu, mùa vụ và dự phòng, chưa chứng minh giảm giá. Người mua trả trước chỉ hỗ trợ đọc tiến độ khi khớp thuyết minh/hợp đồng (BĐS, xây dựng).
 - Vốn điều lệ tăng nghĩa là pha loãng, cần so EPS với LNST.
 
 **Ngân hàng** (`bank`)
@@ -41,7 +41,7 @@ Chung cho mọi cấu trúc: tăng trưởng TTM YoY (doanh thu và LNST; `analy
 - Checklist chi tiết (lợi nhuận theo mảng, NIM/COF, sự kiện tăng vốn, P/B đi cùng ROE): [securities.md](securities.md).
 
 **Bảo hiểm** (`insurance`)
-- Combined ratio <100% là có lãi từ nghiệp vụ bảo hiểm (≤95% tốt, ≥105% xấu). Tỷ lệ bồi thường và tỷ lệ chi phí.
+- Kiểm tra cơ sở combined ratio và điều kiện chấm điểm theo [khung bảo hiểm](insurance.md).
 - Lợi nhuận tài chính (danh mục đầu tư, chủ yếu tiền gửi và trái phiếu) thường chiếm phần lớn LNST, nên nhạy với lãi suất.
 
 ## 4. Định giá: "giá đang rẻ hay đắt, so với cái gì?"
@@ -84,7 +84,7 @@ Kết luận dựa trên hai tổng phụ:
 | **Cơ bản & định giá ≥ +3** | Ứng viên mạnh: cân nhắc giải ngân theo kịch bản | Watchlist: doanh nghiệp tốt nhưng giá chưa xác nhận, chờ trigger kỹ thuật |
 | **Cơ bản & định giá ≤ +2** | Chỉ phù hợp giao dịch theo đà, đặt dừng lỗ chặt | Đứng ngoài |
 
-Sau đó điều chỉnh theo Bối cảnh: thị trường downtrend hoặc ngành lagging thì hạ một bậc. Scorecard là công cụ định lượng thô; override khi có evidence mạnh hơn (ví dụ lợi nhuận một lần làm méo tăng trưởng, chuỗi dữ liệu nghi lỗi) và ghi rõ lý do.
+Sau đó điều chỉnh theo Bối cảnh: thị trường downtrend hoặc ngành lagging thì hạ một bậc. Scorecard là công cụ định lượng thô. Đọc cấu hình **có dữ liệu/tổng tiêu chí** từng nhóm: thiếu hoặc bị treo được bỏ điểm, không tương đương một tín hiệu trung tính. Hạ độ tin cậy của kết luận nếu thiếu tiêu chí quyết định. Nếu chạy lại có BCTC đối chiếu hoặc override, ghi giá trị, điểm trước/sau và lý do.
 
 ## 9. Kịch bản
 

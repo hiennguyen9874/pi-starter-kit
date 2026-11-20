@@ -1,0 +1,29 @@
+{
+  "symbol": "MÃ",
+  "unit": "bil",
+  "scope": "separate",
+  "basis": "Mô tả cùng cơ sở/phạm vi, chỉ tiêu LNST và cách phân loại nếu cần.",
+  "periods": {
+    "2025Q3": {
+      "source": "URL hoặc disclosures/BCTC.pdf, trang 5",
+      "publishedDate": "2025-10-20",
+      "operating": null,
+      "investing": null,
+      "financing": null,
+      "netProfit": null,
+      "capex": null
+    },
+    "2025Q4": {
+      "source": "URL hoặc disclosures/BCTC.pdf, trang 5",
+      "publishedDate": "2026-01-20",
+      "operating": null,
+      "netProfit": null
+    },
+    "2026Q3": {
+      "source": "URL hoặc disclosures/BCTC.pdf, trang 5",
+      "publishedDate": "2026-10-20",
+      "operating": null,
+      "netProfit": null
+    }
+  }
+}

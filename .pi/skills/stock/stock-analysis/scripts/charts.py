@@ -18,7 +18,9 @@ import pandas as pd
 import seaborn as sns
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sstock_lib import BIL, Work, axis_series, benchmark_prices, bogus_annual_ttm, fa_frames, flow_frame, macd, price_frame, rsi, sma, valuation_series
+from sstock_lib import (BIL, Work, axis_series, benchmark_prices, bogus_annual_ttm, clean, complete_window_sum, fa_frames,
+                        flow_frame, fmt_signed, macd, price_frame, ret, rsi, sma, valuation_series)
+from cashflow_checks import fiscal_crosscheck
 
 sns.set_theme(style="whitegrid", context="notebook", font="DejaVu Sans")
 plt.rcParams.update({"figure.dpi": 110, "savefig.dpi": 130, "axes.titlesize": 11, "axes.titleweight": "bold",
@@ -201,7 +203,8 @@ def main(workdir, chart_dir=None):
         ax[0].fill_between(n.index, n[sym], n["VNINDEX"], where=n[sym] < n["VNINDEX"], color=DOWN, alpha=0.15)
         ax[0].axhline(100, color="#555", lw=0.6)
         label = "1 năm" if len(j) == 253 else "cửa sổ chung ngắn (không đủ 1 năm)"
-        ax[0].set_title(f"Hiệu suất {label}: {sym} {n[sym].iloc[-1]-100:+.1f}% vs VNINDEX {n['VNINDEX'].iloc[-1]-100:+.1f}%"
+        returns = [fmt_signed(clean(ret(j[k], len(j)-1), 3), 2) for k in (sym, "VNINDEX")]
+        ax[0].set_title(f"Hiệu suất {label}: {sym} {returns[0]} vs VNINDEX {returns[1]}"
                         f"\n{j.index[0]:%Y-%m-%d} → {j.index[-1]:%Y-%m-%d} ({len(j)} điểm)")
         ax[0].legend(loc="upper left")
     else:
@@ -215,7 +218,10 @@ def main(workdir, chart_dir=None):
             ax[1].plot(se.index, se, ls=ls, color="#f4a261", lw=1.1, label=f"Ngành {rt.upper()}")
     ax[1].axhline(50, color="#555", lw=0.6); ax[1].axhline(80, color=UP, lw=0.6, ls=":")
     ax[1].set_ylim(0, 100); ax[1].set_title("Sức mạnh cổ phiếu vs ngành (0-100, xếp hạng toàn thị trường)")
-    ax[1].legend(loc="upper left", ncol=4)
+    if ax[1].get_legend_handles_labels()[0]:
+        ax[1].legend(loc="upper left", ncol=4)
+    else:
+        ax[1].set_title("Thiếu chuỗi sức mạnh · nguồn: power_rs3 / power_rs6")
     fig.tight_layout(); save(fig, out, "02_relative_strength.png")
 
     # 03 money flow
@@ -223,15 +229,21 @@ def main(workdir, chart_dir=None):
     if not px.empty:
         d = px.iloc[-250:]
         fig, ax = plt.subplots(3, 1, figsize=(14, 10), sharex=True)
-        nf = d["netForeignValue"] / BIL
-        ax[0].bar(d.index, nf, color=np.where(nf >= 0, UP, DOWN), width=1.0)
-        a0 = ax[0].twinx(); a0.plot(d.index, nf.cumsum(), color="black", lw=1.3); a0.set_ylabel("lũy kế (tỷ)"); a0.grid(False)
-        ax[0].set_title(f"Khối ngoại mua/bán ròng (tỷ) — 250 phiên: {nf.sum():+,.0f} tỷ, 20 phiên: {nf.iloc[-20:].sum():+,.0f} tỷ")
-        if not af.empty:
-            a = (af["net"] / BIL).reindex(d.index)
-            ax[1].bar(d.index, a, color=np.where(a >= 0, UP, DOWN), width=1.0)
-            a1 = ax[1].twinx(); a1.plot(d.index, a.fillna(0).cumsum(), color="black", lw=1.3); a1.set_ylabel("lũy kế (tỷ)"); a1.grid(False)
-            ax[1].set_title(f"Mua - bán chủ động (tỷ) — 20 phiên: {a.iloc[-20:].sum():+,.0f} tỷ, 60 phiên: {a.iloc[-60:].sum():+,.0f} tỷ")
+        for pane, label, source, col, windows in (
+            (ax[0], "Khối ngoại mua/bán ròng", d, "netForeignValue", (250, 20)),
+            (ax[1], "Mua - bán chủ động", af, "net", (20, 60)),
+        ):
+            s = (source[col].reindex(d.index) / BIL).replace([np.inf, -np.inf], np.nan) if col in source else None
+            if s is None or not s.notna().any():
+                pane.set_title(f"{label} — thiếu dữ liệu")
+                continue
+            pane.bar(d.index, s, color=np.where(s >= 0, UP, DOWN), width=1.0)
+            accum = pane.twinx()
+            accum.plot(d.index, s.cumsum(), color="black", lw=1.3)
+            accum.set_ylabel("lũy kế (tỷ)" if s.notna().all() else "lũy kế phần có số (tỷ)")
+            accum.grid(False)
+            totals = ", ".join(f"{n} phiên: {fmt_signed(complete_window_sum(s, n), 0, '')}" for n in windows)
+            pane.set_title(f"{label} (tỷ) — {totals}")
         if "proprietaryTradingValue" in d and d["proprietaryTradingValue"].notna().any():
             pt = d["proprietaryTradingValue"] / BIL
             ax[2].bar(d.index, pt, color=np.where(pt >= 0, UP, DOWN), width=1.0)
@@ -246,6 +258,11 @@ def main(workdir, chart_dir=None):
     fqd, fyd = W.load("fa_q"), W.load("fa_y")
     fq, fy = fa_frames(fqd), fa_frames(fyd)
     labels = (fqd or {}).get("chartLabels", {})
+    if fq and st == "nonfinancial":
+        checks = fiscal_crosscheck(fq, fy, next(iter(fq.values())).index[-1])["checks"]
+        years = sorted({str(c["year"]) for c in checks if c["mismatch"]})
+        if years:
+            labels = {**labels, "cashFlow": f"LCTT quý SSTOCK: lệch số năm {', '.join(years)}\nĐối chiếu bảng; chưa xác định quý lệch"}
     fq, labels = repair_profit_performance(fq, labels, quarterly=True)
     fy, labels_y = repair_profit_performance(fy, (fyd or {}).get("chartLabels", {}), quarterly=False)
     for b in bogus_annual_ttm(fy):  # annual *TTMPct can be a source bug; tables.md carries the warning

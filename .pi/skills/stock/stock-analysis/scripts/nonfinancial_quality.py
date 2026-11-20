@@ -58,11 +58,14 @@ def cash_and_earnings(frames, period):
     for key, label in (("inventory", "inventory"), ("receivables", "receivables")):
         s = series("asset", key)
         put(label + "ChangeQoQ", s.iloc[-1] - s.iloc[-2])
+    ebit = series("ebitda", "ebit")
+    finexp = series("costStructure", "financialExpense")
+    put("ebitOverFinExpenseTTM", ratio(ttm(ebit), ttm(finexp)))
     ebt = series("ebitda", "ebt")
-    for s, label in ((ebt - profit, "ebtToParentProfitResidual"),
-                     (series("profitStructure", "operatingProfit"), "operatingProfit"),
-                     (series("profitStructure", "financialProfit"), "financialProfit"),
-                     (ebt, "ebt")):
+    op, fin, other = (series("profitStructure", k) for k in ("operatingProfit", "financialProfit", "otherProfit"))
+    for s, label in ((ebt - profit, "ebtToParentProfitResidual"), (op, "operatingProfit"),
+                     (fin, "financialProfit"), (other, "otherProfit"), (ebt, "ebt"),
+                     (ebt - op - fin - other, "ebtBridgeResidual")):
         put(label + "Q", s.iloc[-1])
         put(label + "QYoYDelta", s.iloc[-1] - s.iloc[-5])
     return result

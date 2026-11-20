@@ -7,7 +7,8 @@ Dùng ở bước 3–5 khi gặp các nhánh dưới đây. **STB là ngân hà
 | Nhãn và mẫu số dư nợ (§1) | `structure = bank`, trước khi diễn giải nhóm 2/NPL/LLR | Chỉ ngân hàng |
 | Chất lượng tăng trưởng (§2) | Ngân hàng có thu nhập dịch vụ đổi bậc, hoặc dự phòng/số dư nợ biến động trái chiều | Chỉ ngân hàng |
 | Nhận diện (§3) | Tên, mã, sàn, website hoặc `structure` giữa các nguồn không khớp | Mọi cấu trúc |
-| Cửa sổ so sánh (§4) | Lợi suất trong bảng khác tiêu đề biểu đồ | Mọi cấu trúc |
+| Cửa sổ / định giá (§4) | Lợi suất khác chart, cơ sở P/B lệch hoặc ngành thiếu cùng kỳ | Mọi cấu trúc |
+| Quyền / biến động bảng cân đối (§5) | Có đứt hệ số giá, tăng giảm vốn hoặc biến động tài sản chưa rõ | Mọi cấu trúc |
 
 Các số STB bên dưới là **ca kiểm chứng sstock ngày 17/11/2026**, không phải giả định cho dữ liệu mới. Giữ nguyên raw và key nguồn; lưu phép đối chiếu trong `<workdir>/audit.py` và `audit.json` theo runtime đã chọn. Những nhãn trong `tables.md`/PNG vẫn là output tự động cho tới khi có sửa đổi và kiểm thử riêng trong pipeline.
 
@@ -103,13 +104,15 @@ Khi tên không khớp mã hoặc website, đối chiếu `code`/`mack`, sàn, `
 ## 4. Mọi cấu trúc: bảng và chart khác mốc
 
 - **Lợi suất:** chart 02 và bảng 1N dùng 253 điểm chung đến phiên chốt (252 khoảng), `adjClose` của mã và `close` của VNINDEX. Xem `price.benchmarkWindows`; nếu không đủ điểm, chart ghi cửa sổ ngắn hoặc thiếu phiên chung, bảng không tính chênh lệch 1N. Với báo cáo cũ, MSH từng lệch do chart 252 điểm và bảng 253 điểm; không áp lời giải đó cho mọi sai lệch.
+- **Cơ sở P/B:** khi BVPS ngày chốt lệch từ 10% so với VCSH ước tính/số CP, pipeline treo điểm phân vị và giá tham chiếu P/B. Kiểm tra VCSH thuộc cổ đông thường/công ty mẹ, số CP lưu hành, mệnh giá, phạm vi và ngày dữ liệu. Phép thử chỉ chạy cho phi tài chính khi vốn điều lệ và số CP snapshot tương thích ở mệnh giá 10.000 đồng; thiếu kiểm tra không có nghĩa đã khớp. Không thay bội số lịch sử bằng phép tính mới. Nếu xác minh được và chấm lại, ghi cơ sở và trước/sau.
+- **Biên ngành:** so cùng quý (hoặc cùng cửa sổ TTM) và đúng cấu trúc BCTC. `sector.fa.period` là kỳ kết thúc dùng để so; thiếu kỳ chung thì để trống, không lấy kỳ gần nhất riêng của mỗi bên.
 - **Định giá:** P/E và P/B phiên chốt lấy đúng ngày từ `raw/valuation_1d.json`; thiếu thì để trống và bỏ giá tham chiếu tương ứng. Thống kê và chart 07 cắt chuỗi tháng tại phiên chốt; tiêu đề chart ghi ngày cuối còn hiển thị sau lọc. Snapshot nguồn và P/E/P/B dự phóng là thông tin riêng, không thay thế bội số phiên chốt. Chỉ tính chênh lệch với ngành khi cùng ngày. P/E ≤0 không phải giá rẻ và không dùng tính giá tham chiếu.
 
 **Xong khi:** nêu rõ hai mốc/cơ sở và chuỗi được dùng, hoặc ghi phần chưa giải thích; không trộn cửa sổ.
 
 ## 5. Sự kiện quyền và biến động bảng cân đối
 
-- **Quyền:** hệ số `close/adjClose` phát hiện điều chỉnh, không tự xác định loại quyền. Đối chiếu thông báo GDKHQ, vốn/vốn góp và (nếu có) tiền thu phát hành. Khớp tăng vốn là bằng chứng hỗ trợ thưởng/cổ tức CP; lời gợi ý quyền mua từ dòng tiền tài chính ròng vẫn cần xác nhận vì bao gồm vay/trả nợ. Hệ số lớn nhưng vốn không tăng là **chưa phân loại**; MSH 01/12/2025 hệ số 1,111 nhưng vốn điều lệ không đổi trong các quý quan sát. `adjClose` vẫn là chuẩn cho mức giá lịch sử.
+- **Quyền:** hệ số `close/adjClose` phát hiện điều chỉnh, không tự xác định loại quyền. Đối chiếu thông báo GDKHQ, vốn/vốn góp và (nếu có) tiền thu phát hành. Khớp tăng vốn chỉ là bằng chứng hỗ trợ, không chốt loại quyền. Tìm **thông báo ĐKCC/GDKHQ hoặc kết quả phát hành** của doanh nghiệp, HNX/HOSE/VSDC. Lưu loại quyền, tỷ lệ/số tiền, ĐKCC, ngày chi trả hoặc kết thúc phát hành và URL; giữ riêng ngày hệ số đổi nếu không khớp. Xác nhận tiền mới bằng **dòng thu phát hành** và đối tượng mua (cổ đông hiện hữu/nhân viên/nhà đầu tư), không bằng LCTT tài chính ròng. TNG 2025: vốn tăng 5% và mô hình TERP gợi ý quyền mua, nhưng thông báo kết quả cho thấy **ESOP**; 61,30 tỷ thu phát hành trong BCTC không xác nhận loại quyền đúng ngày hệ số đổi. Hệ số lớn nhưng vốn không tăng là **chưa phân loại**; MSH 01/12/2025 hệ số 1,111 nhưng vốn điều lệ không đổi trong các quý quan sát. `adjClose` vẫn là chuẩn cho mức giá lịch sử.
 - **Tài sản:** số tăng/giảm gần nhau chỉ là biến động đồng thời. XDCB giảm và TSCĐ/tồn kho tăng là giả thuyết chuyển khoản, cần thuyết minh nghiệm thu/phân loại. Số dư thiểu số phản ánh cả kết quả, giao dịch vốn và sở hữu; đối chiếu trước khi suy IPO/bán bớt. Chênh `cashBank` với tiền cuối kỳ là dấu hiệu khác phạm vi (thường có tiền gửi), không xác định chi capex hay tiền bị hạn chế.
 
 **Xong khi:** ghi kỳ và số tiền/hệ số, phân biệt bằng chứng khớp với loại giao dịch còn chưa xác nhận, chỉ rõ thuyết minh/thông báo cần tìm.
