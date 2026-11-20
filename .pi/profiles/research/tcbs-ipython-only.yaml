@@ -1,0 +1,54 @@
+# ipython variant of tcbs-cm-only.yaml: single `ipython` tool (pi-ipython) instead of codemode.
+# See advance/ipython-only.yaml for conflict notes.
+# MCP (tcbs) stays on via builtin:mcp; its tools are called from Python with
+# `await pi.search(...)` / `await pi.describe(...)` / `await pi.tool(...)`. tool-search is not needed.
+skillsEnable:
+  - handoff
+  - show-me
+  - i-have-adhd
+promptsDisable: ["*"]
+mcpServersEnable:
+  - tcbs
+mcpServersDisable:
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+  - exa
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: false
+      communicationAndToolUseIpython: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: false
+      validation: false
+      finalResponse: false
+      planningDiscipline: false
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ipython
+packagesDisable:
+  - npm:@hiennguyen9874/pi-single-edit
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:pi-web-access
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+  - git:github.com/linearuncle/pi-openai-web-search
+extensionsDisable:
+  - builtin:codemode
+  - builtin:llama.cpp
+  - ./extensions/disable-project-context.ts
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+  - builtin:tool-search
+  - ./extensions/codemode-direct-write.ts
+  - ./extensions/enable-ls-tool.ts
+  - ./extensions/permission-gate.ts
+extensionsEnable:
+  - builtin:mcp

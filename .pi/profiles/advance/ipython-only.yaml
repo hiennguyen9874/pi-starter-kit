@@ -1,0 +1,76 @@
+# ipython-only: like code-mode-only, but the single model tool is `ipython` (pi-ipython)
+# instead of `codemode`.
+#
+# How pi-ipython works (current version, ADR 0005):
+#   - Registers one tool `ipython`: a persistent Python kernel (uv venv). Files, search, edits and
+#     shell (`await bash(...)`) are done from Python. Other pi tools are only callable from Python
+#     via `await pi.tool(name, args)` (Bridged calls go through pi hooks/permissions).
+#   - forceExclusive(): setActiveTools(["ipython", ...direct-exposure tools]) on session_start and
+#     on every before_agent_start; `prepareLoadout` hides every other tool declaration.
+#   - Extends event.systemPrompt (inserts <ipython> before <docs>, <skills> before <cwd>) instead of
+#     replacing it, so local prompt-editing extensions compose with it.
+#   - Kernel config: .pi/pi-ipython.json.
+#
+# Conflicts with .pi/settings.base.json:
+#   - builtin:codemode / builtin:tool-search / ./extensions/codemode-direct-write.ts: their
+#     prepareLoadout also hides/takes over tool declarations -> fights ipython. Must stay disabled.
+#   - permission-gate only sees the `bash` *tool*, not Python `bash()` inside a Cell -> disabled;
+#     set "confirmEachCell": true in .pi/pi-ipython.json (global) if you need a gate.
+#   - Everything else in base is compatible (prompt editors compose; recall/disable-* filters are
+#     overridden by forceExclusive).
+#   - Guidelines: communicationAndToolUse is swapped for communicationAndToolUseIpython(Minimal).
+skillsEnable:
+  - handoff
+  - show-me
+  - i-have-adhd
+skillsDisable: []
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: false
+      communicationAndToolUseIpython: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: false
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ipython
+packagesDisable:
+  # Python reads/searches/edits files itself; these would only enlarge the ipython tool listing.
+  - npm:@hiennguyen9874/pi-multi-edit
+  - npm:@hiennguyen9874/pi-single-edit
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - git:github.com/hiennguyen9874/pi-notebook-mode@feat/single-edit-nested-tool
+  - npm:@howaboua/pi-codex-conversion
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - git:github.com/hiennguyen9874/pi-shake
+  - npm:pi-observational-memory
+extensionsDisable:
+  # Conflict: competing exclusive tool loadouts.
+  - builtin:codemode
+  - builtin:tool-search
+  - ./extensions/codemode-direct-write.ts
+  # Same as code-mode-only.
+  - ./extensions/disable-project-context.ts
+  - ./extensions/system-prompt-appender.ts
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+  # Adds a direct tool that forceExclusive would remove anyway.
+  - ./extensions/enable-ls-tool.ts
+  # Only guards the `bash` tool; Python `bash()` inside a Cell bypasses it.
+  - ./extensions/permission-gate.ts
+extensionsEnable: []
+# No extra.override: settings.json is rebuilt from settings.base.json, so no
+# `defaultTools: +codemode` / `codemode.mode` is carried over.

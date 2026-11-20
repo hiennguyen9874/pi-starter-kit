@@ -1,0 +1,77 @@
+# ipython variant of mattpocock-cm-only.yaml: single `ipython` tool (pi-ipython) instead of codemode.
+# See advance/ipython-only.yaml for conflict notes.
+skillsEnable:
+  - show-me
+  - i-have-adhd
+  - ask-matt
+  - code-review
+  - codebase-design
+  - diagnosing-bugs
+  - domain-modeling
+  - grill-me
+  - grill-with-docs
+  - grilling
+  - handoff
+  - implement
+  - implement-spec
+  - improve-codebase-architecture
+  - pr
+  - prototype
+  - research
+  - retro
+  - setup-matt-pocock-skills
+  - tdd
+  - teach
+  - to-questionnaire
+  - to-spec
+  - to-tickets
+  - triage
+  - wait-what
+  - wayfinder
+  - wizard
+  - writing-for-agents
+promptsDisable: ["*"]
+mcpServersEnable: []
+mcpServersDisable:
+  - exa
+  - chrome-devtools
+  - context-mode
+  - deepwiki
+extensionState:
+  behavioralGuidelines:
+    enabled: true
+    sections:
+      communicationAndToolUse: false
+      communicationAndToolUseIpython: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: true
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ipython
+  - git:github.com/hiennguyen9874/pi-ask-user
+packagesDisable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - npm:pi-observational-memory
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-shake
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:@hiennguyen9874/pi-single-edit
+extensionsDisable:
+  - builtin:codemode
+  - builtin:tool-search
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+  - ./extensions/codemode-direct-write.ts
+  - ./extensions/enable-ls-tool.ts
+  - ./extensions/permission-gate.ts
+extensionsEnable: []

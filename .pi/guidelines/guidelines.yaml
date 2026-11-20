@@ -29,6 +29,12 @@ guidelines:
   - name: communicationAndToolUseMinimal
     path: communication-and-tool-use.minimal.md
     defaultEnabled: false
+  - name: communicationAndToolUseIpython
+    path: communication-and-tool-use.ipython.md
+    defaultEnabled: false
+  - name: communicationAndToolUseIpythonMinimal
+    path: communication-and-tool-use.ipython.minimal.md
+    defaultEnabled: false
   - name: repositoryInstructionsMinimal
     path: repository-instructions.minimal.md
     defaultEnabled: false
