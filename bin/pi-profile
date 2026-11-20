@@ -20,7 +20,7 @@ if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sy
   exit 1
 fi
 
-for dependency in bwrap node; do
+for dependency in bwrap flock node; do
   if ! command -v "$dependency" >/dev/null; then
     printf 'pi-profile: missing required command: %s\n' "$dependency" >&2
     exit 1
@@ -36,9 +36,12 @@ if ! command -v pi >/dev/null; then
   export PATH="$pi_bin:$PATH"
 fi
 
-# Run both the config generator and Pi with the same private view of .pi.
+# Keep installed packages on disk; only the rest of .pi is copy-on-write.
+mkdir -p -- "$root/.pi/npm" "$root/.pi/git"
 exec bwrap --bind / / --dev-bind /dev /dev \
   --overlay-src "$root/.pi" --tmp-overlay "$root/.pi" \
+  --bind "$root/.pi/npm" "$root/.pi/npm" \
+  --bind "$root/.pi/git" "$root/.pi/git" \
   --chdir "$root" -- bash -c '
     set -e
     node --input-type=module - "$1" <<"JS"
@@ -55,7 +58,45 @@ if (error || !Object.hasOwn(config?.profiles ?? {}, name)) {
 syncProfileResources(cwd, name, config.profiles[name]);
 JS
     shift
+
+    # Hold a project-wide lock through package resolution, not the whole session.
+    # Pi inherits FD 9 and the explicit extension hands off the lock on reload.
+    export PI_PROFILE_PACKAGE_LOCK_FILE="$PWD/.pi/npm/.pi-profile.lock"
+    exec 9>>"$PI_PROFILE_PACKAGE_LOCK_FILE"
+    flock -x 9
+    case "${1:-}" in
+      install|remove|uninstall|update|list|config|auth|mcp) exec pi "$@" ;;
+    esac
+
+    lock_extension="$PWD/.pi/.local/pi-profile-package-lock.ts"
+    cat >"$lock_extension" <<"TS"
+import { spawn } from "node:child_process";
+import { fstatSync, statSync } from "node:fs";
+
+export default function packageLock(pi) {
+  const file = process.env.PI_PROFILE_PACKAGE_LOCK_FILE;
+  if (!file) return;
+
+  // Some extensions launch nested Pi processes without inheriting the lock FD.
+  try {
+    const fd = fstatSync(9);
+    const lock = statSync(file);
+    if (fd.dev !== lock.dev || fd.ino !== lock.ino) return;
+  } catch {
+    return;
+  }
+
+  const flock = (mode) => new Promise((resolve, reject) => {
+    const child = spawn("flock", [mode, "3"], { stdio: ["ignore", "ignore", "inherit", 9] });
+    child.once("error", reject);
+    child.once("exit", (code) => code === 0 ? resolve() : reject(new Error(`Package lock failed (${code})`)));
+  });
+
+  pi.on("session_start", () => flock("-u"));
+  pi.on("session_shutdown", (event) => event.reason === "quit" ? undefined : flock("-x"));
+}
+TS
     # Do not forward the selected name as --profile: that would take
     # precedence over later /profile changes on reload.
-    exec pi "$@"
+    exec pi --extension "$lock_extension" "$@"
   ' bash "$profile" "$@"

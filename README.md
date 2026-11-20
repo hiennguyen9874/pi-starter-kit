@@ -4,7 +4,7 @@ A starter configuration for the [Pi coding agent](https://github.com/badlogic/pi
 
 ## Getting started
 
-On Linux, you need Node.js 22.19+ with npm, `curl`, and Bubblewrap with `--tmp-overlay` support (tested with Bubblewrap 0.11.1). You don't need to install Pi first.
+On Linux, you need Node.js 22.19+ with npm, `curl`, `flock` (from util-linux), and Bubblewrap with `--tmp-overlay` support (tested with Bubblewrap 0.11.1). You don't need to install Pi first.
 
 ### Set up a project with `curl`
 
@@ -43,7 +43,9 @@ If Pi and the profile loader's npm dependencies are already installed, you can a
 
 The launcher runs the repository's profile code before Pi starts, so use it only in a checkout you trust. It applies the profile to a temporary copy-on-write view of `.pi` before launching Pi. No initial `/new` or `/reload` is needed. Use `/profile` as usual to switch within that process; do not pass Pi's `--profile` flag to the launcher.
 
-Settings, MCP config, and profile state under `.pi` are private to the launched process and changes there are discarded on exit. Source files and user-level Pi configuration are still shared. To keep `-c` and `--resume` separate too, pass a different `--session-dir` per profile.
+Settings, MCP config, and profile state under `.pi` are private to the launched process and changes there are discarded on exit. Installed packages under `.pi/npm/` and `.pi/git/` are shared by profiles and persist after exit. Pi may still install packages that are new to the project. Launcher-managed startups and reloads take a project lock while resolving packages; sessions can run concurrently once loaded. Use `pi-profile` for concurrent sessions, and avoid running bare `pi install`, `pi remove`, or `pi update` against those shared packages while a wrapped session is using them.
+
+Source files and user-level Pi configuration are still shared. To keep `-c` and `--resume` separate too, pass a different `--session-dir` per profile.
 
 ## Repository layout
 
