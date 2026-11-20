@@ -28,9 +28,10 @@ for dependency in bwrap flock node; do
 done
 
 if ! command -v pi >/dev/null; then
+  # Keep using private Pi installs from older versions of install.sh.
   pi_bin="${XDG_DATA_HOME:-$HOME/.local/share}/pi-starter-kit/node_modules/.bin"
   if [[ ! -x "$pi_bin/pi" ]]; then
-    printf '%s\n' 'pi-profile: Pi not found. Run the starter kit installer first.' >&2
+    printf '%s\n' 'pi-profile: Pi not found. Install Pi separately and make sure pi is on PATH.' >&2
     exit 1
   fi
   export PATH="$pi_bin:$PATH"

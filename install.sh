@@ -3,7 +3,8 @@ set -euo pipefail
 
 usage() {
   printf '%s\n' 'Usage: ./install.sh' \
-    'Set up .pi in the current project, install pi-profile, and install Pi if needed.'
+    'Set up .pi in the current project and install pi-profile.' \
+    'Pi itself is not installed; install it separately before running pi-profile.'
 }
 
 if [[ $# -ne 0 ]]; then
@@ -25,7 +26,6 @@ project=$(pwd -P)
 project_pi="$project/.pi"
 bin_dir="${HOME:?HOME must be set}/.local/bin"
 target="$bin_dir/pi-profile"
-pi_dir="${XDG_DATA_HOME:-$HOME/.local/share}/pi-starter-kit"
 
 if [[ -e "$target" || -L "$target" ]]; then
   if [[ -L "$target" || ! -f "$target" ]] || ! grep -Fxq "$marker" "$target"; then
@@ -80,16 +80,6 @@ fi
 profile_dir="$config_source/extensions/profile"
 if [[ ! -f "$profile_dir/node_modules/yaml/package.json" ]]; then
   npm ci --prefix "$profile_dir" --ignore-scripts --no-audit --no-fund
-fi
-
-if ! command -v pi >/dev/null && [[ ! -x "$pi_dir/node_modules/.bin/pi" ]]; then
-  install -d -- "$pi_dir"
-  npm install --prefix "$pi_dir" --ignore-scripts --no-audit --no-fund --save-exact \
-    '@earendil-works/pi-coding-agent@1.6.0'
-  if [[ ! -x "$pi_dir/node_modules/.bin/pi" ]]; then
-    printf 'Pi installation did not create %s/node_modules/.bin/pi.\n' "$pi_dir" >&2
-    exit 1
-  fi
 fi
 
 if "$setup_pi"; then

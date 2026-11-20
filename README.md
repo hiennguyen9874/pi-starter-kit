@@ -4,29 +4,7 @@ A starter configuration for the [Pi coding agent](https://github.com/badlogic/pi
 
 ## Getting started
 
-On Linux, you need Node.js 22.19+ with npm, `curl`, `flock` (from util-linux), and Bubblewrap with `--tmp-overlay` support (tested with Bubblewrap 0.11.1). You don't need to install Pi first.
-
-### Set up a project with `curl`
-
-Run this **from the directory where you want `.pi/` to be created**:
-
-```bash
-curl --proto '=https' -fsSL https://raw.githubusercontent.com/hiennguyen9874/pi-starter-kit/main/install.sh | bash
-```
-
-Only run the command if you trust this repository. Alternatively, download and inspect `install.sh` before running it with Bash.
-
-### Set up from a checkout
-
-From this checkout, run `./install.sh`. To initialize a different project, `cd` there and run `/path/to/pi-starter-kit/install.sh`.
-
-The installer:
-
-- Copies `.pi/` from the starter kit's GitHub archive into the current directory if `.pi/` is missing. It leaves an existing starter-kit configuration in place and refuses to replace an unrelated `.pi/` directory.
-- Installs the profile loader's npm dependencies and copies the launcher to `~/.local/bin/pi-profile`.
-- Uses Pi already on `PATH`, or installs Pi 1.6.0 privately under `$XDG_DATA_HOME/pi-starter-kit` (default: `~/.local/share/pi-starter-kit`). The launcher finds it automatically; no global npm install or `sudo` is needed.
-
-If `~/.local/bin` isn't on `PATH`, run `export PATH="$HOME/.local/bin:$PATH"` or add it to `~/.zshrc` or `~/.bashrc`. The installer does not edit those files. Re-run the install command to update the launcher; it won't overwrite your project's `.pi/` or replace an existing Pi installation.
+The starter kit sets up `.pi/` and installs `pi-profile`. It does not install Pi itself. See [Installation](install.md) for setup instructions and prerequisites.
 
 ## Run different profiles in the same project
 
