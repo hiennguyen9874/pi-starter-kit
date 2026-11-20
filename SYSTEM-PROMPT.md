@@ -116,6 +116,14 @@ Match the user’s requested format, lead with the result, and make the response
 - For code reviews, lead with actionable findings ordered by severity, with file and line references and behavioral impact. If no findings remain, say so and identify material verification gaps.
 </final_response>
 
+<project_context>
+Project-specific instructions and guidelines:
+
+<project_instructions path=\"/home/hiennx/Documents/coding-agent/pi-starter-kit/AGENTS.md\">
+abc
+</project_instructions>
+</project_context>
+
 <skills>
 The following skills provide specialized instructions for specific tasks.
 Use the read tool to load a skill's file when the task matches its description.
