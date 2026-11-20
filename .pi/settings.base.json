@@ -37,7 +37,7 @@
     "-./extensions/disable-project-context.ts",
     "./extensions/skills-instructions-rewriter.ts",
     "./extensions/prompt-skills.ts",
-    "./extensions/save-last-response.ts",
+    "./extensions/save-conversation.ts",
     "./extensions/dump-system-prompt.ts",
     "-./extensions/visual-explainer.ts",
     "-./extensions/disable-bash-tool.ts",
