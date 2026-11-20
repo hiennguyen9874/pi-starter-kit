@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Launcher from pi-starter-kit
+set -euo pipefail
+
+usage() {
+  printf '%s\n' 'Usage: pi-profile PROFILE [PI_ARGS...]' \
+    'Run from the project root. Example: pi-profile minimal/read-only --offline'
+}
+
+case "${1:-}" in
+  -h|--help) usage; exit 0 ;;
+  '') usage >&2; exit 2 ;;
+esac
+
+profile=$1
+shift
+root=$(pwd -P)
+if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sync.ts" ]]; then
+  printf '%s\n' 'Run pi-profile from the Pi Starter Kit project root.' >&2
+  exit 1
+fi
+
+for dependency in bwrap node; do
+  if ! command -v "$dependency" >/dev/null; then
+    printf 'pi-profile: missing required command: %s\n' "$dependency" >&2
+    exit 1
+  fi
+done
+
+if ! command -v pi >/dev/null; then
+  pi_bin="${XDG_DATA_HOME:-$HOME/.local/share}/pi-starter-kit/node_modules/.bin"
+  if [[ ! -x "$pi_bin/pi" ]]; then
+    printf '%s\n' 'pi-profile: Pi not found. Run the starter kit installer first.' >&2
+    exit 1
+  fi
+  export PATH="$pi_bin:$PATH"
+fi
+
+# Run both the config generator and Pi with the same private view of .pi.
+exec bwrap --bind / / --dev-bind /dev /dev \
+  --overlay-src "$root/.pi" --tmp-overlay "$root/.pi" \
+  --chdir "$root" -- bash -c '
+    set -e
+    node --input-type=module - "$1" <<"JS"
+import { loadProfilesConfig } from "./.pi/extensions/profile/profile-config.ts";
+import { syncProfileResources } from "./.pi/extensions/profile/profile-sync.ts";
+
+const name = process.argv[2];
+const cwd = process.cwd();
+const { config, error } = loadProfilesConfig(cwd);
+if (error || !Object.hasOwn(config?.profiles ?? {}, name)) {
+  console.error(`pi-profile: ${error ?? `unknown profile: ${name}`}`);
+  process.exit(1);
+}
+syncProfileResources(cwd, name, config.profiles[name]);
+JS
+    shift
+    # Do not forward the selected name as --profile: that would take
+    # precedence over later /profile changes on reload.
+    exec pi "$@"
+  ' bash "$profile" "$@"
