@@ -1,6 +1,7 @@
 {
     "confirmEachCell": false,
     "backgroundNotices": true,
+    "parallelWorkPrompt": true,
     "python": {
         "source": "uv",
         "version": "3.13",
