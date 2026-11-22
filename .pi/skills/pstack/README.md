@@ -1,0 +1,13 @@
+- `bro`: Diễn đạt lại tin nhắn trước bằng ngôn ngữ dễ hiểu, không dùng biệt ngữ.
+- `correct`: Ngăn lỗi agent hay lặp lại bằng kiến trúc, kiểu dữ liệu, lint hoặc test; ưu tiên cơ chế thực thi hơn tài liệu.
+- `how`: Giải thích kiến trúc, luồng chạy và vị trí sở hữu của code; trả lời “nó hoạt động thế nào?”.
+- `in-your-own-words`: Nói lại mục tiêu và vấn đề của người dùng theo cách agent hiểu để xác nhận.
+- `ketchup`: Tóm tắt những gì đã thay đổi trong chat và các quyết định đang chờ người dùng.
+- `no-comments`: Nhờ agent chuyên review comment, sửa các phát hiện được chấp nhận và đề xuất cách mã hóa ràng buộc thay vì chỉ ghi comment.
+- `reflect`: Rút bài học bền vững từ cuộc hội thoại và đề xuất chỉnh sửa skill hiện có.
+- `sharpen`: Viết lại prompt để đào sâu chất lượng công việc, không chỉ mở rộng phạm vi.
+- `show-me-your-work`: Ghi nhật ký quyết định dạng TSV: quyết định, lý do, bằng chứng và kết quả, để người khác review.
+- `teach`: Kết hợp `how` và `why` để giải thích một hệ thống hoặc thay đổi dễ hiểu.
+- `technical-writing`: Áp dụng chuẩn viết tài liệu kỹ thuật rõ ràng, phù hợp loại tài liệu và người đọc.
+- `unslop`: Biên tập văn bản để bỏ các kiểu diễn đạt rập khuôn thường gặp ở AI mà vẫn giữ ý.
+- `why`: Tìm lý do thiết kế và trade-off qua commit, PR và các nguồn liên quan; phân biệt bằng chứng với suy luận.
