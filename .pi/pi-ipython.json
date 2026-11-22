@@ -34,6 +34,7 @@
         "model": "openai-codex/gpt-6-luna",
         "thinking": "high",
         "maxPerCell": 100,
-        "maxOutputTokens": 8192
+        "maxOutputTokens": 8192,
+        "classifier": "opencode/jev-1.13-free"
     }
 }
