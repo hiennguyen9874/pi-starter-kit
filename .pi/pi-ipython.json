@@ -9,8 +9,11 @@
         "packages": []
     },
     "output": {
-        "maxBytes": 51200,
-        "maxLines": 2000
+        "maxBytes": 16384,
+        "maxLines": 1000
+    },
+    "commandLog": {
+        "maxBytes": 33554432
     },
     "piTools": {
         "list": true,
@@ -25,5 +28,12 @@
         "ipythonAfter": [
             "rules"
         ]
+    },
+    "modelCalls": {
+        "enabled": true,
+        "model": "openai-codex/gpt-6-luna",
+        "thinking": "high",
+        "maxPerCell": 100,
+        "maxOutputTokens": 8192
     }
 }
