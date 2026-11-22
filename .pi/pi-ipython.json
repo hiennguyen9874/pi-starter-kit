@@ -9,8 +9,8 @@
         "packages": []
     },
     "output": {
-        "maxBytes": 16384,
-        "maxLines": 1000
+        "maxBytes": 51200,
+        "maxLines": 2000
     },
     "commandLog": {
         "maxBytes": 33554432
