@@ -62,3 +62,6 @@ extensionsDisable:
   - ./extensions/disable-read-tool.ts
   - ./extensions/disable-bash-tool.ts
   - ./extensions/disable-edit-tools.ts
+
+skillsDisable:
+  - skills/pstack/teach

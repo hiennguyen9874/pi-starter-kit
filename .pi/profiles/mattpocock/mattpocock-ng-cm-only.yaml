@@ -77,3 +77,6 @@ extra:
     codemode:
       mode: "only"
       inlineBudget: 3000
+
+skillsDisable:
+  - skills/pstack/teach

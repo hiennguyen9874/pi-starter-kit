@@ -5,7 +5,7 @@ description: Fast codebase exploration agent (read-only)
 tools: [read, bash, grep, find, ls]
 skills: false
 extensions: false
-model: openai-codex/gpt-6-luna
+model: openai/gpt-6-luna
 thinking: high
 include_system_prompt: false
 extensions: [pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]

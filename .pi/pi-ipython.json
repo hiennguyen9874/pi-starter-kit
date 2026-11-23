@@ -31,7 +31,7 @@
     },
     "modelCalls": {
         "enabled": true,
-        "model": "openai-codex/gpt-6-luna",
+        "model": "openai/gpt-6-luna",
         "thinking": "high",
         "maxPerCell": 100,
         "maxOutputTokens": 8192,

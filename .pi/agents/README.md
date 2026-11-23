@@ -56,8 +56,8 @@ color: red
 tools: [read, bash, grep]
 skills: false
 extensions: false
-model: openai-codex/gpt-6-sol
-thinking: high
+model: openai/gpt-6.2-sol
+thinking: medium
 max_turns: 80
 include_system_prompt: false
 ---
@@ -204,7 +204,7 @@ Giới hạn số agent chạy song song; agent vượt giới hạn sẽ xếp 
   "concurrency": {
     "default": 4,
     "providers": { "llamacpp": 2 },
-    "models": { "openai-codex/gpt-6-sol": 3 }
+    "models": { "openai/gpt-6.2-sol": 3 }
   }
 }
 ```

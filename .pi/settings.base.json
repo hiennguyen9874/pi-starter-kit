@@ -65,7 +65,6 @@
     ]
   },
   "enabledModels": [
-    "openai-codex/*",
     "opencode-go/*",
     "opencode/*-free",
     "opencode/*-free*",
@@ -89,7 +88,7 @@
     "observationsPoolTargetTokens": 10000,
     "agentMaxTurns": 16,
     "model": {
-      "provider": "openai-codex",
+      "provider": "openai",
       "id": "gpt-6-luna",
       "thinking": "high"
     },

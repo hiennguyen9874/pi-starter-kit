@@ -4,8 +4,8 @@ display_name: Spec Review
 description: Spec alignment review — verifies implemented code matches requirements, plan, and acceptance criteria. Use when checking completeness, scope creep, or architectural deviation after implementation.
 tools: [read, bash, grep, find, ls]
 skills: false
-model: openai-codex/gpt-6.1-sol
-thinking: high
+model: openai/gpt-6.2-sol
+thinking: medium
 include_system_prompt: false
 extensions: [pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
 ---

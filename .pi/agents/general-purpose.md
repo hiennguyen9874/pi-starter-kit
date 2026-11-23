@@ -4,7 +4,7 @@ display_name: Agent
 description: General-purpose agent for complex, multi-step tasks
 tools: [read, bash, grep, find, ls, edit, write]
 skills: false
-model: openai-codex/gpt-6-luna
+model: openai/gpt-6-luna
 thinking: high
 include_system_prompt: true
 extensions: [pi-anthropic-auth, pi-documentation, skills-instructions-rewriter, remove-pi-env-guideline]
