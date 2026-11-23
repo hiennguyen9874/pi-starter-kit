@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join, relative, sep } from "node:path";
 
 import type { Skill } from "@earendil-works/pi-coding-agent";
 import type { ProfileDefinition } from "./profile-policy.ts";
@@ -7,6 +7,7 @@ import type { ProfileDefinition } from "./profile-policy.ts";
 interface CommandLike {
   name?: string;
   source?: string;
+  sourceInfo?: { path?: string };
 }
 
 interface LoadedSkillLike {
@@ -18,8 +19,16 @@ export function getKnownSkillNames(commands: CommandLike[]): string[] {
     .filter((command): command is Required<Pick<CommandLike, "name" | "source">> => {
       return typeof command.name === "string" && command.source === "skill";
     })
-    .map((command) => command.name)
+    .map((command) => command.name.replace(/^skill:/, ""))
     .sort((a, b) => a.localeCompare(b));
+}
+
+export function getLoadedProjectSkillPath(commands: CommandLike[], cwd: string, name: string): string | undefined {
+  const path = commands.find((command) => command.source === "skill" &&
+    command.name?.replace(/^skill:/, "") === name)?.sourceInfo?.path;
+  if (!path || !isAbsolute(path)) return undefined;
+  const selector = relative(join(cwd, ".pi"), path).split(sep).join("/");
+  return selector.startsWith("skills/") ? selector : undefined;
 }
 
 /**

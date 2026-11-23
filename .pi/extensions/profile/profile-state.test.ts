@@ -66,18 +66,19 @@ test("registers sync-profile-system CLI flag", () => {
   assert.equal(flags.includes("sync-profile-system"), true);
 });
 
-test("session_start loads profiles using getCommands API and /profile can activate one", async () => {
+test("/profile switches and survives reload even when Pi retains the startup flag", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-profile-state-"));
   mkdirSync(join(root, ".pi"));
   mkdirSync(join(root, ".pi", "profiles"));
   writeFileSync(
     join(root, ".pi", "profiles.json"),
-    JSON.stringify({ defaultProfile: "backend" }),
+    JSON.stringify({ defaultProfile: "other" }),
   );
   writeFileSync(
     join(root, ".pi", "profiles", "backend.yaml"),
     "skillsEnable:\n  - backend-patterns\n",
   );
+  writeFileSync(join(root, ".pi", "profiles", "other.yaml"), "skillsDisable: [\"*\"]\n");
   writeFileSync(join(root, ".pi", "mcp.json"), JSON.stringify({ mcpServers: {} }));
 
   const handlers: Record<string, Function> = {};
@@ -94,8 +95,8 @@ test("session_start loads profiles using getCommands API and /profile can activa
       handlers[event] = handler;
     },
     appendEntry() {},
-    getFlag() {
-      return undefined;
+    getFlag(name: string) {
+      return name === "profile" ? "backend" : undefined;
     },
     getCommands() {
       return [{ name: "backend-patterns", source: "skill" }];
@@ -132,16 +133,19 @@ test("session_start loads profiles using getCommands API and /profile can activa
   } as any;
 
   await handlers.session_start?.({ reason: "startup" }, ctx);
-  await commands.profile.handler("backend", ctx);
+  const persistedProfile = () => JSON.parse(readFileSync(join(root, ".pi", ".local", "profile-state.json"), "utf8")).name;
+  assert.equal(persistedProfile(), "backend");
+  await commands.profile.handler("other", ctx);
+  await handlers.session_start?.({ reason: "reload" }, ctx);
 
   assert.equal(notifications.includes("No profiles defined in .pi/profiles/"), false);
   assert.equal(notifications.some((message) => message.includes("Unknown skill:")), false);
   assert.equal(
-    notifications.includes('Profile "backend" activated. Reloading to apply startup resource filtering.'),
+    notifications.includes('Profile "other" activated. Reloading to apply startup resource filtering.'),
     true,
   );
   assert.equal(reloadCalls, 1);
-  assert.equal(JSON.parse(readFileSync(join(root, ".pi", ".local", "profile-state.json"), "utf8")).name, "backend");
+  assert.equal(persistedProfile(), "other");
 });
 
 test("session_start does not warn when skill commands are not discovered yet", async () => {

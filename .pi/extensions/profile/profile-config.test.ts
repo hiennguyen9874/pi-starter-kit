@@ -158,12 +158,12 @@ test("rejects invalid behavioral guideline section in YAML file", () => {
 
 test("repository base profile allows configured skills", () => {
   const result = loadProfilesConfig(process.cwd());
-  const baseProfile = result.config?.profiles.base;
+  const baseProfile = result.config?.profiles["base/base"];
   assert.ok(baseProfile);
 
   const policy = createProfilePolicy(baseProfile);
 
-  assert.equal(policy.isSkillAllowed("git-commit"), true);
+  assert.equal(policy.isSkillAllowed("diagnosing-bugs"), true);
 });
 
 test("invalid defaultProfile type is rejected", () => {

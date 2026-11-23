@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 
-import { PROFILE_WILDCARD, type ProfileDefinition } from "./profile-policy.ts";
+import { createSkillPolicy, normalizeSkillSelector, PROFILE_WILDCARD, type ProfileDefinition } from "./profile-policy.ts";
 
 interface JsonObject {
   [key: string]: unknown;
@@ -183,7 +183,7 @@ function loadProjectSkillResources(cwd: string): ProjectSkillResource[] {
   const resources: ProjectSkillResource[] = [];
   collectProjectSkillResources(skillsDir, piDir, resources);
 
-  return resources.sort((a, b) => a.name.localeCompare(b.name));
+  return resources.sort((a, b) => a.overrideEntry.localeCompare(b.overrideEntry, "en"));
 }
 
 function dedupeSorted(values: string[]): string[] {
@@ -266,39 +266,44 @@ function normalizeResourceSet(values: string[] = []): Set<string> {
   return new Set(values.map(resourceName));
 }
 
-// Accept project-relative SKILL.md paths, .pi-relative directories, and skill names.
-function normalizeAlwaysSkill(entry: string): string {
-  return entry.replace(/\\/g, "/").replace(/^(?:\.\/)?\.pi\//, "").replace(/^\.\//, "").replace(/\/SKILL\.md$/, "").replace(/\/$/, "");
-}
-
-export function resolveAlwaysSkillNames(cwd: string, entries: string[] = []): string[] {
-  const set = new Set(entries.map(normalizeAlwaysSkill));
-  const names = [...set].filter((entry) => !entry.includes("/"));
-  for (const skill of loadProjectSkillResources(cwd)) {
-    if (resourceMatches(set, skill.name, skill.overrideEntry)) names.push(skill.name);
+function buildManagedSkillEntries(
+  cwd: string,
+  profile: ProfileDefinition,
+  settings: JsonObject,
+  previousManaged: string[],
+): string[] {
+  const skills = loadProjectSkillResources(cwd);
+  const policy = createSkillPolicy(profile);
+  const alwaysAllowed = new Set(skills
+    .filter((skill) => policy.isAlwaysEnabled(skill.name, skill.overrideEntry))
+    .map((skill) => skill.overrideEntry));
+  const previous = new Set(previousManaged);
+  const exclusions = new Set<string>();
+  if (Array.isArray(settings.skills)) {
+    settings.skills = settings.skills.filter((entry) => {
+      if (typeof entry !== "string" || !entry.startsWith("-") || previous.has(entry)) return true;
+      const path = normalizeSkillSelector(entry);
+      if (alwaysAllowed.has(path)) return false;
+      exclusions.add(path);
+      return true;
+    });
   }
-  return dedupeSorted(names);
+
+  // Pi deduplicates by skill name at discovery time. Exclude losing paths before
+  // it loads skills, rather than trying to replace the winner or hide the warning later.
+  const winners = new Map<string, { skill: ProjectSkillResource; priority: number }>();
+  for (const skill of skills) {
+    if (exclusions.has(skill.overrideEntry)) continue;
+    const priority = policy.priority(skill.name, skill.overrideEntry);
+    if (priority > 0 && priority > (winners.get(skill.name)?.priority ?? 0)) {
+      winners.set(skill.name, { skill, priority });
+    }
+  }
+  return dedupeSorted(skills
+    .filter((skill) => !exclusions.has(skill.overrideEntry) && winners.get(skill.name)?.skill !== skill)
+    .map((skill) => `-${skill.overrideEntry}`));
 }
 
-function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): string[] {
-  const enabledSet = normalizeResourceSet(profile.skillsEnable);
-  const disabledSet = normalizeResourceSet(profile.skillsDisable);
-  const alwaysSet = new Set((profile.alwaysSkills ?? []).map(normalizeAlwaysSkill));
-  const enableAll = enabledSet.has(PROFILE_WILDCARD);
-  const disableAll = disabledSet.has(PROFILE_WILDCARD);
-
-  return dedupeSorted(
-    loadProjectSkillResources(cwd)
-      .filter(
-        (skill) =>
-          !resourceMatches(alwaysSet, skill.name, skill.overrideEntry) &&
-          (disableAll ||
-            resourceMatches(disabledSet, skill.name, skill.overrideEntry) ||
-            (!enableAll && enabledSet.size > 0 && !resourceMatches(enabledSet, skill.name, skill.overrideEntry))),
-      )
-      .map((skill) => `-${skill.overrideEntry}`),
-  );
-}
 function buildManagedPromptEntries(cwd: string, profile: ProfileDefinition): string[] {
   const enabledSet = normalizeResourceSet(profile.promptsEnable);
   const disabledSet = normalizeResourceSet(profile.promptsDisable);
@@ -450,7 +455,9 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
   const managedState = readManagedState(cwd);
   const settingsPath = getSettingsPath(cwd);
   const baseSettings = readJsonObject(getSettingsBasePath(cwd));
-  const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile);
+  const currentSettings = baseSettings ?? readJsonObject(settingsPath) ?? {};
+  const previousManagedSkillEntries = baseSettings ? [] : (managedState.managedSkillEntries ?? []);
+  const nextManagedSkillEntries = buildManagedSkillEntries(cwd, profile, currentSettings, previousManagedSkillEntries);
   const nextManagedPromptEntries = buildManagedPromptEntries(cwd, profile);
   const nextManagedPackageEntries = buildManagedSettingEntries(
     getSettingEntries(baseSettings, "packages"),
@@ -462,17 +469,6 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
     profile.extensionsEnable,
     profile.extensionsDisable,
   );
-  const currentSettings = baseSettings ?? readJsonObject(settingsPath) ?? {};
-  const alwaysSet = new Set((profile.alwaysSkills ?? []).map(normalizeAlwaysSkill));
-  const alwaysPaths = new Set(loadProjectSkillResources(cwd)
-    .filter((skill) => resourceMatches(alwaysSet, skill.name, skill.overrideEntry))
-    .map((skill) => skill.overrideEntry));
-  if (Array.isArray(currentSettings.skills)) {
-    currentSettings.skills = currentSettings.skills.filter((entry) =>
-      typeof entry !== "string" || !entry.startsWith("-") ||
-      (!alwaysSet.has(normalizeAlwaysSkill(entry.slice(1))) && !alwaysPaths.has(normalizeAlwaysSkill(entry.slice(1)))));
-  }
-  const previousManagedSkillEntries = baseSettings ? [] : (managedState.managedSkillEntries ?? []);
   const previousManagedPromptEntries = baseSettings ? [] : (managedState.managedPromptEntries ?? []);
   const previousManagedPackageEntries = baseSettings ? [] : (managedState.managedPackageEntries ?? []);
   const previousManagedExtensionEntries = baseSettings ? [] : (managedState.managedExtensionEntries ?? []);

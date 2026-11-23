@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { loadProfilesConfig } from "./profile-config.ts";
 import { createProfilePolicy } from "./profile-policy.ts";
@@ -13,7 +13,6 @@ import {
   readPersistedProfileName,
   syncBaseSystemResources,
   syncProfileResources,
-  resolveAlwaysSkillNames,
 } from "./profile-sync.ts";
 
 function createRoot(): string {
@@ -23,8 +22,8 @@ function createRoot(): string {
   return root;
 }
 
-function writeSkill(root: string, name: string): void {
-  const skillDir = join(root, ".pi", "skills", name);
+function writeSkill(root: string, name: string, path = name): void {
+  const skillDir = join(root, ".pi", "skills", path);
   mkdirSync(skillDir, { recursive: true });
   writeFileSync(
     join(skillDir, "SKILL.md"),
@@ -302,7 +301,7 @@ test("global skills override each profile, including wildcard disables, without 
   writeFileSync(join(root, ".pi", "settings.base.json"), JSON.stringify({skills: ["-skills/handoff", "-skills/pstack/teach"]}));
   writeFileSync(join(root, ".pi", "profiles.json"), JSON.stringify({alwaysSkills: ["handoff", ".pi/skills/pstack/teach/SKILL.md"]}));
   writeFileSync(join(root, ".pi", "profiles", "locked.yaml"), "skillsDisable:\n  - '*'\n");
-  writeFileSync(join(root, ".pi", "profiles", "focused.yaml"), "skillsEnable:\n  - excluded\nskillsDisable:\n  - handoff\n  - skills/pstack/teach\n");
+  writeFileSync(join(root, ".pi", "profiles", "focused.yaml"), "skillsEnable:\n  - excluded\nskillsDisable:\n  - handoff\n  - teach\n");
   const { config, error } = loadProfilesConfig(root);
   assert.equal(error, undefined);
   for (const name of ["locked", "focused"]) {
@@ -313,9 +312,35 @@ test("global skills override each profile, including wildcard disables, without 
     assert.ok(!settings.skills.includes("-skills/pstack/teach"));
     assert.ok(settings.skills.includes("-skills/other/teach"));
     assert.equal(settings.skills.includes("-skills/excluded"), name === "locked");
-    const policy = createProfilePolicy(profile, resolveAlwaysSkillNames(root, profile.alwaysSkills));
+    const policy = createProfilePolicy(profile);
     assert.equal(policy.isSkillAllowed("handoff"), true);
-    assert.equal(policy.isSkillAllowed("teach"), true);
+    assert.equal(policy.isSkillAllowed("teach", "skills/pstack/teach"), true);
+    assert.equal(policy.isSkillAllowed("teach", "skills/other/teach"), false);
     assert.equal(policy.isSkillAllowed("excluded"), name === "focused");
   }
+});
+
+test("Matt Pocock profiles exclude the pstack versions before Pi starts", (t) => {
+  const root = createRoot();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const pstackTdd = "pstack/06-review-testing-and-performance/tdd";
+  const pstackTeach = "pstack/03-understanding-systems/teach";
+  for (const [name, path] of [["tdd", pstackTdd], ["teach", pstackTeach], ["tdd", "mattpocock/tdd"], ["teach", "mattpocock/teach"]]) {
+    writeSkill(root, name, path);
+  }
+
+  const { config, error } = loadProfilesConfig(process.cwd());
+  assert.equal(error, undefined);
+  const settings = () => JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+  const mattProfiles = Object.entries(config!.profiles).filter(([name]) => /^(mattpocock\/mattpocock|livekit\/livekit-mattpocock)/.test(name));
+  assert.ok(mattProfiles.some(([name]) => name === "mattpocock/mattpocock"));
+  for (const [name, profile] of mattProfiles) {
+    syncProfileResources(root, name, profile);
+    assert.deepEqual(settings().skills, [`-skills/${pstackTeach}`, `-skills/${pstackTdd}`], name);
+    assert.equal(syncProfileResources(root, name, profile).changed, false, name);
+  }
+
+  const base = "base/base";
+  syncProfileResources(root, base, config!.profiles[base]);
+  assert.deepEqual(settings().skills, ["-skills/mattpocock/teach", `-skills/${pstackTdd}`]);
 });

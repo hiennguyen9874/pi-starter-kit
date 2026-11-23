@@ -49,3 +49,14 @@ test("non-skill input is ignored", () => {
     isSkillCommand: false,
   });
 });
+
+test("skill commands apply path selectors to the actual loaded variant", () => {
+  const policy = createProfilePolicy({
+    alwaysSkills: [".pi/skills/pstack/teach/SKILL.md"],
+    skillsEnable: ["./.pi/skills/mattpocock/teach/SKILL.md"],
+    skillsDisable: ["skills/pstack/teach/"],
+  });
+  assert.equal(evaluateSkillCommand("/skill:teach", policy, () => "skills/mattpocock/teach/SKILL.md").allowed, true);
+  assert.equal(evaluateSkillCommand("/skill:teach", policy, () => "skills/pstack/teach/SKILL.md").allowed, false);
+  assert.equal(evaluateSkillCommand("/skill:teach", policy).allowed, false);
+});

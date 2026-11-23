@@ -1,7 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { writeSync } from "node:fs";
-import { Container, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
+import type { SelectItem } from "@earendil-works/pi-tui";
 
 import {
   hasBehavioralGuidelinesInsertionMarker,
@@ -13,10 +12,11 @@ import { loadProfilesConfig } from "./profile-config.ts";
 import {
   getKnownSkillNames,
   getKnownSkillNamesFromLoadedSkills,
+  getLoadedProjectSkillPath,
   mergeKnownSkillNames,
   summarizeProfile,
 } from "./profile-discovery.ts";
-import { createProfilePolicy, PROFILE_WILDCARD, type ProfileDefinition, type ProfilePolicy } from "./profile-policy.ts";
+import { createProfilePolicy, normalizeSkillSelector, PROFILE_WILDCARD, type ProfileDefinition, type ProfilePolicy } from "./profile-policy.ts";
 import {
   loadProfileKnownMcpServerNames,
   loadProfileKnownPromptNames,
@@ -24,7 +24,6 @@ import {
   readPersistedProfileName,
   syncBaseSystemResources,
   syncProfileResources,
-  resolveAlwaysSkillNames,
   writePersistedProfileName,
 } from "./profile-sync.ts";
 
@@ -78,7 +77,11 @@ export function resolveSelectedProfile(input: {
   return {};
 }
 
-export function evaluateSkillCommand(text: string, policy?: ProfilePolicy): SkillCommandEvaluation {
+export function evaluateSkillCommand(
+  text: string,
+  policy?: ProfilePolicy,
+  getSkillPath?: (skillName: string) => string | undefined,
+): SkillCommandEvaluation {
   const match = text.match(/^\s*\/skill:([^\s]+)/);
   if (!match) {
     return { isSkillCommand: false };
@@ -88,7 +91,7 @@ export function evaluateSkillCommand(text: string, policy?: ProfilePolicy): Skil
   return {
     isSkillCommand: true,
     skillName,
-    allowed: policy ? policy.isSkillAllowed(skillName) : true,
+    allowed: policy ? policy.isSkillAllowed(skillName, getSkillPath?.(skillName)) : true,
   };
 }
 
@@ -132,7 +135,7 @@ export function buildProfilePrompt(
   const lines = [`Active profile: ${profileName}. Follow these restrictions.`];
 
   if (profile.alwaysSkills?.length) {
-    lines.push(`Always allowed skills (override profile restrictions): ${profile.alwaysSkills.join(", ")}.`);
+    lines.push(`Always allowed skills (unless explicitly disabled by path): ${profile.alwaysSkills.join(", ")}.`);
   }
   if (profile.skillsEnable?.length) {
     lines.push(`Allowed skills: ${profile.skillsEnable.join(", ")}.`);
@@ -153,7 +156,7 @@ export function buildProfilePrompt(
     lines.push(`Disallowed MCP servers: ${profile.mcpServersDisable.join(", ")}.`);
   }
 
-  lines.push("Always allowed skills override skill restrictions. Otherwise, do not use disallowed prompts, skills, or MCP servers.");
+  lines.push("Exact skill path exclusions override always-allowed skills. Do not use disallowed prompts, skills, or MCP servers.");
   return lines.join("\n");
 }
 
@@ -172,9 +175,9 @@ export function validateProfileReferences(
 
   if (shouldValidateSkills) {
     for (const raw of [...(profile.skillsEnable ?? []), ...(profile.skillsDisable ?? [])]) {
-      const skill = raw.startsWith("-") ? raw.slice(1) : raw;
+      const skill = normalizeSkillSelector(raw);
       // Path-based entries (e.g. "skills/taste-skill/image-to-code") disambiguate
-      // same-name skills by overrideEntry; they are validated at sync time, not here.
+      // same-name project skills when startup filters are generated.
       if (skill !== PROFILE_WILDCARD && !skill.includes("/") && !knownSkillSet.has(skill)) {
         warnings.push(`Unknown skill: ${skill}`);
       }
@@ -230,7 +233,7 @@ export function buildProfileExplanation(input: {
     `MCP servers enabled: ${formatList(input.activeProfile.mcpServersEnable, "all unless disabled")}`,
     `MCP servers disabled: ${formatList(input.activeProfile.mcpServersDisable)}`,
     `Behavioral guidelines: ${input.activeProfile.extensionState?.behavioralGuidelines?.enabled === false ? "off" : "on"}`,
-    "Rule: always enabled skills override profile restrictions; otherwise disable wins; non-empty enable list allow-lists; * means all.",
+    "Rule: exact skill path disables win first, then always enabled skills; otherwise disable wins; non-empty enable list allow-lists; * means all.",
   ];
 
   if (input.resourcesRequireReload) {
@@ -371,7 +374,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
 
     state.activeProfileName = name;
     state.activeProfile = profile;
-    state.activePolicy = createProfilePolicy(profile, resolveAlwaysSkillNames(ctx.cwd, profile.alwaysSkills));
+    state.activePolicy = createProfilePolicy(profile);
     state.knownSkills = [...new Set([...state.knownSkills, ...getKnownSkillNames(pi.getCommands())])].sort((a, b) =>
       a.localeCompare(b),
     );
@@ -455,6 +458,10 @@ export default function profileExtension(pi: ExtensionAPI): void {
         return;
       }
 
+      const [{ DynamicBorder }, { Container, SelectList, Text }] = await Promise.all([
+        import("@earendil-works/pi-coding-agent"),
+        import("@earendil-works/pi-tui"),
+      ]);
       const activeName = state.activeProfileName;
       const items: SelectItem[] = profileNames.map((name) => {
         const isActive = name === activeName;
@@ -597,7 +604,9 @@ export default function profileExtension(pi: ExtensionAPI): void {
       state.warnedAboutDirectMcpTools = true;
     }
 
-    const flagValue = pi.getFlag("profile");
+    // Pi preserves flag values across reloads. Reapplying the startup choice
+    // would undo the profile just persisted by a /profile command.
+    const flagValue = event.reason === "startup" ? pi.getFlag("profile") : undefined;
     const selection = resolveSelectedProfile({
       flagProfile: typeof flagValue === "string" ? flagValue : undefined,
       persistedProfile: readPersistedProfileName(ctx.cwd),
@@ -636,7 +645,8 @@ export default function profileExtension(pi: ExtensionAPI): void {
   });
 
   pi.on("input", async (event, ctx) => {
-    const evaluation = evaluateSkillCommand(event.text, state.activePolicy);
+    const evaluation = evaluateSkillCommand(event.text, state.activePolicy, (name) =>
+      getLoadedProjectSkillPath(pi.getCommands(), ctx.cwd, name));
     if (!evaluation.isSkillCommand || evaluation.allowed) {
       return { action: "continue" };
     }

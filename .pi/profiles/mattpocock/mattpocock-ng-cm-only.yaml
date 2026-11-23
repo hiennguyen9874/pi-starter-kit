@@ -16,8 +16,8 @@ skillsEnable:
   - research
   - retro
   - setup-matt-pocock-skills
-  - tdd
-  - teach
+  - skills/mattpocock/tdd
+  - skills/mattpocock/teach
   - to-questionnaire
   - to-spec
   - to-tickets

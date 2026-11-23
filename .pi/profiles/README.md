@@ -46,9 +46,9 @@ the enabled tools and extensions before trusting a profile.
    run `/reload` as instructed.
 4. Optionally set `"defaultProfile": "review/my-review"` in
    [`.pi/profiles.json`](../profiles.json). An explicit `--profile` flag when
-   running Pi directly takes precedence, followed by persisted selection, restored
-   session selection, and the default. The default therefore does not override a
-   previously selected profile.
+   running Pi directly takes precedence on startup, followed by persisted selection,
+   restored session selection, and the default. The default therefore does not
+   override a previously selected profile.
 
 The recommended `pi-profile` launcher prepares an isolated copy-on-write `.pi`
 view before Pi starts, allowing concurrent profiles; its settings and profile
@@ -62,7 +62,7 @@ All fields are optional; resource lists are arrays of strings.
 
 | Fields | Purpose |
 | --- | --- |
-| `skillsEnable`, `skillsDisable` | Filter skills by name. |
+| `skillsEnable`, `skillsDisable` | Filter skills by name or exact project skill path. |
 | `promptsEnable`, `promptsDisable` | Filter prompt templates by name. |
 | `mcpServersEnable`, `mcpServersDisable` | Filter MCP servers by name from the baseline configuration. |
 | `packagesEnable`, `packagesDisable` | Overlay package entries from the baseline settings, using package source strings. |
@@ -73,7 +73,7 @@ All fields are optional; resource lists are arrays of strings.
 For skills, prompts, and MCP servers, an absent or empty enable list allows all
 unless disabled; a nonempty enable list is an allow-list. `"*"` in an enable list
 allows all, while `"*"` in a disable list disables all. Disable entries take
-precedence. Quote `"*"` in YAML. Package and extension lists instead overlay the
+precedence, with the `alwaysSkills` exception below. Quote `"*"` in YAML. Package and extension lists instead overlay the
 baseline; they are not allow-lists. Paths for project extensions are relative to
 `.pi`, as in the example.
 
@@ -82,3 +82,28 @@ baseline exists, `.pi/mcp.json`, as well as local profile state. Edit the base
 files rather than relying on generated output for persistent configuration. A
 profile controls resources but does not inherit from another profile; copy an
 existing YAML file if you want a starting point.
+
+## Select between skills with the same name
+
+Use an exact path under `.pi/skills` for one copy. You can write it relative to
+`.pi` or to the project root, and use either the skill directory or its `SKILL.md`:
+
+```yaml
+skillsEnable:
+  - skills/mattpocock/teach
+skillsDisable:
+  - .pi/skills/pstack/03-understanding-systems/teach/SKILL.md
+```
+
+An exact `skillsDisable` path excludes that copy even if it is in `alwaysSkills`.
+Otherwise, `alwaysSkills` bypasses name-based and wildcard restrictions. If
+multiple copies under `.pi/skills` still qualify, the profile keeps a copy
+explicitly enabled by path first, then a copy in `alwaysSkills` by path, then
+uses alphabetical path order. It writes exclusions for the other copies before
+Pi builds the `/skill:` commands. This does not resolve collisions from other
+sources such as user skills or packages.
+
+Use `pi-profile mattpocock/mattpocock` to apply these filters before Pi starts.
+With plain `pi --profile mattpocock/mattpocock`, Pi loads resources before the
+profile extension can write changes. Run `/reload` when the extension reports
+updated startup filters.

@@ -29,6 +29,7 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
     REGISTRY.guidelines.map(({ name }) => name),
     [
       "communicationAndToolUse",
+      "communicationAndToolUseIpython",
       "repositoryInstructions",
       "executionPolicy",
       "evidenceDiscipline",
@@ -37,7 +38,6 @@ test("loadBehavioralGuidelineRegistry exposes current behavioral guideline secti
       "validation",
       "finalResponse",
       "communicationAndToolUseMinimal",
-      "communicationAndToolUseIpython",
       "communicationAndToolUseIpythonMinimal",
       "repositoryInstructionsMinimal",
       "executionPolicyMinimal",
@@ -134,7 +134,7 @@ const IPYTHON_CONFIG = {
 test("guidelines go right after an existing <ipython> section", () => {
   const prompt = simulateIpythonAfterRules(SYSTEM_PROMPT);
   const result = injectBehavioralGuidelines(prompt, IPYTHON_CONFIG, REGISTRY);
-  assert.match(result, /<\/ipython>\n\n<execution_policy>/);
+  assert.match(result, /<\/ipython>\n\n<communication_and_tool_use>/);
   assert.ok(result.indexOf("<final_response>") < result.indexOf("<docs>"));
 });
 
