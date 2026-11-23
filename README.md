@@ -36,3 +36,7 @@ Source files and user-level Pi configuration are still shared. To keep `-c` and 
 - `.pi/mcp.base.json` — base MCP server definitions.
 
 Customize these files to fit your own workflow. Some integrations are disabled by default or enabled only by specific profiles.
+
+### Skills enabled in every profile
+
+Set `alwaysSkills` in `.pi/profiles.json` to skill names or project-relative paths to `SKILL.md` (or paths relative to `.pi`, such as `skills/pstack/.../teach`). These skills take precedence over each profile's `skillsEnable` and `skillsDisable`, including `*`. Use a path to select a specific project skill when names are duplicated. The profile manager removes matching direct project-skill exclusions; it cannot make a missing skill available or override a disabled package/extension or other independent Pi settings. Skill commands are checked by name, because Pi commands do not identify the source path. After changing this file, restart Pi or run `/reload`; `/profile explain` shows the active rules.

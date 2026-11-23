@@ -266,9 +266,24 @@ function normalizeResourceSet(values: string[] = []): Set<string> {
   return new Set(values.map(resourceName));
 }
 
+// Accept project-relative SKILL.md paths, .pi-relative directories, and skill names.
+function normalizeAlwaysSkill(entry: string): string {
+  return entry.replace(/\\/g, "/").replace(/^(?:\.\/)?\.pi\//, "").replace(/^\.\//, "").replace(/\/SKILL\.md$/, "").replace(/\/$/, "");
+}
+
+export function resolveAlwaysSkillNames(cwd: string, entries: string[] = []): string[] {
+  const set = new Set(entries.map(normalizeAlwaysSkill));
+  const names = [...set].filter((entry) => !entry.includes("/"));
+  for (const skill of loadProjectSkillResources(cwd)) {
+    if (resourceMatches(set, skill.name, skill.overrideEntry)) names.push(skill.name);
+  }
+  return dedupeSorted(names);
+}
+
 function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): string[] {
   const enabledSet = normalizeResourceSet(profile.skillsEnable);
   const disabledSet = normalizeResourceSet(profile.skillsDisable);
+  const alwaysSet = new Set((profile.alwaysSkills ?? []).map(normalizeAlwaysSkill));
   const enableAll = enabledSet.has(PROFILE_WILDCARD);
   const disableAll = disabledSet.has(PROFILE_WILDCARD);
 
@@ -276,9 +291,10 @@ function buildManagedSkillEntries(cwd: string, profile: ProfileDefinition): stri
     loadProjectSkillResources(cwd)
       .filter(
         (skill) =>
-          disableAll ||
-          resourceMatches(disabledSet, skill.name, skill.overrideEntry) ||
-          (!enableAll && enabledSet.size > 0 && !resourceMatches(enabledSet, skill.name, skill.overrideEntry)),
+          !resourceMatches(alwaysSet, skill.name, skill.overrideEntry) &&
+          (disableAll ||
+            resourceMatches(disabledSet, skill.name, skill.overrideEntry) ||
+            (!enableAll && enabledSet.size > 0 && !resourceMatches(enabledSet, skill.name, skill.overrideEntry))),
       )
       .map((skill) => `-${skill.overrideEntry}`),
   );
@@ -447,6 +463,15 @@ export function syncProfileResources(cwd: string, profileName: string, profile: 
     profile.extensionsDisable,
   );
   const currentSettings = baseSettings ?? readJsonObject(settingsPath) ?? {};
+  const alwaysSet = new Set((profile.alwaysSkills ?? []).map(normalizeAlwaysSkill));
+  const alwaysPaths = new Set(loadProjectSkillResources(cwd)
+    .filter((skill) => resourceMatches(alwaysSet, skill.name, skill.overrideEntry))
+    .map((skill) => skill.overrideEntry));
+  if (Array.isArray(currentSettings.skills)) {
+    currentSettings.skills = currentSettings.skills.filter((entry) =>
+      typeof entry !== "string" || !entry.startsWith("-") ||
+      (!alwaysSet.has(normalizeAlwaysSkill(entry.slice(1))) && !alwaysPaths.has(normalizeAlwaysSkill(entry.slice(1)))));
+  }
   const previousManagedSkillEntries = baseSettings ? [] : (managedState.managedSkillEntries ?? []);
   const previousManagedPromptEntries = baseSettings ? [] : (managedState.managedPromptEntries ?? []);
   const previousManagedPackageEntries = baseSettings ? [] : (managedState.managedPackageEntries ?? []);

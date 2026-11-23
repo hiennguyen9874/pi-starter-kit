@@ -1,3 +1,21 @@
 {
-  "defaultProfile": "advance/ipython-only"
+  "defaultProfile": "advance/ipython-only",
+  "alwaysSkills": [
+    "handoff",
+    "show-me",
+    "i-have-adhd",
+    ".pi/skills/pstack/02-requirements-and-prompting/sharpen/SKILL.md",
+    ".pi/skills/pstack/02-requirements-and-prompting/in-your-own-words/SKILL.md",
+    ".pi/skills/pstack/03-understanding-systems/how/SKILL.md",
+    ".pi/skills/pstack/03-understanding-systems/teach/SKILL.md",
+    ".pi/skills/pstack/03-understanding-systems/why/SKILL.md",
+    ".pi/skills/pstack/04-context-and-recap/ketchup/SKILL.md",
+    ".pi/skills/pstack/06-review-testing-and-performance/no-comments/SKILL.md",
+    ".pi/skills/pstack/08-workflow-and-automation/correct/SKILL.md",
+    ".pi/skills/pstack/08-workflow-and-automation/reflect/SKILL.md",
+    ".pi/skills/pstack/09-writing-and-communication/bro/SKILL.md",
+    ".pi/skills/pstack/09-writing-and-communication/technical-writing/SKILL.md",
+    ".pi/skills/pstack/09-writing-and-communication/unslop/SKILL.md",
+    ".pi/skills/mattpocock/wait-what/SKILL.md"
+  ]
 }

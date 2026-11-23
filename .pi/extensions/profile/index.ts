@@ -24,6 +24,7 @@ import {
   readPersistedProfileName,
   syncBaseSystemResources,
   syncProfileResources,
+  resolveAlwaysSkillNames,
   writePersistedProfileName,
 } from "./profile-sync.ts";
 
@@ -130,6 +131,9 @@ export function buildProfilePrompt(
 
   const lines = [`Active profile: ${profileName}. Follow these restrictions.`];
 
+  if (profile.alwaysSkills?.length) {
+    lines.push(`Always allowed skills (override profile restrictions): ${profile.alwaysSkills.join(", ")}.`);
+  }
   if (profile.skillsEnable?.length) {
     lines.push(`Allowed skills: ${profile.skillsEnable.join(", ")}.`);
   }
@@ -149,7 +153,7 @@ export function buildProfilePrompt(
     lines.push(`Disallowed MCP servers: ${profile.mcpServersDisable.join(", ")}.`);
   }
 
-  lines.push("If a prompt, skill, or MCP server is disallowed, do not attempt to use it.");
+  lines.push("Always allowed skills override skill restrictions. Otherwise, do not use disallowed prompts, skills, or MCP servers.");
   return lines.join("\n");
 }
 
@@ -218,6 +222,7 @@ export function buildProfileExplanation(input: {
   );
   const lines = [
     `Active profile: ${input.activeProfileName}`,
+    `Always enabled skills: ${formatList(input.activeProfile.alwaysSkills)}`,
     `Skills enabled: ${formatList(input.activeProfile.skillsEnable, "all unless disabled")}`,
     `Skills disabled: ${formatList(input.activeProfile.skillsDisable)}`,
     `Prompts enabled: ${formatList(input.activeProfile.promptsEnable, "all unless disabled")}`,
@@ -225,7 +230,7 @@ export function buildProfileExplanation(input: {
     `MCP servers enabled: ${formatList(input.activeProfile.mcpServersEnable, "all unless disabled")}`,
     `MCP servers disabled: ${formatList(input.activeProfile.mcpServersDisable)}`,
     `Behavioral guidelines: ${input.activeProfile.extensionState?.behavioralGuidelines?.enabled === false ? "off" : "on"}`,
-    "Rule: disable wins; non-empty enable list allow-lists; * means all.",
+    "Rule: always enabled skills override profile restrictions; otherwise disable wins; non-empty enable list allow-lists; * means all.",
   ];
 
   if (input.resourcesRequireReload) {
@@ -366,7 +371,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
 
     state.activeProfileName = name;
     state.activeProfile = profile;
-    state.activePolicy = createProfilePolicy(profile);
+    state.activePolicy = createProfilePolicy(profile, resolveAlwaysSkillNames(ctx.cwd, profile.alwaysSkills));
     state.knownSkills = [...new Set([...state.knownSkills, ...getKnownSkillNames(pi.getCommands())])].sort((a, b) =>
       a.localeCompare(b),
     );

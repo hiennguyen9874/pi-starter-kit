@@ -170,7 +170,7 @@ function validateProfileDefinition(
   return result;
 }
 
-function loadDefaultProfile(piDir: string): { defaultProfile?: string; error?: string } {
+function loadDefaultProfile(piDir: string): { defaultProfile?: string; alwaysSkills?: string[]; error?: string } {
   const profilesJsonPath = join(piDir, "profiles.json");
   if (!existsSync(profilesJsonPath)) {
     return {};
@@ -188,7 +188,11 @@ function loadDefaultProfile(piDir: string): { defaultProfile?: string; error?: s
       return { error: '"defaultProfile" must be a string when present' };
     }
 
-    return { defaultProfile: raw.defaultProfile as string | undefined };
+    if (raw.alwaysSkills !== undefined && (!isStringArray(raw.alwaysSkills) || raw.alwaysSkills.some((s) => !s.trim() || s !== s.trim() || s === "*" || s.startsWith("-")))) {
+      return { error: '"alwaysSkills" must be a string[] of skill names or paths (without wildcards or exclusions)' };
+    }
+
+    return { defaultProfile: raw.defaultProfile as string | undefined, alwaysSkills: raw.alwaysSkills as string[] | undefined };
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }
@@ -271,7 +275,7 @@ export function loadProfilesConfig(cwd: string): LoadProfilesConfigResult {
   const profilesDir = join(piDir, "profiles");
   const profilesJsonPath = join(piDir, "profiles.json");
 
-  const { defaultProfile, error: defaultError } = loadDefaultProfile(piDir);
+  const { defaultProfile, alwaysSkills, error: defaultError } = loadDefaultProfile(piDir);
   if (defaultError) {
     return { path: profilesJsonPath, error: defaultError };
   }
@@ -280,6 +284,12 @@ export function loadProfilesConfig(cwd: string): LoadProfilesConfigResult {
   const { profiles, errors } = loadProfilesFromDirectory(profilesDir, behavioralGuidelineSectionNameSet);
   if (errors.length > 0) {
     return { path: profilesDir, error: errors.join("\n") };
+  }
+
+  if (alwaysSkills?.length) {
+    for (const profile of Object.values(profiles)) {
+      profile.alwaysSkills = [...alwaysSkills];
+    }
   }
 
   return {

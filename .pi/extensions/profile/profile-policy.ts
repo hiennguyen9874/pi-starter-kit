@@ -11,6 +11,8 @@ export interface ProfileExtra {
 }
 
 export interface ProfileDefinition {
+  /** Global skills, populated from profiles.json, not from profile YAML. */
+  alwaysSkills?: string[];
   skillsEnable?: string[];
   skillsDisable?: string[];
   promptsEnable?: string[];
@@ -54,7 +56,8 @@ function isAllowed(name: string, enabledSet: Set<string>, disabledSet: Set<strin
   return enabledSet.has(name);
 }
 
-export function createProfilePolicy(profile: ProfileDefinition = {}): ProfilePolicy {
+export function createProfilePolicy(profile: ProfileDefinition = {}, alwaysSkillNames: string[] = profile.alwaysSkills ?? []): ProfilePolicy {
+  const alwaysSkillSet = new Set(alwaysSkillNames);
   const skillEnabledSet = new Set(profile.skillsEnable ?? []);
   const skillDisabledSet = new Set(profile.skillsDisable ?? []);
   const mcpEnabledSet = new Set(profile.mcpServersEnable ?? []);
@@ -67,7 +70,7 @@ export function createProfilePolicy(profile: ProfileDefinition = {}): ProfilePol
     hasPromptAllowList: hasRestrictiveAllowList(promptEnabledSet),
     hasMcpAllowList: hasRestrictiveAllowList(mcpEnabledSet),
     isSkillAllowed(name: string) {
-      return isAllowed(name, skillEnabledSet, skillDisabledSet);
+      return alwaysSkillSet.has(name) || isAllowed(name, skillEnabledSet, skillDisabledSet);
     },
     isPromptAllowed(name: string) {
       return isAllowed(name, promptEnabledSet, promptDisabledSet);

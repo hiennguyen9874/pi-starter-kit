@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { loadProfilesConfig } from "./profile-config.ts";
+import { createProfilePolicy } from "./profile-policy.ts";
 import { join } from "node:path";
 
 import {
@@ -11,6 +13,7 @@ import {
   readPersistedProfileName,
   syncBaseSystemResources,
   syncProfileResources,
+  resolveAlwaysSkillNames,
 } from "./profile-sync.ts";
 
 function createRoot(): string {
@@ -283,4 +286,36 @@ test("wildcard profile entries apply to skill and MCP resource syncing", () => {
 
   assert.deepEqual(lockedSettings.skills, ["-skills/backend-patterns", "-skills/frontend-design"]);
   assert.deepEqual(Object.keys(mcp.mcpServers), []);
+});
+
+
+test("global skills override each profile, including wildcard disables, without enabling duplicate paths", () => {
+  const root = createRoot();
+  mkdirSync(join(root, ".pi", "profiles"));
+  writeSkill(root, "handoff");
+  for (const group of ["pstack", "other"]) {
+    const dir = join(root, ".pi", "skills", group, "teach");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "SKILL.md"), "---\nname: teach\ndescription: teach\n---\n");
+  }
+  writeSkill(root, "excluded");
+  writeFileSync(join(root, ".pi", "settings.base.json"), JSON.stringify({skills: ["-skills/handoff", "-skills/pstack/teach"]}));
+  writeFileSync(join(root, ".pi", "profiles.json"), JSON.stringify({alwaysSkills: ["handoff", ".pi/skills/pstack/teach/SKILL.md"]}));
+  writeFileSync(join(root, ".pi", "profiles", "locked.yaml"), "skillsDisable:\n  - '*'\n");
+  writeFileSync(join(root, ".pi", "profiles", "focused.yaml"), "skillsEnable:\n  - excluded\nskillsDisable:\n  - handoff\n  - skills/pstack/teach\n");
+  const { config, error } = loadProfilesConfig(root);
+  assert.equal(error, undefined);
+  for (const name of ["locked", "focused"]) {
+    const profile = config!.profiles[name];
+    syncProfileResources(root, name, profile);
+    const settings = JSON.parse(readFileSync(join(root, ".pi", "settings.json"), "utf8"));
+    assert.ok(!settings.skills.includes("-skills/handoff"));
+    assert.ok(!settings.skills.includes("-skills/pstack/teach"));
+    assert.ok(settings.skills.includes("-skills/other/teach"));
+    assert.equal(settings.skills.includes("-skills/excluded"), name === "locked");
+    const policy = createProfilePolicy(profile, resolveAlwaysSkillNames(root, profile.alwaysSkills));
+    assert.equal(policy.isSkillAllowed("handoff"), true);
+    assert.equal(policy.isSkillAllowed("teach"), true);
+    assert.equal(policy.isSkillAllowed("excluded"), name === "focused");
+  }
 });

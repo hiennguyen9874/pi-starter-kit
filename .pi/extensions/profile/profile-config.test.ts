@@ -257,3 +257,12 @@ test("loads profiles from one level of group subfolders", () => {
   assert.deepEqual(Object.keys(result.config?.profiles ?? {}).sort(), ["base", "review/api"]);
   assert.deepEqual(result.config?.profiles["review/api"].skillsEnable, ["api"]);
 });
+
+
+test("rejects invalid global skill configuration", () => {
+  for (const alwaysSkills of ["handoff", ["*"], ["-handoff"], [""], [42]]) {
+    const root = createRoot();
+    writeFileSync(join(root, ".pi", "profiles.json"), JSON.stringify({ alwaysSkills }));
+    assert.match(loadProfilesConfig(root).error ?? "", /alwaysSkills/);
+  }
+});
