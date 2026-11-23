@@ -78,4 +78,5 @@ extra:
       mode: "only"
       inlineBudget: 3000
 skillsDisable:
-  - skills/pstack/teach
+  - skills/pstack/06-review-testing-and-performance/tdd
+  - skills/pstack/03-understanding-systems/teach
