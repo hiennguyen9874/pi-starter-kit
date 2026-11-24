@@ -1,0 +1,33 @@
+# Review session evidence and propose improvements for the user to choose from.
+skillsEnable:
+  - skills/mattpocock/retro
+  - skills/mattpocock/writing-for-agents
+promptsDisable: ["*"]
+mcpServersDisable: ["*"]
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: true
+packagesEnable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-ask-user
+packagesDisable:
+  - npm:pi-observational-memory
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts

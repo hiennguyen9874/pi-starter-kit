@@ -1,0 +1,38 @@
+# Resolve decision tickets across sessions, then turn the map into a spec and implementation tickets.
+skillsEnable:
+  - skills/mattpocock/wayfinder
+  - skills/mattpocock/grilling
+  - skills/mattpocock/domain-modeling
+  - skills/mattpocock/prototype
+  - skills/mattpocock/research
+  - skills/mattpocock/to-spec
+  - skills/mattpocock/to-tickets
+promptsDisable: ["*"]
+mcpServersDisable: ["*"]
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: true
+packagesEnable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - git:github.com/hiennguyen9874/pi-ask-user
+  - npm:pi-subagents-lite
+packagesDisable:
+  - npm:pi-observational-memory
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
+  - git:github.com/hiennguyen9874/pi-shake
+extensionsDisable:
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts

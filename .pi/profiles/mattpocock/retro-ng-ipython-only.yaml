@@ -1,0 +1,45 @@
+# IPython variant of retro-ng-cm-only.yaml. See advance/ipython-only.yaml for conflict notes.
+# Review session evidence and propose improvements for the user to choose from.
+skillsEnable:
+  - skills/mattpocock/retro
+  - skills/mattpocock/writing-for-agents
+promptsDisable: ["*"]
+mcpServersDisable: ["*"]
+extensionState:
+  behavioralGuidelines:
+    enabled: false
+    sections:
+      communicationAndToolUse: false
+      communicationAndToolUseIpython: true
+      executionPolicy: true
+      evidenceDiscipline: true
+      changeScope: true
+      validation: true
+      finalResponse: true
+      planningDiscipline: true
+packagesEnable:
+  - git:github.com/hiennguyen9874/pi-ipython
+  - git:github.com/hiennguyen9874/pi-ask-user
+packagesDisable:
+  - npm:@hiennguyen9874/pi-multi-edit
+  - npm:pi-observational-memory
+  - npm:@gotgenes/pi-subagents
+  - npm:pi-subagents-lite
+  - npm:pi-subagents
+  - npm:pi-prompt-template-model
+  - npm:pi-intercom
+  - npm:@spences10/pi-confirm-destructive
+  - git:github.com/hiennguyen9874/pi-shake
+  - git:github.com/hiennguyen9874/pi-grep-glob
+  - npm:@hiennguyen9874/pi-single-edit
+extensionsDisable:
+  - builtin:codemode
+  - builtin:tool-search
+  - ./extensions/disable-write-tool.ts
+  - ./extensions/disable-read-tool.ts
+  - ./extensions/disable-bash-tool.ts
+  - ./extensions/disable-edit-tools.ts
+  - ./extensions/codemode-direct-write.ts
+  - ./extensions/enable-ls-tool.ts
+  - ./extensions/permission-gate.ts
+extensionsEnable: []
