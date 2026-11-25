@@ -30,7 +30,7 @@
         ]
     },
     "modelCalls": {
-        "enabled": true,
+        "enabled": false,
         "model": "openai/gpt-6-luna",
         "thinking": "high",
         "maxPerCell": 100,
