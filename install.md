@@ -5,7 +5,7 @@ The installer sets up the project’s `.pi/` directory and installs the `pi-prof
 ## Requirements
 
 - On Linux, use Bash and Node.js 22.19+ with npm. The installer uses `curl` and `tar` to fetch and extract the starter kit when needed.
-- To run `pi-profile`, you need `flock` and Bubblewrap (`bwrap`) with `--tmp-overlay` support. These are system packages, not npm packages.
+- To run `pi-profile`, you need `flock` and Bubblewrap (`bwrap`) that can create bind mounts on your host or inside your container. These are system packages, not npm packages. Overlay support is optional: the default launcher falls back to a temporary copy of `.pi` when an overlay mount is unavailable.
 
 On Ubuntu or Debian, install them with `apt`:
 
@@ -14,14 +14,15 @@ sudo apt update
 sudo apt install util-linux bubblewrap
 ```
 
-`flock` comes with `util-linux` and is often already installed. To verify both tools and check for overlay support, run:
+`flock` comes with `util-linux` and is often already installed. To verify both tools and check whether Bubblewrap recognizes the overlay flags, run:
 
 ```sh
 flock --version
-bwrap --help | grep -F -- --tmp-overlay
+bwrap --version
+bwrap --help | grep -E -- '--(overlay-src|tmp-overlay)'
 ```
 
-If the second command shows no `--tmp-overlay` option, install a newer Bubblewrap release before running `pi-profile`. Bubblewrap 0.11.1 has been tested with this starter kit.
+Overlay mode needs both flags and a kernel/container configuration that permits unprivileged OverlayFS mounts. Bubblewrap 0.11.1 has been tested with overlay mode; 0.4.0 has been tested with copy mode. To skip the mount probe, run `PI_PROFILE_MODE=copy pi-profile minimal/read-only`. See [launcher modes](README.md#choose-how-pi-is-isolated).
 
 ## Install Pi separately
 

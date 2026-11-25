@@ -107,5 +107,5 @@ case ":${PATH:-}:" in
     ;;
 esac
 if ! command -v bwrap >/dev/null; then
-  printf '%s\n' 'Before using pi-profile, install Bubblewrap with --tmp-overlay support.'
+  printf '%s\n' 'Before using pi-profile, install Bubblewrap. Overlay support is optional.'
 fi
