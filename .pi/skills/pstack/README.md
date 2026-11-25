@@ -1,13 +1,13 @@
 # pstack skills
 
-Bản sao các skill từ [pstack trong cursor/plugins](https://github.com/cursor/plugins/tree/7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9/pstack), được sắp xếp theo mục đích sử dụng. Bao gồm **58 skill pstack** (34 skill chức năng và 24 principle skill) cùng **3 skill trong Benny automation pack**.
+Bản sao các skill từ [pstack trong cursor/plugins](https://github.com/cursor/plugins/tree/41e400932eca14f289e7db717a70455256b6d388/pstack), được sắp xếp theo mục đích sử dụng. Bao gồm **59 skill pstack** (35 skill chức năng và 24 principle skill) cùng **3 skill trong Benny automation pack**.
 
 ## Các nhóm
 
 | Thư mục | Nội dung | Skills |
 |---|---|---|
 | [01-getting-started-and-setup](01-getting-started-and-setup/) | Bắt đầu, cấu hình model và chọn skill. | [`setup-pstack`](01-getting-started-and-setup/setup-pstack/SKILL.md), [`poteto-mode`](01-getting-started-and-setup/poteto-mode/SKILL.md), [`poteto-help`](01-getting-started-and-setup/poteto-help/SKILL.md) |
-| [02-requirements-and-prompting](02-requirements-and-prompting/) | Làm rõ yêu cầu và cải thiện prompt. | [`in-your-own-words`](02-requirements-and-prompting/in-your-own-words/SKILL.md), [`sharpen`](02-requirements-and-prompting/sharpen/SKILL.md) |
+| [02-requirements-and-prompting](02-requirements-and-prompting/) | Làm rõ yêu cầu, tìm thuật ngữ chuyên môn và cải thiện prompt. | [`in-your-own-words`](02-requirements-and-prompting/in-your-own-words/SKILL.md), [`sharpen`](02-requirements-and-prompting/sharpen/SKILL.md), [`reframe`](02-requirements-and-prompting/reframe/SKILL.md) |
 | [03-understanding-systems](03-understanding-systems/) | Tìm hiểu cách hệ thống hoạt động, lịch sử và phạm vi ảnh hưởng của thay đổi. | [`how`](03-understanding-systems/how/SKILL.md), [`why`](03-understanding-systems/why/SKILL.md), [`teach`](03-understanding-systems/teach/SKILL.md), [`blast-radius`](03-understanding-systems/blast-radius/SKILL.md) |
 | [04-context-and-recap](04-context-and-recap/) | Khôi phục và tóm tắt bối cảnh. | [`recall`](04-context-and-recap/recall/SKILL.md), [`ketchup`](04-context-and-recap/ketchup/SKILL.md), [`ketchup-video`](04-context-and-recap/ketchup-video/SKILL.md) |
 | [05-design-and-orchestration](05-design-and-orchestration/) | Thiết kế, điều phối công việc và agent song song. | [`architect`](05-design-and-orchestration/architect/SKILL.md), [`arena`](05-design-and-orchestration/arena/SKILL.md), [`swarm`](05-design-and-orchestration/swarm/SKILL.md), [`figure-it-out`](05-design-and-orchestration/figure-it-out/SKILL.md) |
@@ -30,4 +30,4 @@ Mỗi skill có hướng dẫn riêng trong file `SKILL.md` của nó. Các đ�
 - Việc phân nhóm thay đổi cấu trúc thư mục so với upstream: một số đường dẫn tương đối giữa các skill, ví dụ `../<skill>/SKILL.md`, có thể không còn đúng. Một số tham chiếu khác trỏ tới tài nguyên không được sao chép.
 - Agent trong `_upstream/agents/` không tự được đăng ký trong pi. Benny yêu cầu Cursor Automations; upstream không đăng ký ba skill Benny thành slash skill thông thường.
 
-Nguồn được sao chép ở commit `7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9`. Giấy phép: [MIT](LICENSE).
+Nguồn được sao chép ở commit `41e400932eca14f289e7db717a70455256b6d388`. Giấy phép: [MIT](LICENSE).
