@@ -5,7 +5,7 @@ The installer sets up the project’s `.pi/` directory and installs the `pi-prof
 ## Requirements
 
 - On Linux, use Bash and Node.js 22.19+ with npm. The installer uses `curl` and `tar` to fetch and extract the starter kit when needed.
-- To run `pi-profile`, you need `flock`. The isolated modes also need Bubblewrap (`bwrap`) that can create bind mounts on your host or inside your container. If Bubblewrap is unavailable, explicitly set `PI_PROFILE_MODE=direct` to use the real `.pi` directory without isolation. These are system packages, not npm packages. Overlay support is optional: the default launcher falls back to a temporary copy of `.pi` when an overlay mount is unavailable.
+- To run `pi-profile`, you need `flock`. The `auto`, `overlay`, and `copy` modes also need Bubblewrap (`bwrap`) that can create bind mounts on your host or inside your container. If Bubblewrap is unavailable, use `PI_PROFILE_MODE=proot` with PRoot, or `PI_PROFILE_MODE=direct` to use the real `.pi` directory without isolation. These are system packages, not npm packages. Overlay support is optional: the default launcher falls back to a temporary copy of `.pi` when an overlay mount is unavailable.
 
 On Ubuntu or Debian, install them with `apt`:
 
@@ -23,6 +23,34 @@ bwrap --help | grep -E -- '--(overlay-src|tmp-overlay)'
 ```
 
 Overlay mode needs both flags and a kernel/container configuration that permits unprivileged OverlayFS mounts. Bubblewrap 0.11.1 has been tested with overlay mode; 0.4.0 has been tested with copy mode. To skip the mount probe, run `PI_PROFILE_MODE=copy pi-profile minimal/read-only`. See [launcher modes](README.md#choose-how-pi-is-isolated).
+
+### PRoot without container changes
+
+Install `proot` (for example, `sudo apt install proot` on Ubuntu or Debian) and make it available on `PATH`. This mode does not require user namespaces, but the environment must allow PRoot to trace its child processes with `ptrace`.
+
+On Ubuntu or Debian, if you cannot install system packages but APT package downloads are available, you can extract PRoot and its library into your home directory instead:
+
+```bash
+(
+  set -e
+  dest="$HOME/.local/opt/pi-profile-proot"
+  downloads=$(mktemp -d)
+  trap 'rm -rf -- "$downloads"' EXIT
+  cd "$downloads"
+  apt-get download proot libtalloc2
+  mkdir -p "$dest"
+  for package in ./*.deb; do dpkg-deb -x "$package" "$dest"; done
+)
+```
+
+Then, in the shell where you launch Pi:
+
+```bash
+proot_dir="$HOME/.local/opt/pi-profile-proot"
+export PATH="$proot_dir/usr/bin:$PATH"
+export LD_LIBRARY_PATH="$proot_dir/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+PI_PROFILE_MODE=proot pi-profile minimal/read-only
+```
 
 ## Install Pi separately
 

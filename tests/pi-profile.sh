@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Run with bash tests/pi-profile.sh on Linux with bind-mount-capable Bubblewrap.
-# Pass --direct-only to run without Bubblewrap.
+# Pass --direct-only or --proot-only to run without Bubblewrap.
 set -euo pipefail
 
 launcher=$(cd -- "$(dirname -- "$0")/../bin" && pwd -P)/pi-profile
 export REAL_BWRAP
-if [[ "${1:-}" != --direct-only ]]; then
+if [[ -z "${1:-}" ]]; then
   REAL_BWRAP=$(command -v bwrap)
 fi
 work=$(mktemp -d)
@@ -19,13 +19,13 @@ printf original > .pi/settings.json
 printf nested > .pi/profiles/npm/kept
 
 cat > .pi/extensions/profile/profile-config.ts <<'JS'
-export const loadProfilesConfig = () => ({ config: { profiles: { test: {} } } });
+export const loadProfilesConfig = () => ({ config: { profiles: { test: {}, second: {} } } });
 JS
 cat > .pi/extensions/profile/profile-sync.ts <<'JS'
 import { mkdirSync, writeFileSync } from 'node:fs';
-export function syncProfileResources() {
+export function syncProfileResources(_cwd, name) {
   mkdirSync('.pi/.local', { recursive: true });
-  writeFileSync('.pi/settings.json', 'private');
+  writeFileSync('.pi/settings.json', name === 'test' ? 'private' : name);
 }
 JS
 
@@ -39,7 +39,21 @@ if [[ "${PI_PROFILE_MODE:-}" == direct ]]; then
 else
   [[ "$1" == --extension && -f "$2" && "$3" == --offline ]]
 fi
-[[ $(cat .pi/settings.json) == private && $(cat .pi/profiles/npm/kept) == nested ]]
+expected=${4:-private}
+[[ $(cat .pi/settings.json) == "$expected" && $(cat .pi/profiles/npm/kept) == nested ]]
+if [[ "${PI_PROFILE_MODE:-}" == proot ]]; then
+  [[ "$PWD" == "$TEST_PROJECT" ]]
+  # Simulate the package-lock extension unlocking at session_start.
+  flock -u 9
+  : > "$expected.ready"
+  other=second
+  if [[ "$expected" == second ]]; then other=private; fi
+  for ((i=0; i<100; i++)); do
+    [[ ! -f "$other.ready" ]] || break
+    sleep 0.1
+  done
+  [[ -f "$other.ready" && $(cat .pi/settings.json) == "$expected" ]]
+fi
 printf 'run\n' >> .pi/npm/runs
 printf 'run\n' >> .pi/git/runs
 exit 42
@@ -72,13 +86,31 @@ check_mode() {
   [[ -z $(ls -A "$TMPDIR") ]]
 }
 
-if [[ "${1:-}" != --direct-only ]]; then
+if [[ -z "${1:-}" ]]; then
   check_mode copy 42 copy
   check_mode auto 42 $'probe\ncopy'
   check_mode overlay 43 overlay
   PROBE_STATUS=0 check_mode auto 43 $'probe\noverlay'
   check_mode invalid 2 ''
   [[ $(cat .pi/npm/runs) == $'run\nrun' && $(cat .pi/git/runs) == $'run\nrun' ]]
+fi
+
+if [[ "${1:-}" == --proot-only ]]; then
+  export TEST_PROJECT="$PWD"
+  : > "$BWRAP_LOG"
+  PI_PROFILE_MODE=proot "$launcher" test --offline private &
+  first=$!
+  PI_PROFILE_MODE=proot "$launcher" second --offline second &
+  second=$!
+  first_status=0 second_status=0
+  wait "$first" || first_status=$?
+  wait "$second" || second_status=$?
+  [[ "$first_status" == 42 && "$second_status" == 42 ]]
+  [[ $(cat .pi/settings.json) == original && ! -e .pi/.local ]]
+  [[ ! -s "$BWRAP_LOG" && -z $(ls -A "$TMPDIR") ]]
+  [[ $(cat .pi/npm/runs) == $'run\nrun' && $(cat .pi/git/runs) == $'run\nrun' ]]
+  printf '%s\n' 'pi-profile concurrent PRoot tests passed'
+  exit 0
 fi
 
 rm -f .pi/{npm,git}/runs

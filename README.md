@@ -28,15 +28,16 @@ Set `PI_PROFILE_MODE` when starting the launcher:
 - `auto` (default) tries a Bubblewrap overlay mount and falls back to `copy` if the mount probe fails. It does not retry failed profile setup or Pi sessions.
 - `overlay` requires Bubblewrap and kernel support for a copy-on-write overlay. Use this mode to see the mount error directly.
 - `copy` copies `.pi` to a temporary directory, then bind-mounts the copy in place. This works with older Bubblewrap versions if the host allows bind mounts. It takes more startup time and temporary disk space. Set `TMPDIR` to a location outside `.pi` if needed. The launcher removes the copy on exit, but a hard kill can leave it behind.
+- `proot` copies `.pi` per session and uses PRoot to map the copy into the same project directory, without Bubblewrap or user namespaces. It requires `proot` on `PATH` and permission to trace child processes. It is not a security sandbox and can be slower for subprocess-heavy workflows.
 - `direct` skips Bubblewrap and applies the profile to the real `.pi` directory. Changes persist after exit. This is opt-in, never an automatic fallback. The launcher holds the project lock until Pi exits; don’t mix direct sessions with other Pi sessions in the same checkout.
 
 For example, to run inside a container that blocks Bubblewrap:
 
 ```bash
-PI_PROFILE_MODE=direct pi-profile minimal/read-only --offline
+PI_PROFILE_MODE=proot pi-profile minimal/read-only --offline
 ```
 
-In `overlay` and `copy` modes, settings, MCP config, and profile state under `.pi` are private to the launched process and changes there are discarded on exit. Installed packages under `.pi/npm/` and `.pi/git/` are bind-mounted from the original project, not copied; they are shared by profiles and persist after exit. Pi may still install packages that are new to the project. Launcher-managed startups and reloads take a project lock while resolving packages; sessions can run concurrently once loaded. Use one of these isolated modes for concurrent sessions, and avoid running bare `pi install`, `pi remove`, or `pi update` against those shared packages while a wrapped session is using them.
+In `overlay`, `copy`, and `proot` modes, settings, MCP config, and profile state under `.pi` are private to the launched process and changes there are discarded on exit. Installed packages under `.pi/npm/` and `.pi/git/` are mapped from the original project, not copied; they are shared by profiles and persist after exit. Pi may still install packages that are new to the project. Launcher-managed startups and reloads take a project lock while resolving packages; sessions can run concurrently once loaded. Use one of these isolated modes for concurrent sessions, and avoid running bare `pi install`, `pi remove`, or `pi update` against those shared packages while a wrapped session is using them.
 
 Source files and user-level Pi configuration are still shared. To keep `-c` and `--resume` separate too, pass a different `--session-dir` per profile.
 

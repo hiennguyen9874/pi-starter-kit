@@ -5,7 +5,8 @@ set -euo pipefail
 usage() {
   printf '%s\n' 'Usage: pi-profile PROFILE [PI_ARGS...]' \
     'Run from the project root. Example: pi-profile minimal/read-only --offline' \
-    'Set PI_PROFILE_MODE=auto (default), overlay, copy, or direct.' \
+    'Set PI_PROFILE_MODE=auto (default), overlay, copy, proot, or direct.' \
+    'PRoot mode copies .pi without Bubblewrap or user namespaces.' \
     'Direct mode does not use Bubblewrap and modifies the project .pi in place.'
 }
 
@@ -18,8 +19,8 @@ profile=$1
 shift
 mode=${PI_PROFILE_MODE:-auto}
 case "$mode" in
-  auto|overlay|copy|direct) ;;
-  *) printf 'pi-profile: invalid PI_PROFILE_MODE: %s (expected auto, overlay, copy, or direct)\n' "$mode" >&2; exit 2 ;;
+  auto|overlay|copy|proot|direct) ;;
+  *) printf 'pi-profile: invalid PI_PROFILE_MODE: %s (expected auto, overlay, copy, proot, or direct)\n' "$mode" >&2; exit 2 ;;
 esac
 root=$(pwd -P)
 if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sync.ts" ]]; then
@@ -28,9 +29,10 @@ if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sy
 fi
 
 dependencies=(flock node)
-if [[ "$mode" != direct ]]; then
-  dependencies+=(bwrap)
-fi
+case "$mode" in
+  proot) dependencies+=(proot) ;;
+  auto|overlay|copy) dependencies+=(bwrap) ;;
+esac
 for dependency in "${dependencies[@]}"; do
   if ! command -v "$dependency" >/dev/null; then
     printf 'pi-profile: missing required command: %s\n' "$dependency" >&2
@@ -162,6 +164,20 @@ else
   tar -C "$project_pi" --anchored --exclude=./npm --exclude=./git -cf - . |
     tar -C "$stage/.pi" --no-same-owner -xf -
   mkdir -- "$stage/.pi/npm" "$stage/.pi/git"
+  if [[ "$mode" == proot ]]; then
+    stage_pi="$(cd -- "$stage/.pi" && pwd -P)"
+    # PRoot uses ':' to separate source and destination and '!' as a suffix.
+    if [[ "$stage_pi" == *:* || "$project_pi" == *:* ]]; then
+      printf '%s\n' 'pi-profile: proot mode requires project and TMPDIR paths without colons.' >&2
+      exit 1
+    fi
+    proot -r / -w "$root" \
+      -b "$stage_pi:$project_pi!" \
+      -b "$project_pi/npm:$project_pi/npm!" \
+      -b "$project_pi/git:$project_pi/git!" \
+      "${launch[@]}" "$profile" "$mode" "$@"
+    exit
+  fi
   sandbox+=(--bind "$stage/.pi" "$project_pi")
 fi
 
