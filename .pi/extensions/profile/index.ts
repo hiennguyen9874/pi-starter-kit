@@ -27,10 +27,37 @@ import {
   writePersistedProfileName,
 } from "./profile-sync.ts";
 
+export type ProfileSelectionSource = "process" | "flag" | "persisted" | "session" | "default";
+
 export interface ResolvedProfileSelection {
   name?: string;
-  source?: "flag" | "persisted" | "session" | "default";
+  source?: ProfileSelectionSource;
   error?: string;
+}
+
+// Pi re-imports extensions on /reload (jiti moduleCache: false) and on /new,
+// so module state is lost. globalThis survives in the same Node process and,
+// unlike the shared .pi/.local/profile-state.json, it is not shared with other
+// Pi processes or inherited by child processes. Keyed by cwd for in-process
+// sessions that run in another project.
+const PROCESS_PROFILE_KEY = Symbol.for("pi-starter-kit.profile.process-selection");
+
+function getProcessProfiles(): Map<string, string> {
+  const store = globalThis as typeof globalThis & { [PROCESS_PROFILE_KEY]?: Map<string, string> };
+  store[PROCESS_PROFILE_KEY] ??= new Map();
+  return store[PROCESS_PROFILE_KEY];
+}
+
+export function readProcessProfileName(cwd: string): string | undefined {
+  return getProcessProfiles().get(cwd);
+}
+
+export function writeProcessProfileName(cwd: string, name: string | undefined): void {
+  if (name) {
+    getProcessProfiles().set(cwd, name);
+  } else {
+    getProcessProfiles().delete(cwd);
+  }
 }
 
 export interface SkillCommandEvaluation {
@@ -45,6 +72,7 @@ export interface McpRequestEvaluation {
 }
 
 export function resolveSelectedProfile(input: {
+  processProfile?: string;
   flagProfile?: string;
   persistedProfile?: string;
   restoredProfile?: string;
@@ -52,7 +80,8 @@ export function resolveSelectedProfile(input: {
   availableProfiles: string[];
 }): ResolvedProfileSelection {
   const availableProfiles = new Set(input.availableProfiles);
-  const candidates: Array<{ name?: string; source: "flag" | "persisted" | "session" | "default" }> = [
+  const candidates: Array<{ name?: string; source: ProfileSelectionSource }> = [
+    { name: input.processProfile, source: "process" },
     { name: input.flagProfile, source: "flag" },
     { name: input.persistedProfile, source: "persisted" },
     { name: input.restoredProfile, source: "session" },
@@ -65,6 +94,10 @@ export function resolveSelectedProfile(input: {
     }
 
     if (!availableProfiles.has(candidate.name)) {
+      // A profile removed while this process runs should not block reloads.
+      if (candidate.source === "process") {
+        continue;
+      }
       return {
         source: candidate.source,
         error: `Profile "${candidate.name}" is not defined`,
@@ -393,6 +426,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     pi.appendEntry("profile-state", { name: state.activeProfileName });
 
     if (cwd) {
+      writeProcessProfileName(cwd, state.activeProfileName);
       writePersistedProfileName(cwd, state.activeProfileName);
     }
   }
@@ -604,10 +638,14 @@ export default function profileExtension(pi: ExtensionAPI): void {
       state.warnedAboutDirectMcpTools = true;
     }
 
-    // Pi preserves flag values across reloads. Reapplying the startup choice
-    // would undo the profile just persisted by a /profile command.
-    const flagValue = event.reason === "startup" ? pi.getFlag("profile") : undefined;
+    // Priority: this process's last choice (/profile or the startup flag) ->
+    // --profile -> shared persisted file -> session entry -> default.
+    // The process choice lets /profile survive /reload and /new even though Pi
+    // keeps the startup flag, without letting another terminal's persisted
+    // file override this terminal's --profile.
+    const flagValue = pi.getFlag("profile");
     const selection = resolveSelectedProfile({
+      processProfile: readProcessProfileName(ctx.cwd),
       flagProfile: typeof flagValue === "string" ? flagValue : undefined,
       persistedProfile: readPersistedProfileName(ctx.cwd),
       restoredProfile: findRestoredProfileName(ctx),
@@ -623,6 +661,7 @@ export default function profileExtension(pi: ExtensionAPI): void {
     }
 
     setActiveProfile(selection.name, ctx);
+    writeProcessProfileName(ctx.cwd, state.activeProfileName);
 
     if (selection.name && state.activeProfile) {
       const syncResult = syncProfileResources(ctx.cwd, selection.name, state.activeProfile);
