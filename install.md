@@ -5,7 +5,7 @@ The installer sets up the project’s `.pi/` directory and installs the `pi-prof
 ## Requirements
 
 - On Linux, use Bash and Node.js 22.19+ with npm. The installer uses `curl` and `tar` to fetch and extract the starter kit when needed.
-- To run `pi-profile`, you need `flock` and Bubblewrap (`bwrap`) that can create bind mounts on your host or inside your container. These are system packages, not npm packages. Overlay support is optional: the default launcher falls back to a temporary copy of `.pi` when an overlay mount is unavailable.
+- To run `pi-profile`, you need `flock`. The isolated modes also need Bubblewrap (`bwrap`) that can create bind mounts on your host or inside your container. If Bubblewrap is unavailable, explicitly set `PI_PROFILE_MODE=direct` to use the real `.pi` directory without isolation. These are system packages, not npm packages. Overlay support is optional: the default launcher falls back to a temporary copy of `.pi` when an overlay mount is unavailable.
 
 On Ubuntu or Debian, install them with `apt`:
 

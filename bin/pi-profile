@@ -5,7 +5,8 @@ set -euo pipefail
 usage() {
   printf '%s\n' 'Usage: pi-profile PROFILE [PI_ARGS...]' \
     'Run from the project root. Example: pi-profile minimal/read-only --offline' \
-    'Set PI_PROFILE_MODE=auto (default), overlay, or copy to select how .pi is isolated.'
+    'Set PI_PROFILE_MODE=auto (default), overlay, copy, or direct.' \
+    'Direct mode does not use Bubblewrap and modifies the project .pi in place.'
 }
 
 case "${1:-}" in
@@ -17,8 +18,8 @@ profile=$1
 shift
 mode=${PI_PROFILE_MODE:-auto}
 case "$mode" in
-  auto|overlay|copy) ;;
-  *) printf 'pi-profile: invalid PI_PROFILE_MODE: %s (expected auto, overlay, or copy)\n' "$mode" >&2; exit 2 ;;
+  auto|overlay|copy|direct) ;;
+  *) printf 'pi-profile: invalid PI_PROFILE_MODE: %s (expected auto, overlay, copy, or direct)\n' "$mode" >&2; exit 2 ;;
 esac
 root=$(pwd -P)
 if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sync.ts" ]]; then
@@ -26,7 +27,11 @@ if [[ ! -d "$root/.pi/profiles" || ! -f "$root/.pi/extensions/profile/profile-sy
   exit 1
 fi
 
-for dependency in bwrap flock node; do
+dependencies=(flock node)
+if [[ "$mode" != direct ]]; then
+  dependencies+=(bwrap)
+fi
+for dependency in "${dependencies[@]}"; do
   if ! command -v "$dependency" >/dev/null; then
     printf 'pi-profile: missing required command: %s\n' "$dependency" >&2
     exit 1
@@ -44,48 +49,8 @@ if ! command -v pi >/dev/null; then
 fi
 
 project_pi="$root/.pi"
-sandbox=(bwrap --bind / / --dev-bind /dev /dev)
-overlay=(--overlay-src "$project_pi" --tmp-overlay "$project_pi")
-
-if [[ "$mode" == auto ]]; then
-  # Probe the actual mount, not just the flags: the host kernel can reject it.
-  # Never retry a failed profile sync or Pi session in a different mode.
-  if "${sandbox[@]}" "${overlay[@]}" -- /bin/true 2>/dev/null; then
-    mode=overlay
-  else
-    printf '%s\n' 'pi-profile: overlay unavailable; using a temporary .pi copy.' >&2
-    mode=copy
-  fi
-fi
-
-if [[ "$mode" == overlay ]]; then
-  sandbox+=("${overlay[@]}")
-else
-  stage=$(mktemp -d)
-  trap 'rm -rf -- "$stage"' EXIT
-  trap 'exit 129' HUP
-  trap 'exit 130' INT
-  trap 'exit 143' TERM
-
-  # Avoid recursively copying our staging directory when TMPDIR is inside .pi.
-  case "$(cd -- "$stage" && pwd -P)/" in
-    "$(cd -- "$project_pi" && pwd -P)/"*)
-      printf '%s\n' 'pi-profile: set TMPDIR to a directory outside .pi for copy mode.' >&2
-      exit 1 ;;
-  esac
-
-  mkdir -- "$stage/.pi"
-  tar -C "$project_pi" --anchored --exclude=./npm --exclude=./git -cf - . |
-    tar -C "$stage/.pi" --no-same-owner -xf -
-  mkdir -- "$stage/.pi/npm" "$stage/.pi/git"
-  sandbox+=(--bind "$stage/.pi" "$project_pi")
-fi
-
-# Keep installed packages (and their lock) shared across both modes.
 mkdir -p -- "$project_pi/npm" "$project_pi/git"
-sandbox+=(--bind "$project_pi/npm" "$project_pi/npm"
-          --bind "$project_pi/git" "$project_pi/git"
-          --chdir "$root" -- bash -c '
+launch=(bash -c '
     set -e
     node --input-type=module - "$1" <<"JS"
 import { loadProfilesConfig } from "./.pi/extensions/profile/profile-config.ts";
@@ -100,7 +65,11 @@ if (error || !Object.hasOwn(config?.profiles ?? {}, name)) {
 }
 syncProfileResources(cwd, name, config.profiles[name]);
 JS
-    shift
+    run_mode=$2
+    shift 2
+    if [[ "$run_mode" == direct ]]; then
+      exec pi "$@"
+    fi
 
     # Hold a project-wide lock through package resolution, not the whole session.
     # Pi inherits FD 9 and the explicit extension hands off the lock on reload.
@@ -142,7 +111,64 @@ TS
     # Do not forward the selected name as --profile: that would take
     # precedence over later /profile changes on reload.
     exec pi --extension "$lock_extension" "$@"
-  ' bash "$profile" "$@")
+  ' bash)
+
+if [[ "$mode" == direct ]]; then
+  cd -- "$root"
+  # Unlike isolated modes, profile config itself is shared. Lock before syncing
+  # and keep the lock until Pi exits. Do not pass the lock FD to Pi.
+  printf '%s\n' 'pi-profile: direct mode modifies the project .pi in place.' >&2
+  exec 9>>"$project_pi/npm/.pi-profile.lock"
+  if ! flock -xn 9; then
+    printf '%s\n' 'pi-profile: project lock is unavailable; close the other launcher session and retry.' >&2
+    exit 75
+  fi
+  # The parent keeps the lock; Pi and its children do not inherit the FD.
+  "${launch[@]}" "$profile" direct "$@" 9>&-
+  exit
+fi
+
+sandbox=(bwrap --bind / / --dev-bind /dev /dev)
+overlay=(--overlay-src "$project_pi" --tmp-overlay "$project_pi")
+
+if [[ "$mode" == auto ]]; then
+  # Probe the actual mount, not just the flags: the host kernel can reject it.
+  # Never retry a failed profile sync or Pi session in a different mode.
+  if "${sandbox[@]}" "${overlay[@]}" -- /bin/true 2>/dev/null; then
+    mode=overlay
+  else
+    printf '%s\n' 'pi-profile: overlay unavailable; using a temporary .pi copy.' >&2
+    mode=copy
+  fi
+fi
+
+if [[ "$mode" == overlay ]]; then
+  sandbox+=("${overlay[@]}")
+else
+  stage=$(mktemp -d)
+  trap 'rm -rf -- "$stage"' EXIT
+  trap 'exit 129' HUP
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+
+  # Avoid recursively copying our staging directory when TMPDIR is inside .pi.
+  case "$(cd -- "$stage" && pwd -P)/" in
+    "$(cd -- "$project_pi" && pwd -P)/"*)
+      printf '%s\n' 'pi-profile: set TMPDIR to a directory outside .pi for copy mode.' >&2
+      exit 1 ;;
+  esac
+
+  mkdir -- "$stage/.pi"
+  tar -C "$project_pi" --anchored --exclude=./npm --exclude=./git -cf - . |
+    tar -C "$stage/.pi" --no-same-owner -xf -
+  mkdir -- "$stage/.pi/npm" "$stage/.pi/git"
+  sandbox+=(--bind "$stage/.pi" "$project_pi")
+fi
+
+# Keep installed packages (and their lock) shared across isolated modes.
+sandbox+=(--bind "$project_pi/npm" "$project_pi/npm"
+          --bind "$project_pi/git" "$project_pi/git"
+          --chdir "$root" -- "${launch[@]}" "$profile" "$mode" "$@")
 
 if [[ "$mode" == overlay ]]; then
   exec "${sandbox[@]}"

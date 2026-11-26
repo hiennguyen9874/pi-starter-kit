@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Run with bash tests/pi-profile.sh on Linux with bind-mount-capable Bubblewrap.
+# Pass --direct-only to run without Bubblewrap.
 set -euo pipefail
 
 launcher=$(cd -- "$(dirname -- "$0")/../bin" && pwd -P)/pi-profile
 export REAL_BWRAP
-REAL_BWRAP=$(command -v bwrap)
+if [[ "${1:-}" != --direct-only ]]; then
+  REAL_BWRAP=$(command -v bwrap)
+fi
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 export TMPDIR="$work/tmp" PATH="$work/bin:$PATH"
@@ -29,7 +32,13 @@ JS
 cat > "$work/bin/pi" <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
-[[ "$1" == --extension && -f "$2" && "$3" == --offline ]]
+if [[ "${PI_PROFILE_MODE:-}" == direct ]]; then
+  [[ "$#" == 1 && "$1" == --offline ]]
+  [[ ! -e /proc/self/fd/9 ]]
+  if flock -n .pi/npm/.pi-profile.lock true; then exit 99; fi
+else
+  [[ "$1" == --extension && -f "$2" && "$3" == --offline ]]
+fi
 [[ $(cat .pi/settings.json) == private && $(cat .pi/profiles/npm/kept) == nested ]]
 printf 'run\n' >> .pi/npm/runs
 printf 'run\n' >> .pi/git/runs
@@ -63,10 +72,30 @@ check_mode() {
   [[ -z $(ls -A "$TMPDIR") ]]
 }
 
-check_mode copy 42 copy
-check_mode auto 42 $'probe\ncopy'
-check_mode overlay 43 overlay
-PROBE_STATUS=0 check_mode auto 43 $'probe\noverlay'
-check_mode invalid 2 ''
-[[ $(cat .pi/npm/runs) == $'run\nrun' && $(cat .pi/git/runs) == $'run\nrun' ]]
+if [[ "${1:-}" != --direct-only ]]; then
+  check_mode copy 42 copy
+  check_mode auto 42 $'probe\ncopy'
+  check_mode overlay 43 overlay
+  PROBE_STATUS=0 check_mode auto 43 $'probe\noverlay'
+  check_mode invalid 2 ''
+  [[ $(cat .pi/npm/runs) == $'run\nrun' && $(cat .pi/git/runs) == $'run\nrun' ]]
+fi
+
+rm -f .pi/{npm,git}/runs
+: > "$BWRAP_LOG"
+status=0
+(
+  exec 8>>.pi/npm/.pi-profile.lock
+  flock -x 8
+  PI_PROFILE_MODE=direct "$launcher" test --offline
+) || status=$?
+[[ "$status" == 75 && $(cat .pi/settings.json) == original ]]
+status=0
+PI_PROFILE_MODE=direct "$launcher" missing --offline || status=$?
+[[ "$status" == 1 && $(cat .pi/settings.json) == original && ! -e .pi/npm/runs ]]
+status=0
+PI_PROFILE_MODE=direct "$launcher" test --offline || status=$?
+[[ "$status" == 42 && $(cat .pi/settings.json) == private ]]
+[[ ! -s "$BWRAP_LOG" && -z $(ls -A "$TMPDIR") ]]
+[[ $(cat .pi/npm/runs) == run && $(cat .pi/git/runs) == run ]]
 printf '%s\n' 'pi-profile mode tests passed'
