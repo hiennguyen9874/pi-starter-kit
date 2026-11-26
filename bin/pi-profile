@@ -171,6 +171,23 @@ else
       printf '%s\n' 'pi-profile: proot mode requires project and TMPDIR paths without colons.' >&2
       exit 1
     fi
+    # PRoot 5.1.0 (still shipped by Ubuntu/Debian APT) does not translate
+    # statx(), which Node uses, so files created in the copy look missing.
+    probe=$(mktemp -- "$stage_pi/.pi-profile-proot-probe.XXXXXX")
+    probe_status=0
+    proot -r / -b "$stage_pi:$project_pi!" node -e '
+      try { require("node:fs").statSync(process.argv[1]); } catch { process.exit(3); }
+    ' "$project_pi/${probe##*/}" || probe_status=$?
+    rm -f -- "$probe"
+    if [[ "$probe_status" == 3 ]]; then
+      printf '%s\n' 'pi-profile: this PRoot does not support statx, so Node cannot see new files in the .pi copy.' \
+        'PRoot 5.1.0 from Ubuntu/Debian APT is affected; install PRoot 5.3.0 or newer (see install.md),' \
+        'or use PI_PROFILE_MODE=auto, copy, or direct.' >&2
+      exit 1
+    elif [[ "$probe_status" != 0 ]]; then
+      printf 'pi-profile: PRoot check failed (exit %s); make sure PRoot can trace child processes.\n' "$probe_status" >&2
+      exit 1
+    fi
     proot -r / -w "$root" \
       -b "$stage_pi:$project_pi!" \
       -b "$project_pi/npm:$project_pi/npm!" \

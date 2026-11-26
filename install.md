@@ -26,31 +26,80 @@ Overlay mode needs both flags and a kernel/container configuration that permits 
 
 ### PRoot without container changes
 
-Install `proot` (for example, `sudo apt install proot` on Ubuntu or Debian) and make it available on `PATH`. This mode does not require user namespaces, but the environment must allow PRoot to trace its child processes with `ptrace`.
+This mode needs a PRoot that supports the `statx` system call, which Node uses. PRoot 5.1.0, the version in Ubuntu 24.04 and Debian APT repositories, does not support it: Pi cannot see files created in the `.pi` copy and fails with errors such as `ENOENT: no such file or directory, mkdir '.../.pi/.local'`. `pi-profile` checks this before launching and stops with an error. PRoot 5.3.0, 5.4.1, and 5.5.0 work; 5.2.0 and older do not.
 
-On Ubuntu or Debian, if you cannot install system packages but APT package downloads are available, you can extract PRoot and its library into your home directory instead:
+Each option below installs PRoot to `~/.local/bin/proot` and does not need root access. First check which architecture you have with `uname -m`.
+
+#### Option 1: x86-64 static binary (5.5.0)
 
 ```bash
 (
   set -e
-  dest="$HOME/.local/opt/pi-profile-proot"
   downloads=$(mktemp -d)
   trap 'rm -rf -- "$downloads"' EXIT
   cd "$downloads"
-  apt-get download proot libtalloc2
-  mkdir -p "$dest"
-  for package in ./*.deb; do dpkg-deb -x "$package" "$dest"; done
+  url=https://github.com/proot-me/proot/releases/download/v5.5.0
+  curl -fsSLO "$url/proot" -O "$url/SHA256SUMS"
+  grep ' proot$' SHA256SUMS | sha256sum -c -
+  install -D -m 0755 proot "$HOME/.local/bin/proot"
 )
 ```
 
-Then, in the shell where you launch Pi:
+#### Option 2: ARM static binary (5.3.0)
+
+The newest upstream release with ARM binaries is 5.3.0. It does not publish checksums; the SHA-256 values below were taken from the release assets when this guide was written.
 
 ```bash
-proot_dir="$HOME/.local/opt/pi-profile-proot"
-export PATH="$proot_dir/usr/bin:$PATH"
-export LD_LIBRARY_PATH="$proot_dir/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+(
+  set -e
+  case "$(uname -m)" in
+    aarch64|arm64) arch=aarch64 sum=fa10b1a7818c2f5b1dcb5834450570c368c9ecf66d31521509621b95c4538a45 ;;
+    armv7*|armv6*) arch=arm sum=bf186a37c7a19621e5bf3cfdf6bce54bfa2e220f91eb7196318e699ac174cc69 ;;
+    *) echo "No static PRoot 5.3.0 binary for $(uname -m); build from source." >&2; exit 1 ;;
+  esac
+  downloads=$(mktemp -d)
+  trap 'rm -rf -- "$downloads"' EXIT
+  cd "$downloads"
+  curl -fsSL -o proot "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-$arch-static"
+  echo "$sum  proot" | sha256sum -c -
+  install -D -m 0755 proot "$HOME/.local/bin/proot"
+)
+```
+
+#### Option 3: Build 5.5.0 from source (Ubuntu/Debian)
+
+Use this on any architecture. It needs `curl`, `gcc`, `make`, and `pkg-config`. It downloads the talloc development package with APT without installing it, then links talloc statically, so the resulting binary does not depend on `libtalloc2`.
+
+```bash
+(
+  set -e
+  build=$(mktemp -d)
+  trap 'rm -rf -- "$build"' EXIT
+  cd "$build"
+  apt-get download libtalloc-dev
+  dpkg-deb -x libtalloc-dev_*.deb talloc
+  pc=$(find "$PWD/talloc" -name talloc.pc)
+  libdir=${pc%/pkgconfig/talloc.pc}
+  rm -f -- "$libdir/libtalloc.so"  # make the linker use libtalloc.a
+  curl -fsSL https://github.com/proot-me/proot/archive/refs/tags/v5.5.0.tar.gz | tar -xz
+  PKG_CONFIG_PATH="$libdir/pkgconfig" PKG_CONFIG_SYSROOT_DIR="$PWD/talloc" \
+    make -C proot-5.5.0/src proot
+  install -D -m 0755 proot-5.5.0/src/proot "$HOME/.local/bin/proot"
+)
+```
+
+If you have root access, you can instead install `libtalloc-dev` (or `libtalloc-devel` on Fedora/RHEL) and run `make -C proot-5.5.0/src proot` directly.
+
+#### Check the installation
+
+```bash
+hash -r
+command -v proot  # should be ~/.local/bin/proot
+proot --version   # should report 5.3.0 or newer, not 5.1.0
 PI_PROFILE_MODE=proot pi-profile minimal/read-only
 ```
+
+Make sure `~/.local/bin` comes before `/usr/bin` on `PATH`, so this binary takes precedence over a system `proot`. This mode does not require user namespaces, but the environment must allow PRoot to trace its child processes with `ptrace`.
 
 ## Install Pi separately
 

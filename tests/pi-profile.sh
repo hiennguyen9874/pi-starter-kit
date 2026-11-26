@@ -38,6 +38,8 @@ if [[ "${PI_PROFILE_MODE:-}" == direct ]]; then
   if flock -n .pi/npm/.pi-profile.lock true; then exit 99; fi
 else
   [[ "$1" == --extension && -f "$2" && "$3" == --offline ]]
+  # Pi loads the extension with Node, which uses statx (unlike [[ -f ]]).
+  node -e 'require("node:fs").statSync(process.argv[1])' "$2"
 fi
 expected=${4:-private}
 [[ $(cat .pi/settings.json) == "$expected" && $(cat .pi/profiles/npm/kept) == nested ]]
@@ -98,6 +100,15 @@ fi
 if [[ "${1:-}" == --proot-only ]]; then
   export TEST_PROJECT="$PWD"
   : > "$BWRAP_LOG"
+  # Simulate PRoot 5.1.0, whose missing statx support the launcher detects.
+  mkdir "$work/old-proot"
+  printf '#!/bin/sh\nexit 3\n' > "$work/old-proot/proot"
+  chmod +x "$work/old-proot/proot"
+  status=0
+  PATH="$work/old-proot:$PATH" PI_PROFILE_MODE=proot "$launcher" test --offline 2> "$work/err" || status=$?
+  [[ "$status" == 1 ]] && grep -q statx "$work/err"
+  [[ $(cat .pi/settings.json) == original && ! -e .pi/.local && ! -e .pi/npm/runs ]]
+  [[ -z $(ls -A "$TMPDIR") ]]
   PI_PROFILE_MODE=proot "$launcher" test --offline private &
   first=$!
   PI_PROFILE_MODE=proot "$launcher" second --offline second &

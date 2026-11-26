@@ -107,5 +107,5 @@ case ":${PATH:-}:" in
     ;;
 esac
 if ! command -v bwrap >/dev/null; then
-  printf '%s\n' 'For auto, overlay, or copy mode, install Bubblewrap. Alternatively, use proot mode with PRoot, or direct mode to modify .pi in place.'
+  printf '%s\n' 'For auto, overlay, or copy mode, install Bubblewrap. Alternatively, use proot mode with PRoot 5.3.0+ (not the 5.1.0 in Ubuntu/Debian APT; see install.md), or direct mode to modify .pi in place.'
 fi
